@@ -20,7 +20,7 @@ route.put("/Allot-Theatre",auth,IsOrganizer,AllotTheatre)
 route.get("/All-Shows",auth,IsOrganizer,AllShows)
 route.get("/not-uploaded",auth,IsOrganizer,notUploadedShows)
 route.get("/verified-not-uploaded",auth,IsOrganizer,VerifiedButnotUploaded)
-
+// hello this is for the tesing 
 // notUploadedShows
 // DONE
 route.get("/Ticket-Details",auth,IsOrganizer,TicketDetails)
