@@ -1,0 +1,299 @@
+{
+  "projectCategories2025": [
+    "Feature Film",
+    "Short Film",
+    "Documentary",
+    "Docu-series",
+    "Web Series",
+    "TV Series",
+    "Music Video",
+    "Animated Feature",
+    "Animated Short",
+    "Virtual Reality (VR)",
+    "Augmented Reality (AR)",
+    "Mixed Reality (MR)",
+    "360° Video",
+    "Experimental Film",
+    "Commercial / Advertisement",
+    "Corporate Video",
+    "Event Coverage",
+    "Live Streaming Production",
+    "Social Media Content",
+    "Influencer / Creator Video",
+    "Podcast Video Production",
+    "Educational / E-Learning Video",
+    "Film Trailer / Teaser",
+    "Crowdfunding Video",
+    "Fashion Film",
+    "Sports Production",
+    "Gaming Content / Esports",
+    "Behind the Scenes (BTS)",
+    "Other"
+  ],
+  "categories": [
+    {
+      "category": "Video Editing",
+      "tools": [
+        "Adobe Premiere Pro",
+        "Final Cut Pro",
+        "DaVinci Resolve",
+        "Avid Media Composer",
+        "Vegas Pro",
+        "HitFilm Express",
+        "Lightworks",
+        "Filmora",
+        "iMovie",
+        "Kdenlive",
+        "Camtasia",
+        "Other"
+      ]
+    },
+    {
+      "category": "VFX & Motion Graphics",
+      "tools": [
+        "Adobe After Effects",
+        "Blender",
+        "Nuke",
+        "Fusion",
+        "Cinema 4D",
+        "Houdini",
+        "Autodesk Maya",
+        "3ds Max",
+        "Mocha Pro",
+        "Boujou",
+        "PFTrack",
+        "Other"
+      ]
+    },
+    {
+      "category": "Graphic Design",
+      "tools": [
+        "Adobe Photoshop",
+        "Adobe Illustrator",
+        "CorelDRAW",
+        "Affinity Designer",
+        "Inkscape",
+        "Sketch",
+        "Canva",
+        "Gravit Designer",
+        "Vectr",
+        "Other"
+      ]
+    },
+    {
+      "category": "3D Modeling & Animation",
+      "tools": [
+        "Blender",
+        "Autodesk Maya",
+        "Autodesk 3ds Max",
+        "Cinema 4D",
+        "ZBrush",
+        "Modo",
+        "Houdini",
+        "LightWave 3D",
+        "Clara.io",
+        "Other"
+      ]
+    },
+    {
+      "category": "Audio Editing & Sound Design",
+      "tools": [
+        "Adobe Audition",
+        "Avid Pro Tools",
+        "Audacity",
+        "FL Studio",
+        "Logic Pro X",
+        "Ableton Live",
+        "Cubase",
+        "GarageBand",
+        "Reaper",
+        "Sound Forge",
+        "Other"
+      ]
+    },
+    {
+      "category": "Color Grading",
+      "tools": [
+        "DaVinci Resolve",
+        "Adobe Premiere Lumetri",
+        "Final Cut Pro Color Board",
+        "FilmLight Baselight",
+        "Assimilate Scratch",
+        "Other"
+      ]
+    },
+    {
+      "category": "Scriptwriting & Pre-Production",
+      "tools": [
+        "Final Draft",
+        "Celtx",
+        "WriterDuet",
+        "Fade In",
+        "Trelby",
+        "Scrivener",
+        "StudioBinder",
+        "Milanote",
+        "Other"
+      ]
+    },
+    {
+      "category": "Storyboarding",
+      "tools": [
+        "Storyboarder",
+        "Toon Boom Storyboard Pro",
+        "Storyboard That",
+        "FrameForge",
+        "Boords",
+        "ShotPro",
+        "Other"
+      ]
+    },
+    {
+      "category": "Production Management",
+      "tools": [
+        "StudioBinder",
+        "Movie Magic Scheduling",
+        "Celtx Production",
+        "SetHero",
+        "Gorilla Scheduling",
+        "Yamdu",
+        "Other"
+      ]
+    },
+    {
+      "category": "Streaming & Encoding",
+      "tools": [
+        "OBS Studio",
+        "Wirecast",
+        "vMix",
+        "Streamlabs",
+        "XSplit",
+        "HandBrake",
+        "FFmpeg",
+        "Other"
+      ]
+    },
+    {
+      "category": "Visual Collaboration",
+      "tools": [
+        "Figma",
+        "Miro",
+        "Notion",
+        "Trello",
+        "Slack",
+        "Asana",
+        "ClickUp",
+        "Google Workspace",
+        "Microsoft Teams",
+        "Other"
+      ]
+    },
+    {
+      "category": "Distribution & Marketing Tools",
+      "tools": [
+        "FilmFreeway",
+        "Festhome",
+        "Reelhouse",
+        "Vimeo OTT",
+        "YouTube Studio",
+        "DistroKid",
+        "CD Baby",
+        "Aggregator Platforms",
+        "Other"
+      ]
+    },
+    {
+      "category": "Photography",
+      "tools": [
+        "Adobe Lightroom",
+        "Capture One",
+        "DxO PhotoLab",
+        "ON1 Photo RAW",
+        "Luminar",
+        "Darktable",
+        "GIMP",
+        "Other"
+      ]
+    }
+  ],
+    "tools": [
+    "Jibs",
+    "Cranes",
+    "Sliders",
+    "Dollies",
+    "C-stands",
+    "DJI Ronin",
+    "Steadicam",
+    "Props Kit",
+    "ARRI Alexa",
+    "Canon C300",
+    "Makeup Kit",
+    "Sony Venice",
+    "Fog Machine",
+    "Aputure 600d",
+    "Godox Lights",
+    "Clapperboard",
+    "Green Screen",
+    "ARRI SkyPanel",
+    "Tascam DR-70D",
+    "DJI Mavic Pro",
+    "Wardrobe Tools",
+    "Blackmagic URSA",
+    "Cooke S4 Lenses",
+    "Kino Flo Lights",
+    "SmallHD Monitor",
+    "Prosthetics Kit",
+    "Zoom H6 Recorder",
+    "Manfrotto Tripods",
+    "Sennheiser MKH416",
+    "DJI Inspire Drone",
+    "RED Digital Cinema",
+    "Freefly Alta Drone",
+    "Rode NTG Microphone",
+    "Atomos Ninja Monitor",
+    "Zeiss Master Prime Lenses"
+  ],
+    "software": [
+    "Nuke",
+    "Moho",
+    "Unity",
+    "Notch",
+    "Audacity",
+    "Celtx",
+    "EZTitles",
+    "Vegas Pro",
+    "FL Studio",
+    "TVPaint",
+    "Houdini",
+    "ShotPro",
+    "Fade In",
+    "3ds Max",
+    "Storyboarder",
+    "Dragonframe",
+    "Blender",
+    "ShotGrid",
+    "FrameForge",
+    "Disguise",
+    "Final Draft",
+    "Subtitle Edit",
+    "DaVinci Resolve",
+    "Logic Pro X",
+    "Unreal Engine",
+    "WriterDuet",
+    "Final Cut Pro",
+    "Avid Pro Tools",
+    "StudioBinder",
+    "Adobe After Effects",
+    "Adobe Premiere Pro",
+    "Avid Media Composer",
+    "FilmLight Baselight",
+    "Autodesk Flame",
+    "Autodesk Maya",
+    "Cinema 4D",
+    "Toon Boom Harmony",
+    "Movie Magic Scheduling",
+    "iZotope RX",
+    "Nuendo",
+    "DCP-o-matic"
+  ]
+}

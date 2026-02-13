@@ -1,0 +1,271 @@
+{
+  "genres": [
+    {
+      "index": 1,
+      "name": "Action",
+      "subgenres": [
+        { "index": 1, "name": "Adventure Action" },
+        { "index": 2, "name": "Martial Arts" },
+        { "index": 3, "name": "Superhero Action" },
+        { "index": 4, "name": "Disaster/Apocalyptic Action" },
+        { "index": 5, "name": "Spy/Secret Agent" },
+        { "index": 6, "name": "War Action" },
+        { "index": 7, "name": "Crime Action" }
+      ]
+    },
+    {
+      "index": 2,
+      "name": "Adventure",
+      "subgenres": [
+        { "index": 1, "name": "Fantasy Adventure" },
+        { "index": 2, "name": "Survival Adventure" },
+        { "index": 3, "name": "Historical Adventure" },
+        { "index": 4, "name": "Sci-Fi Adventure" },
+        { "index": 5, "name": "Jungle/Exploration Adventure" }
+      ]
+    },
+    {
+      "index": 3,
+      "name": "Comedy",
+      "subgenres": [
+        { "index": 1, "name": "Romantic Comedy" },
+        { "index": 2, "name": "Satirical/Parody" },
+        { "index": 3, "name": "Slapstick" },
+        { "index": 4, "name": "Black Comedy/Dark Humor" },
+        { "index": 5, "name": "Stand-Up/Improvisation" },
+        { "index": 6, "name": "Situational Comedy" }
+      ]
+    },
+    {
+      "index": 4,
+      "name": "Drama",
+      "subgenres": [
+        { "index": 1, "name": "Legal Drama" },
+        { "index": 2, "name": "Historical Drama" },
+        { "index": 3, "name": "Political Drama" },
+        { "index": 4, "name": "Romantic Drama" },
+        { "index": 5, "name": "Family Drama" },
+        { "index": 6, "name": "Tragedy" },
+        { "index": 7, "name": "Social/Issue-Based Drama" }
+      ]
+    },
+    {
+      "index": 5,
+      "name": "Thriller",
+      "subgenres": [
+        { "index": 1, "name": "Crime Thriller" },
+        { "index": 2, "name": "Psychological Thriller" },
+        { "index": 3, "name": "Action Thriller" },
+        { "index": 4, "name": "Spy Thriller" },
+        { "index": 5, "name": "Supernatural Thriller" },
+        { "index": 6, "name": "Legal Thriller" }
+      ]
+    },
+    {
+      "index": 6,
+      "name": "Horror",
+      "subgenres": [
+        { "index": 1, "name": "Supernatural" },
+        { "index": 2, "name": "Slasher" },
+        { "index": 3, "name": "Psychological Horror" },
+        { "index": 4, "name": "Zombie/Apocalypse Horror" },
+        { "index": 5, "name": "Monster Horror" },
+        { "index": 6, "name": "Found Footage" },
+        { "index": 7, "name": "Body Horror" }
+      ]
+    },
+    {
+      "index": 7,
+      "name": "Science Fiction",
+      "subgenres": [
+        { "index": 1, "name": "Dystopian Sci-Fi" },
+        { "index": 2, "name": "Space Exploration" },
+        { "index": 3, "name": "Alien Invasion" },
+        { "index": 4, "name": "Cyberpunk" },
+        { "index": 5, "name": "Time Travel" },
+        { "index": 6, "name": "Post-Apocalyptic Sci-Fi" }
+      ]
+    },
+    {
+      "index": 8,
+      "name": "Fantasy",
+      "subgenres": [
+        { "index": 1, "name": "Urban Fantasy" },
+        { "index": 2, "name": "Epic Fantasy" },
+        { "index": 3, "name": "Mythological Fantasy" },
+        { "index": 4, "name": "Dark Fantasy" },
+        { "index": 5, "name": "Magical Realism" }
+      ]
+    },
+    {
+      "index": 9,
+      "name": "Romance",
+      "subgenres": [
+        { "index": 1, "name": "Romantic Comedy" },
+        { "index": 2, "name": "Romantic Drama" },
+        { "index": 3, "name": "Tragic Romance" },
+        { "index": 4, "name": "Fantasy Romance" },
+        { "index": 5, "name": "Period Romance" }
+      ]
+    },
+    {
+      "index": 10,
+      "name": "Mystery",
+      "subgenres": [
+        { "index": 1, "name": "Detective/Investigation" },
+        { "index": 2, "name": "Whodunit" },
+        { "index": 3, "name": "Psychological Mystery" },
+        { "index": 4, "name": "Supernatural Mystery" },
+        { "index": 5, "name": "Tech/Modern Mystery" }
+      ]
+    },
+    {
+      "index": 11,
+      "name": "Crime",
+      "subgenres": [
+        { "index": 1, "name": "Heist/Robbery" },
+        { "index": 2, "name": "Mafia/Gangster" },
+        { "index": 3, "name": "Police Procedural" },
+        { "index": 4, "name": "Legal Crime" },
+        { "index": 5, "name": "Crime Thriller" }
+      ]
+    },
+    {
+      "index": 12,
+      "name": "Animation",
+      "subgenres": [
+        { "index": 1, "name": "Traditional Animation" },
+        { "index": 2, "name": "CGI Animation" },
+        { "index": 3, "name": "Stop-Motion Animation" },
+        { "index": 4, "name": "Anime" },
+        { "index": 5, "name": "Motion Capture" },
+        { "index": 6, "name": "Experimental Animation" }
+      ]
+    },
+    {
+      "index": 13,
+      "name": "Musical",
+      "subgenres": [
+        { "index": 1, "name": "Traditional Musicals" },
+        { "index": 2, "name": "Jukebox Musical" },
+        { "index": 3, "name": "Rock/Pop Musical" },
+        { "index": 4, "name": "Stage-to-Screen Adaptation" },
+        { "index": 5, "name": "Animated Musical" }
+      ]
+    },
+    {
+      "index": 14,
+      "name": "Historical",
+      "subgenres": [
+        { "index": 1, "name": "Biographical Drama" },
+        { "index": 2, "name": "War History" },
+        { "index": 3, "name": "Political History" },
+        { "index": 4, "name": "Social History" }
+      ]
+    },
+    {
+      "index": 15,
+      "name": "War",
+      "subgenres": [
+        { "index": 1, "name": "Epic War" },
+        { "index": 2, "name": "Anti-War" },
+        { "index": 3, "name": "Historical War" },
+        { "index": 4, "name": "Modern War" }
+      ]
+    },
+    {
+      "index": 16,
+      "name": "Western",
+      "subgenres": [
+        { "index": 1, "name": "Classic Western" },
+        { "index": 2, "name": "Revisionist Western" },
+        { "index": 3, "name": "Spaghetti Western" },
+        { "index": 4, "name": "Neo-Western" }
+      ]
+    },
+    {
+      "index": 17,
+      "name": "Family",
+      "subgenres": [
+        { "index": 1, "name": "Animated Family Movies" },
+        { "index": 2, "name": "Live-Action Family Movies" },
+        { "index": 3, "name": "Fantasy Family Movies" }
+      ]
+    },
+    {
+      "index": 18,
+      "name": "Sports",
+      "subgenres": [
+        { "index": 1, "name": "Biographical Sports" },
+        { "index": 2, "name": "Team Sports" },
+        { "index": 3, "name": "Individual Sports" },
+        { "index": 4, "name": "Extreme Sports" }
+      ]
+    },
+    {
+      "index": 19,
+      "name": "Superhero",
+      "subgenres": [
+        { "index": 1, "name": "Marvel Universe" },
+        { "index": 2, "name": "DC Universe" },
+        { "index": 3, "name": "Independent/Other Superheroes" }
+      ]
+    },
+    {
+      "index": 20,
+      "name": "Psychological",
+      "subgenres": [
+        { "index": 1, "name": "Psychological Horror" },
+        { "index": 2, "name": "Psychological Thriller" },
+        { "index": 3, "name": "Psychological Mystery" }
+      ]
+    },
+    {
+      "index": 21,
+      "name": "Noir",
+      "subgenres": [
+        { "index": 1, "name": "Classic Noir" },
+        { "index": 2, "name": "Neo-Noir" },
+        { "index": 3, "name": "Tech-Noir" }
+      ]
+    },
+    {
+      "index": 22,
+      "name": "Post-Apocalyptic",
+      "subgenres": [
+        { "index": 1, "name": "Zombie Apocalypse" },
+        { "index": 2, "name": "Natural Disaster" },
+        { "index": 3, "name": "Alien Invasion" },
+        { "index": 4, "name": "Totalitarian/Dystopian Future" }
+      ]
+    },
+    {
+      "index": 23,
+      "name": "Documentary",
+      "subgenres": [
+        { "index": 1, "name": "Nature/Environmental" },
+        { "index": 2, "name": "Historical" },
+        { "index": 3, "name": "Sports" },
+        { "index": 4, "name": "Biographical" },
+        { "index": 5, "name": "Investigative" }
+      ]
+    },
+    {
+      "index": 24,
+      "name": "Experimental",
+      "subgenres": [
+        { "index": 1, "name": "Abstract/Non-Narrative" },
+        { "index": 2, "name": "Surrealism" }
+      ]
+    },
+    {
+      "index": 25,
+      "name": "Coming-of-Age",
+      "subgenres": [
+        { "index": 1, "name": "Teenage Coming-of-Age" },
+        { "index": 2, "name": "Adventure Coming-of-Age" },
+        { "index": 3, "name": "Romantic Coming-of-Age" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "notableCredits": [
+    {
+      "projectName": "string",
+      "role": [
+        "Director",
+        "Assistant Director",
+        "Producer",
+        "Writer",
+        "Cinematographer",
+        "Editor",
+        "Sound Designer",
+        "Actor",
+        "VFX Artist",
+        "Other"
+      ],
+      "type": [
+  "Feature Film",
+  "Short Film",
+  "Documentary",
+  "Web Series",
+  "TV Series",
+  "Music Video",
+  "Commercial/Advertisement",
+  "Stage Play/Theatre",
+  "Animation",
+  "Experimental Film",
+  "Other"
+      ],
+      "platform": [
+        "Theatrical",
+        "Film Festival",
+        "YouTube",
+        "Netflix",
+        "Amazon Prime",
+        "Disney+ Hotstar",
+        "HBO Max",
+        "Apple TV+",
+        "Other OTT",
+        "Other"
+      ],
+      "releaseDate": "YYYY-MM-DD",
+      
+    
+      "linkedAwards": [
+        "Academy Award (Oscar)",
+        "Golden Globe",
+        "BAFTA",
+        "Cannes Film Festival",
+        "Berlin International Film Festival",
+        "Venice Film Festival",
+        "National Film Award (India)",
+        "Filmfare Award",
+        "Sundance Film Festival",
+        "Toronto International Film Festival",
+        "Other"
+      ],
+      "remarks": "string"
+    }
+  ],
+   "productionHouses": [
+    {
+      "category": "Major Studios - India",
+      "names": [
+        "Yash Raj Films",
+        "Dharma Productions",
+        "Red Chillies Entertainment",
+        "Balaji Motion Pictures",
+        "Reliance Entertainment",
+        "UTV Motion Pictures",
+        "T-Series Films",
+        "Viacom18 Motion Pictures",
+        "Excel Entertainment",
+        "Bhansali Productions",
+        "Pooja Entertainment"
+      ]
+    },
+    {
+      "category": "Independent/Medium - India",
+      "names": [
+        "Phantom Films",
+        "Sikhya Entertainment",
+        "RSVP Movies",
+        "Jar Pictures",
+        "Drishyam Films",
+        "Friday Filmworks",
+        "Clean Slate Filmz",
+        "Mani Ratnam’s Madras Talkies"
+      ]
+    },
+    {
+      "category": "Global Studios",
+      "names": [
+        "Warner Bros",
+        "Universal Pictures",
+        "Paramount Pictures",
+        "Sony Pictures",
+        "20th Century Studios",
+        "Walt Disney Studios",
+        "A24",
+        "Lionsgate",
+        "Legendary Pictures"
+      ]
+    },
+    {
+      "category": "Freelance/Other",
+      "names": [
+        "Independent Producer",
+        "Freelance Production",
+        "Self-Produced",
+        "Other"
+      ]
+    }
+  ]
+}

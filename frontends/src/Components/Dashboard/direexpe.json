@@ -1,0 +1,58 @@
+
+{
+  "_id": {
+    "$oid": "68385e387d005d4ede75671a"
+  },
+  "title": "newwupdatinggssss",
+  "tagline": "aassssssssddf",
+  "releasedate": "Fri, 20 Jun 2025",
+  "genre": {
+    "$oid": "68385c197d005d4ede7566e3"
+  },
+  "SUbGenre": [
+    {
+      "$oid": "68385c287d005d4ede7566e9"
+    }
+  ],
+  "language": [
+    {
+      "$oid": "68385db97d005d4ede75670b"
+    }
+  ],  
+  "TotalDuration": "4m 57s",
+  "Posterurl": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1748544013/movie_Project/kqeljkxmmdocohq02tfy.jpg",
+  "trailerurl": "https://res.cloudinary.com/dp6kj5f6i/video/upload/v1748544106/movie_Project/myx2gbyasxi829dwuvr6.mp4",
+  "showType": "Theatre",
+  "AllotedToTheNumberOfTheatres": [],
+  "createdAt": "Thu May 29 2025 13:16:35 GMT+0000 (Coordinated Universal Time)",
+  "uploaded": false,
+  "uploadingTime": "Thu, 29/05/2025 13:16:35",
+  "movieStatus": "Expired",
+  "VerifiedByTheAdmin": false,
+  "customeMessage": [],
+  "BannerLiked": 0,
+  "Comment": [],
+  "BannerDisLiked": 0,
+  "directorname": [
+    "faizan khan"
+  ],
+  "producername": [
+    "faizan khan11"
+  ],
+  "writersname": [
+    "faizan khan11111"
+  ],
+  "totalbudget": "3213213",
+  "hashtags": [
+    {
+      "$oid": "68385bbb7d005d4ede7566d6"
+    }
+  ],
+  "movieDuration": "01:32:12",
+  "ratingAndReviews": [],
+  "ticketspurchased": [],
+  "updatedAt": {
+    "$date": "2025-07-23T08:02:00.390Z"
+  },
+  "__v": 0
+}

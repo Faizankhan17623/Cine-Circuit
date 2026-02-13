@@ -1,0 +1,45 @@
+{
+  "professions": [
+    "Doctor",
+    "Nurse",
+    "Teacher",
+    "Engineer",
+    "Software Developer",
+    "Accountant",
+    "Lawyer",
+    "Manager",
+    "Sales Representative",
+    "Farmer",
+    "Other"
+  ],
+  "fundingSources": [
+    "Self-funded",
+    "Friends & Family",
+    "Private Investors",
+    "Production House Backing",
+    "Studio Financing",
+    "Co-Production Deal",
+    "OTT Pre-Sales (Netflix, Prime, etc.)",
+    "Theatrical Distributor Advance",
+    "TV / Music Rights Sale",
+    "Government Film Fund (NFDC, State Board)",
+    "International Grants",
+    "Film Festival / Market Funding",
+    "Corporate Sponsorship",
+    "Product Placement",
+    "Crowdfunding (Wishberry, Kickstarter)",
+    "Other"
+  ],
+   "unionsGuildsAffiliations": [
+    "Film Writers Association (FWA - India)",
+    "FWICE (Federation of Western India Cine Employees)",
+    "IMPPA (Indian Motion Picture Producers Association)",
+    "WGA (Writers Guild of America)",
+    "DGA (Directors Guild of America)",
+    "PGA (Producers Guild of America)",
+    "SAG-AFTRA (Screen Actors Guild - USA)",
+    "BAFTA (British Academy of Film and Television Arts)",
+    "Academy of Motion Picture Arts and Sciences (Oscars)",
+    "Other"
+  ]
+}

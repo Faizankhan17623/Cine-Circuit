@@ -1,0 +1,130 @@
+Personal  Information (All: Experienced/Fresher Directors and Producers) all fields required
+- Full Name (Text field, required)
+  Applicability: All
+- Email Address (Text field, required, validate email format)
+  Applicability: All
+- Phone Number (Text field, required, with country code dropdown)
+  Applicability: All
+- WhatsApp Number (Text field, optional, "Same as Phone" checkbox default checked)
+  Applicability: All
+- Address (Text area, required, for verification)
+  Applicability: All
+- Upload Photo (File upload, required, headshot or logo, max 5MB, PNG/JPG) can be like a checkbox use the same image as the profile image 
+  Applicability: All
+- Role (Dropdown: Director/Producer, required)
+  Applicability: All
+- Experience Level (Dropdown: Fresher/Experienced, required)
+  Applicability: All
+
+Section 1: Professional Background (Both Roles)
+- Website/Portfolio Link (Text field, optional, e.g., IMDB, YouTube for freshers)
+  Applicability: Both (Experienced/Fresher Directors and Producers)
+- Social Media Links (Text fields: Instagram, Facebook, LinkedIn, optional)
+  Applicability: Both can also make a drop down for that like one by one Instagram facebook linkedin can also add a filed like other and if he does not has any like no instag or face book or linkedin but one of the website profile is needed
+
+- Years of Experience (Dropdown: None, <1, 1-2, 3-5, 5-10, 10+, required)
+  Applicability: Both (Modified for freshers: "Any film-related experience?")
+- Total Completed Projects (Number field, optional, include amateur for freshers)
+  Applicability: Both
+- Notable Projects (Text area, optional, "Proud projects" for freshers)
+  Applicability: Both  can add a drop down for notable projects if yes then like a drop down can add like 5 projects not more thena that 
+- Short Bio (Text area, optional, max 250 characters)
+  Applicability: Both
+
+Section 2: Projects (Both Roles)
+
+- Ongoing Projects (Text area, optional, small projects for freshers) for the ongoing project can ask using a check box any ongoing projhefct if yes then a dop down that will have the project name writer name total estimated budget and completion and starting dat f that project can add atlreat 5 projects 
+  Applicability: Both
+- Projects Planned This Year (Text field, optional, ideas for freshers)
+  Applicability: Both a checkbox like yes or no in that  and also en extra filed like in writing process 
+- Preferred Genres (Multiple-choice: Drama, Comedy, Documentary, Action, Horror, Other, required)
+  Applicability: Both dropdown of all the genres can select 4 to 5 genres andc subgenres 
+- Budget Range (Dropdown: <$5K, $5K-$50K, $50K-$200K, >$200K, Unspecified, required)
+  Applicability: Both (Hypothetical for freshers)
+- Project Ready for Distribution (Yes/No radio, optional text area for details)
+  Applicability: Both (Shareable work for freshers) if yes then a drop down that will have l;ike project name total budget witerename starting and ending date 
+
+Section 3: Screening Types (Both Roles)
+- Preferred Screening Formats (Multiple-choice: Theatrical, Streaming, Festivals, Online, Local, Other, required)
+  Applicability: Both (Simple options for freshers, e.g., YouTube)
+- Handle Own Promotions (Yes/No radio, required)
+  Applicability: Both if yes then nohing if no then we will add an extra checkbox like woul;d you like the company to hoabdle yur promotionas in that also yes and no and like probabelley 
+
+- Target Audience Type (Multiple-choice: General, Youth, Niche, Industry, Other, required)
+  Applicability: Both
+
+Section 4: Support Needs (Both Roles)
+
+- Support Needed (Checkboxes: Sponsorship, Legal, Promotions, Distribution, None, multiple selections)
+  Applicability: Both (Tooltips for freshers, e.g., "Legal = copyrights")
+yes in that we can add lik legal or like promoions distrubations and if there are any other support that we can provide w can give you that also 
+
+Section 5: Motivation and Role-Specific
+- Main Reason for Joining (Text area, required, aspirational for freshers)
+  Applicability: Both
+- Certifications/Education (Text area, optional, e.g., film school, workshops)
+  Applicability: Both
+- Collaboration Experience (Text area, optional, what went well/improve)
+  Applicability: Both
+- Comfort with Diverse Teams/Feedback (Yes/No radio, required)
+  Applicability: Both
+- Resources Needed (Text area, optional, e.g., equipment, training)
+  Applicability: Both
+
+
+- Experienced Director:
+  - Awards/Festivals (Repeatable: Festival/Award, Year, Work Title, optional)
+    Applicability: Experienced Directors
+  - Software/Tools (Text field, optional, e.g., Final Cut Pro)
+    Applicability: Experienced Directors
+  - Recent Project Details (Text area, required, title, year, cast/crew size, budget)
+    Applicability: Experienced Directors
+  - Typical Team Size (Number field, optional)
+    Applicability: Experienced Directors
+  - Notable Credits (Repeatable: Title, Year, Role, optional)
+    Applicability: Experienced Directors
+  - Upload Project Materials (File upload, optional, e.g., stills)
+    Applicability: Experienced Directors
+
+- Experienced Producer:
+  - Production Resume (File upload or text area, required)
+    Applicability: Experienced Producers
+  - Funding Sources (Multiple-choice: Grants, Investors, Crowdfunding, Pre-sales, optional)
+    Applicability: Experienced Producers
+  - Unions/Guilds (Text field, optional, e.g., Producers Guild)
+    Applicability: Experienced Producers
+  - Number of Projects/Average Team Size (Number fields, required)
+    Applicability: Experienced Producers
+  - Risk Management Examples (Text area, required)
+    Applicability: Experienced Producers
+  - Upload Production Materials (File upload, optional)
+    Applicability: Experienced Producers
+
+- Fresher Director:
+  - Inspiration and Student Projects (Text area, required)
+    Applicability: Fresher Directors
+  - Challenges in Early Work (Text area, required)
+    Applicability: Fresher Directors
+  - Preparation for Directing (Text area, optional)
+    Applicability: Fresher Directors
+  - Influences and Low-Budget Application (Text area, optional)
+    Applicability: Fresher Directors
+  - Visualizing/Blocking a Scene (Text area or file upload, optional)
+    Applicability: Fresher Directors
+
+- Fresher Producer:
+  - Inspiration and Small-Scale Projects (Text area, required)
+    Applicability: Fresher Producers
+  - Budgeting/Scheduling Approach (Text area, required)
+    Applicability: Fresher Producers
+  - Internship/Crowdfunding Experience (Text area, optional)
+    Applicability: Fresher Producers
+  - Networking Plans (Text area, optional)
+    Applicability: Fresher Producers
+  - Handling Funding Delays (Text area, optional)
+    Applicability: Fresher Producers
+
+Section 6: Policy Agreement
+- Consent to Terms & Conditions (Checkbox, required)
+  Applicability: All
+-and like the terms and the conditions too 

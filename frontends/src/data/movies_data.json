@@ -1,0 +1,272 @@
+[
+    {
+        "index": 1,
+        "movie_name": "The Last Horizon",
+        "show_date": "08-08-25",
+        "show_time": "16:15",
+        "total_tickets_purchased": 6,
+        "progress": "Upcoming",
+        "price": 120
+    },
+    {
+        "index": 2,
+        "movie_name": "Echoes of Tomorrow",
+        "show_date": "09-08-25",
+        "show_time": "04:53",
+        "total_tickets_purchased": 3,
+        "progress": "Upcoming",
+        "price": 150
+    },
+    {
+        "index": 3,
+        "movie_name": "Starlight Odyssey",
+        "show_date": "14-08-25",
+        "show_time": "13:30",
+        "total_tickets_purchased": 5,
+        "progress": "Upcoming",
+        "price": 110
+    },
+    {
+        "index": 4,
+        "movie_name": "Crimson Dawn",
+        "show_date": "17-08-25",
+        "show_time": "18:45",
+        "total_tickets_purchased": 8,
+        "progress": "Upcoming",
+        "price": 140
+    },
+    {
+        "index": 5,
+        "movie_name": "The Silent Voyage",
+        "show_date": "20-08-25",
+        "show_time": "15:00",
+        "total_tickets_purchased": 2,
+        "progress": "Upcoming",
+        "price": 100
+    },
+    {
+        "index": 6,
+        "movie_name": "Quantum Heist",
+        "show_date": "23-08-25",
+        "show_time": "21:15",
+        "total_tickets_purchased": 4,
+        "progress": "Upcoming",
+        "price": 160
+    },
+    {
+        "index": 7,
+        "movie_name": "Shadows in Neon",
+        "show_date": "26-08-25",
+        "show_time": "19:30",
+        "total_tickets_purchased": 7,
+        "progress": "Upcoming",
+        "price": 130
+    },
+    {
+        "index": 8,
+        "movie_name": "Aurora Rising",
+        "show_date": "29-08-25",
+        "show_time": "14:00",
+        "total_tickets_purchased": 1,
+        "progress": "Upcoming",
+        "price": 90
+    },
+    {
+        "index": 9,
+        "movie_name": "Midnight Empire",
+        "show_date": "01-09-25",
+        "show_time": "12:15",
+        "total_tickets_purchased": 6,
+        "progress": "Upcoming",
+        "price": 125
+    },
+    {
+        "index": 10,
+        "movie_name": "The Lost Chronicle",
+        "show_date": "04-09-25",
+        "show_time": "17:45",
+        "total_tickets_purchased": 3,
+        "progress": "Upcoming",
+        "price": 145
+    },
+    {
+        "index": 11,
+        "movie_name": "Neon Skies",
+        "show_date": "05-06-25",
+        "show_time": "20:30",
+        "total_tickets_purchased": 4,
+        "progress": "Upcoming",
+        "price": 115
+    },
+    {
+        "index": 12,
+        "movie_name": "Frozen Shadows",
+        "show_date": "15-05-25",
+        "show_time": "18:20",
+        "total_tickets_purchased": 9,
+        "progress": "Upcoming",
+        "price": 135
+    },
+    {
+        "index": 13,
+        "movie_name": "Rise of Eternity",
+        "show_date": "27-04-25",
+        "show_time": "14:45",
+        "total_tickets_purchased": 2,
+        "progress": "Upcoming",
+        "price": 105
+    },
+    {
+        "index": 14,
+        "movie_name": "Whispers in the Dark",
+        "show_date": "10-07-25",
+        "show_time": "19:10",
+        "total_tickets_purchased": 5,
+        "progress": "Upcoming",
+        "price": 140
+    },
+    {
+        "index": 15,
+        "movie_name": "Solar Flare",
+        "show_date": "12-09-25",
+        "show_time": "21:00",
+        "total_tickets_purchased": 7,
+        "progress": "Upcoming",
+        "price": 155
+    },
+    {
+        "index": 16,
+        "movie_name": "City of Echoes",
+        "show_date": "03-03-25",
+        "show_time": "13:00",
+        "total_tickets_purchased": 3,
+        "progress": "Upcoming",
+        "price": 95
+    },
+    {
+        "index": 17,
+        "movie_name": "Dreamcatcher",
+        "show_date": "28-02-25",
+        "show_time": "11:15",
+        "total_tickets_purchased": 6,
+        "progress": "Upcoming",
+        "price": 125
+    },
+    {
+        "index": 18,
+        "movie_name": "Titan's Fall",
+        "show_date": "16-01-25",
+        "show_time": "20:45",
+        "total_tickets_purchased": 8,
+        "progress": "Upcoming",
+        "price": 170
+    },
+    {
+        "index": 19,
+        "movie_name": "Ocean's Breath",
+        "show_date": "07-10-25",
+        "show_time": "17:30",
+        "total_tickets_purchased": 4,
+        "progress": "Upcoming",
+        "price": 110
+    },
+    {
+        "index": 20,
+        "movie_name": "Starbound Legacy",
+        "show_date": "15-11-25",
+        "show_time": "19:45",
+        "total_tickets_purchased": 5,
+        "progress": "Upcoming",
+        "price": 150
+    },
+    {
+        "index": 21,
+        "movie_name": "Infinite Voyage",
+        "show_date": "02-12-25",
+        "show_time": "16:00",
+        "total_tickets_purchased": 9,
+        "progress": "Upcoming",
+        "price": 175
+    },
+    {
+        "index": 22,
+        "movie_name": "Shadow Realm",
+        "show_date": "21-01-25",
+        "show_time": "14:25",
+        "total_tickets_purchased": 2,
+        "progress": "Upcoming",
+        "price": 100
+    },
+    {
+        "index": 23,
+        "movie_name": "Phoenix Rising",
+        "show_date": "06-06-25",
+        "show_time": "22:00",
+        "total_tickets_purchased": 7,
+        "progress": "Upcoming",
+        "price": 145
+    },
+    {
+        "index": 24,
+        "movie_name": "Lunar Chronicles",
+        "show_date": "18-04-25",
+        "show_time": "12:40",
+        "total_tickets_purchased": 4,
+        "progress": "Upcoming",
+        "price": 115
+    },
+    {
+        "index": 25,
+        "movie_name": "The Forgotten City",
+        "show_date": "11-08-24",
+        "show_time": "09:30",
+        "total_tickets_purchased": 6,
+        "progress": "Upcoming",
+        "price": 130
+    },
+    {
+        "index": 26,
+        "movie_name": "Echo Rift",
+        "show_date": "23-09-24",
+        "show_time": "19:10",
+        "total_tickets_purchased": 3,
+        "progress": "Upcoming",
+        "price": 120
+    },
+    {
+        "index": 27,
+        "movie_name": "Veil of Storms",
+        "show_date": "29-10-24",
+        "show_time": "21:50",
+        "total_tickets_purchased": 8,
+        "progress": "Upcoming",
+        "price": 140
+    },
+    {
+        "index": 28,
+        "movie_name": "Pulse of the Void",
+        "show_date": "13-11-24",
+        "show_time": "20:05",
+        "total_tickets_purchased": 2,
+        "progress": "Upcoming",
+        "price": 100
+    },
+    {
+        "index": 29,
+        "movie_name": "Glass Horizons",
+        "show_date": "04-12-24",
+        "show_time": "18:25",
+        "total_tickets_purchased": 5,
+        "progress": "Upcoming",
+        "price": 135
+    },
+    {
+        "index": 30,
+        "movie_name": "Neptune's Call",
+        "show_date": "22-01-24",
+        "show_time": "15:35",
+        "total_tickets_purchased": 4,
+        "progress": "Upcoming",
+        "price": 115
+    }
+]

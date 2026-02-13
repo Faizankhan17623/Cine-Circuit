@@ -1,0 +1,27 @@
+[
+  {
+    "index": 1,
+    "name": "LinkedIn",
+    "icon": "FaLinkedin"
+  },
+  {
+    "index": 2,
+    "name": "YouTube",
+    "icon": "FaYoutube"
+  },
+  {
+    "index": 3,
+    "name": "Instagram",
+    "icon": "FaInstagram"
+  },
+  {
+    "index": 4,
+    "name": "IMDB",
+    "icon": "FaImdb"
+  },
+  {
+    "index": 5,
+    "name": "Twitter",
+    "icon": "FaXTwitter"
+  }
+]
