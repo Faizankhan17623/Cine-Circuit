@@ -1,0 +1,56 @@
+const mongoose = require('mongoose')
+const TheatreRequestSchmea = new mongoose.Schema({
+    email:{
+        type:String,
+        required:true,
+    },
+    username:{
+        type:String,
+        required:true
+    },
+    number:{
+        type:Number,
+        required:true
+    },
+    password:{
+        type:String,
+        required:true
+    },
+    confirmpassword:{
+        type:Number,
+        required:true
+    },
+    locationName:{
+        type:String,
+        required:true
+    },
+    locationurl:{
+        type:String,
+        required:true
+    },
+    Theatreimages:[{
+        type:String,
+        required:true
+    }],
+    typesofseatsAvailable:[{
+        type:String,
+        required:true
+    }],
+    CustomMessage:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Message'
+    }],
+    movieScreeningType:[{
+        type:String,
+        required:true
+    }],
+    parkingAvailable:{
+        type:Boolean,
+        required:true
+    },
+    languagesAvailable:[{
+        type:String,
+        required:true
+    }]
+})
+module.exports =  mongoose.model('TheatreRequests',TheatreRequestSchmea)

@@ -1,0 +1,1743 @@
+{
+	"info": {
+		"_postman_id": "0b94ea91-53c5-49d3-999c-b0a83bdb4e6e",
+		"name": "Movie Project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36635923"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Authorization",
+					"item": [
+						{
+							"name": "Create Account",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/Create-Account",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Create-Account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "otp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\":\"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Main_Base_Url}}/otp",
+									"host": [
+										"{{Main_Base_Url}}"
+									],
+									"path": [
+										"otp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "login ",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{Main_Base_Url}}/Welcome-Back",
+									"host": [
+										"{{Main_Base_Url}}"
+									],
+									"path": [
+										"Welcome-Back"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Message",
+					"item": [
+						{
+							"name": "Personal Message",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/Send-Message",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Send-Message"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Likes Dislike",
+					"item": [
+						{
+							"name": "Comment",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/Comment-Banner",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Comment-Banner"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Like Banner",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/Like-Banner",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Like-Banner"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Dislike ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/Dislike-Banner",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Dislike-Banner"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Reset Password",
+					"item": [
+						{
+							"name": "Link Send",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\":\"fk3701@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URLS}}/Send-Link",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Send-Link"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Forget Password",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/Change-Password",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Change-Password"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Update User  Data",
+					"item": [
+						{
+							"name": "Update-Username",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/Update-userName",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Update-userName"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update-Password",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/Update-Password",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Update-Password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update-Image",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/Update-Image",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Update-Image"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update-Number",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/Update-Number",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"Update-Number"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Rating And Review",
+					"item": [
+						{
+							"name": "Create Rating",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URLS}}/createRating",
+									"host": [
+										"{{BASE_URLS}}"
+									],
+									"path": [
+										"createRating"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "All Shows",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URLS}}/Shows",
+							"host": [
+								"{{BASE_URLS}}"
+							],
+							"path": [
+								"Shows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Specific Shows",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URLS}}/Specific-Show",
+							"host": [
+								"{{BASE_URLS}}"
+							],
+							"path": [
+								"Specific-Show"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orgainezer",
+			"item": [
+				{
+					"name": "Create Orgainezer",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_ORG_URL}}/CreateOrgainezer",
+							"host": [
+								"{{MAIN_ORG_URL}}"
+							],
+							"path": [
+								"CreateOrgainezer"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Orgainezer login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Shows",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_ORG_URL}}/Shows",
+							"host": [
+								"{{MAIN_ORG_URL}}"
+							],
+							"path": [
+								"Shows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ticket Allotment",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"TotalTicketsToAllot\":\"10\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{MAIN_ORG_URL}}/Allot-Theatre",
+							"host": [
+								"{{MAIN_ORG_URL}}"
+							],
+							"path": [
+								"Allot-Theatre"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Ticket",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_ORG_URL}}/Create-Ticket",
+							"host": [
+								"{{MAIN_ORG_URL}}"
+							],
+							"path": [
+								"Create-Ticket"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create Show",
+			"item": [
+				{
+					"name": "Tags",
+					"item": [
+						{
+							"name": "Create tags",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tagname\":\"dada\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Create-tags",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Create-tags"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Tags",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Update-tags",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Update-tags"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Tags",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Delete-tags",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Delete-tags"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Tags",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Get-Alltags",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Get-Alltags"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Cast",
+					"item": [
+						{
+							"name": "Create Cast",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Create-cast",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Create-cast"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Cast name",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Update-castName",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Update-castName"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Cast Image ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Update-castImage",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Update-castImage"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Cast ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Delete-cast",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Delete-cast"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Full Cast ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Get-WholeCast",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Get-WholeCast"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Create Show",
+					"item": [
+						{
+							"name": "Create Show",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Create-Show",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Create-Show"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Show Title",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Update-ShowTitle",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Update-ShowTitle"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update TagLine",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Update-TagLine",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Update-TagLine"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Title Image ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Update-TitleImage",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Update-TitleImage"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Title Trailer ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/Update-TitleTrailer",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"Update-TitleTrailer"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Show ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{MAIN_SHOW_URL}}/delete-show",
+									"host": [
+										"{{MAIN_SHOW_URL}}"
+									],
+									"path": [
+										"delete-show"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Upload Show",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_SHOW_URL}}/Upload?id=67cda28e1b336468c8dcd174",
+							"host": [
+								"{{MAIN_SHOW_URL}}"
+							],
+							"path": [
+								"Upload"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "67cda28e1b336468c8dcd174"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Languages",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_SHOW_URL}}/Get-AllLanguages",
+							"host": [
+								"{{MAIN_SHOW_URL}}"
+							],
+							"path": [
+								"Get-AllLanguages"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Orgaineser",
+					"item": [
+						{
+							"name": "verification orgainesers",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Org-Verification",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Org-Verification"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Orgs ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/delete-Org",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"delete-Org"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete All Orgs ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/delete-allOrg",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"delete-allOrg"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Orgainesers",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/All-Orgainesers",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"All-Orgainesers"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Genre",
+					"item": [
+						{
+							"name": "Create Genre",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Create-Genre",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Create-Genre"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Genre ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Update-Genre",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Update-Genre"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Genre ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/delete-Genre",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"delete-Genre"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove All Genre ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/remove-AllGenre",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"remove-AllGenre"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Everything genre and sub ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Get-All-Genre-and-Sub",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Get-All-Genre-and-Sub"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Sub Genre",
+					"item": [
+						{
+							"name": "Create Sub Genre ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Create-SubGenre",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Create-SubGenre"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Sub Gnere ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Update-SubGenre",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Update-SubGenre"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Sub Genre ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/delete-SubGenre",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"delete-SubGenre"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete All Genre Ans SUb ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/remove-All-SubGenre",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"remove-All-SubGenre"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Sub Genre ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Get-AllSubGenre",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Get-AllSubGenre"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Theatre",
+					"item": [
+						{
+							"name": "Theatre Request",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Theatre-Request",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Theatre-Request"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Theatres ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Get-AllTheatres",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Get-AllTheatres"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Theatre Form Data ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Theatre-FormData",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Theatre-FormData"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Show",
+					"item": [
+						{
+							"name": "Verify SHow ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Verify-Show",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Verify-Show"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Unverified Shows ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Unverified-Shows",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Unverified-Shows"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verified Shows",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Verified-Shows",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Verified-Shows"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All Shows ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/All-Shows",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"All-Shows"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Language",
+					"item": [
+						{
+							"name": "Create Language ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Create-Language",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Create-Language"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Language ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Update-Language",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Update-Language"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Lnguage ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/delete-Language",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"delete-Language"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All Languages",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/All-Languages",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"All-Languages"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete All Languages ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/delete-AllLanguage",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"delete-AllLanguage"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Single Language ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{ADMIN_URL}}/Single-Languages",
+									"host": [
+										"{{ADMIN_URL}}"
+									],
+									"path": [
+										"Single-Languages"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Theatrer",
+			"item": [
+				{
+					"name": "Theatre Creation ",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Testing5\",\r\n    \"email\":\"test5@gmail.com\",\r\n    \"password\":\"12345678\",\r\n    \"number\":\"9919495997\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{MAIN_THEAT_URL}}/Create-Theatre",
+							"host": [
+								"{{MAIN_THEAT_URL}}"
+							],
+							"path": [
+								"Create-Theatre"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Theatre Creationg Request ",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "TheareImages",
+									"type": "file",
+									"src": [
+										"postman-cloud:///1efd117c-0b3d-4a40-aee0-e2612aeb408b",
+										"postman-cloud:///1ef7bfdc-ca34-4850-9b75-b4f3c8e8a8d0"
+									]
+								},
+								{
+									"key": "email",
+									"value": "ASSADaFASDFASD@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "asdfasdfa",
+									"type": "text"
+								},
+								{
+									"key": "locationname",
+									"value": "Padmini bara",
+									"type": "text"
+								},
+								{
+									"key": "locationurl",
+									"value": "asdasdfasdfasdf",
+									"type": "text"
+								},
+								{
+									"key": "typesofseats",
+									"value": "mast wale hain ekdaam ",
+									"type": "text"
+								},
+								{
+									"key": "Screentypes",
+									"value": "padman ",
+									"type": "text"
+								},
+								{
+									"key": "languageAvailable",
+									"value": "padmini",
+									"type": "text"
+								},
+								{
+									"key": "parking",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{MAIN_THEAT_URL}}/Theatre-info",
+							"host": [
+								"{{MAIN_THEAT_URL}}"
+							],
+							"path": [
+								"Theatre-info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Theatres",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_THEAT_URL}}/All-Theatres",
+							"host": [
+								"{{MAIN_THEAT_URL}}"
+							],
+							"path": [
+								"All-Theatres"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Theatre Creation Request",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_THEAT_URL}}/Theatre-Creation-request",
+							"host": [
+								"{{MAIN_THEAT_URL}}"
+							],
+							"path": [
+								"Theatre-Creation-request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Distribute Tickets",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_THEAT_URL}}/Distribute-Tickets",
+							"host": [
+								"{{MAIN_THEAT_URL}}"
+							],
+							"path": [
+								"Distribute-Tickets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tickets Time",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_THEAT_URL}}/Update-TicketsTime",
+							"host": [
+								"{{MAIN_THEAT_URL}}"
+							],
+							"path": [
+								"Update-TicketsTime"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tickets Created",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_THEAT_URL}}/Tickets-Created",
+							"host": [
+								"{{MAIN_THEAT_URL}}"
+							],
+							"path": [
+								"Tickets-Created"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payment",
+			"item": [
+				{
+					"name": "MAKE A PAYMENT",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Categories\":[\"67e07919c7f51d96a5f36486\",\"67e07919c7f51d96a5f36487\",\"67e07919c7f51d96a5f36488\",\"67e07919c7f51d96a5f36489\",\"67e07919c7f51d96a5f3648a\"],\r\n    \"totalTickets\":[\"5\",\"2\",\"5\",\"5\",\"5\"],\r\n    \"time\":\"2:10\"\r\n}   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{MAIN_PAYMENT_URL}}/Payment?ShowId=67d985e94312d10f2118a067&Theatreid=67d4693f3c197f990a6909df&Ticketid=67e07919c7f51d96a5f36485",
+							"host": [
+								"{{MAIN_PAYMENT_URL}}"
+							],
+							"path": [
+								"Payment"
+							],
+							"query": [
+								{
+									"key": "ShowId",
+									"value": "67d985e94312d10f2118a067"
+								},
+								{
+									"key": "Theatreid",
+									"value": "67d4693f3c197f990a6909df"
+								},
+								{
+									"key": "Ticketid",
+									"value": "67e07919c7f51d96a5f36485"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Payment",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{MAIN_PAYMENT_URL}}/Payment?ShowId=67d985e94312d10f2118a067&Theatreid=67d4693f3c197f990a6909df&Ticketid=67e07919c7f51d96a5f36485",
+							"host": [
+								"{{MAIN_PAYMENT_URL}}"
+							],
+							"path": [
+								"Payment"
+							],
+							"query": [
+								{
+									"key": "ShowId",
+									"value": "67d985e94312d10f2118a067"
+								},
+								{
+									"key": "Theatreid",
+									"value": "67d4693f3c197f990a6909df"
+								},
+								{
+									"key": "Ticketid",
+									"value": "67e07919c7f51d96a5f36485"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_ORG",
+			"value": "http://localhost:4000/api/v1/Org/",
+			"type": "default"
+		},
+		{
+			"key": "MAIN_ORG_URL",
+			"value": "https://moviewebsite-mjuz.onrender.com/api/v1/Org",
+			"type": "default"
+		},
+		{
+			"key": "MAIN_SHOW_URL",
+			"value": "https://moviewebsite-mjuz.onrender.com/api/v1/Show",
+			"type": "default"
+		},
+		{
+			"key": "ADMIN_URL",
+			"value": "https://moviewebsite-mjuz.onrender.com/api/v1/Admin",
+			"type": "default"
+		}
+	]
+}

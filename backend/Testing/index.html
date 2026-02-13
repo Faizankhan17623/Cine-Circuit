@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Demo</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+
+<body>
+    <h2>Razorpay Payment Test</h2>
+    <button id="rzp-button1">Buy Now</button>
+    <button>Maro muje maro</button>
+    
+    <script>
+        document.getElementById('rzp-button1').addEventListener('click', async function () {
+            try {
+                // 1️⃣ Create Order from Backend
+                let orderRes = await fetch("http://localhost:4000/api/v1/Payment/Make-Payment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        ShowId: "67f63d70010a6e87121751f4",
+                        Theatreid: "67f657d4eddc932a952a88f2",
+                        Ticketid: "67f7957dc8d417cb8d50ac81",
+                        userId: "67f613950eda9a66a3a4924f",
+                        Categories: [
+                            "67f7957dc8d417cb8d50ac86",
+                            "67f7957dc8d417cb8d50ac85",
+                            "67f7957dc8d417cb8d50ac84",
+                            "67f7957dc8d417cb8d50ac83",
+                            "67f7957dc8d417cb8d50ac82"
+
+                        ],
+                        totalTickets: ["5", "4", "3", "2", "1"],
+                        time: "18:30"
+                    })
+                });
+
+                let orderData = await orderRes.json();
+                console.log("Order Data:", orderData);
+
+                if (!orderData.success) {
+                    alert("Error creating order");
+                    return;
+                }
+
+                // 2️⃣ Open Razorpay Checkout
+                let options = {
+                    "key": "rzp_test_9k1NsiGy7HDgky",
+                    "amount": orderData.order.amount,
+                    "currency": "INR",
+                    "name": "Test Payment",
+                    "description": "Razorpay Integration Test",
+                    "order_id": orderData.order.id,
+                    "handler": async function (response) {
+                        // console.log("Payment Response:", response);
+
+                        // 3️⃣ Verify Payment from Backend
+                        let verifyRes = await fetch("http://localhost:4000/api/v1/Payment/Verify-Payment", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                userId: "67f613950eda9a66a3a4924f",
+                                paymentId: orderData.data._id // Use the payment document ID from the order creation response
+                            })
+                        });
+
+                        let verifyData = await verifyRes.json();
+                        console.log("Verify Data:", verifyData);
+                        if (verifyData.success) {
+                            alert("Payment Verified Successfully!");
+                        } else {
+                            alert("Payment Verification Failed!");
+                        }
+                    },
+                    "theme": { "color": "#3399cc" }
+                };
+
+                let rzp = new Razorpay(options);
+                console.log("This is the razorpay",rzp)
+                rzp.open();
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Something went wrong!");
+            }
+        });
+    </script>
+    
+</body>
+
+</html>
