@@ -1,742 +1,174 @@
-// [
-//   {
-//     "_id": { "$oid": "66c000000000000000000001" },
-//     "id": { "$oid": "66b000000000000000000001" },
-//     "username": "Rajesh Kumar",
-//     "email": "rajesh.kumar@gmail.com",
-//     "CountryCode": "+91",
-//     "number": "9876543210",
-//     "Country": "India",
-//     "state": "Maharashtra",
-//     "City": "Mumbai",
-//     "sameforlocalandpermanent": false,
-//     "localaddress": "12, Film City Road, Goregaon East, Mumbai 400065",
-//     "permanentaddress": "45, Shivaji Nagar, Pune 411005",
-//     "gender": "Male",
-//     "image": "https://ui-avatars.com/api/?name=Rajesh+Kumar&background=random",
-//     "website": "https://rajeshkumarfilms.com",
-//     "totalprojects": 8,
-//     "yearsexperience": "12",
-//     "Shortbio": "Award-winning director with over a decade of experience in Indian cinema specializing in drama and social commentary films. Have worked with major production houses across Mumbai.",
-//     "NotableProjects": {
-//       "needed": "Yes",
-//       "items": [
-//         { "Name": "Rang De Basanti Returns", "Budget": "₹50 Lakhs – ₹1 Crore", "Role": "Director", "link": "https://rajeshkumarfilms.com/rang", "_id": { "$oid": "66d000000000000000010001" } },
-//         { "Name": "Mumbai Diaries", "Budget": "₹25 Lakhs – ₹50 Lakhs", "Role": "Director", "link": "https://rajeshkumarfilms.com/mumbai", "_id": { "$oid": "66d000000000000000010002" } }
-//       ]
-//     },
-//     "SocialMedia": {
-//       "active": "Yes",
-//       "profiles": [
-//         { "Platform": "LinkedIn", "followers": "12500", "link": "https://www.linkedin.com/in/rajeshkumar", "_id": { "$oid": "66d000000000000000010003" } },
-//         { "Platform": "YouTube", "followers": "85000", "link": "https://www.youtube.com/@rajeshkumarfilms", "_id": { "$oid": "66d000000000000000010004" } },
-//         { "Platform": "Instagram", "followers": "120000", "link": "https://www.instagram.com/rajeshkumarfilms", "_id": { "$oid": "66d000000000000000010005" } }
-//       ]
-//     },
-//     "ongoing": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Sapne Apne Apne", "Script": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875191/movie_Project/rmbqmkzirhc84bv98mlu.pdf", "StartDate": "2026-01", "EndDate": "2026-06", "Released": "No", "_id": { "$oid": "66d000000000000000010006" } }
-//       ]
-//     },
-//     "planned": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Dharavi Rising", "ProjectType": "", "ProjectStatus": "Pre-Production", "StartDate": "2026-03", "EndDate": "2026-10", "Released": "false", "_id": { "$oid": "66d000000000000000010007" } }
-//       ]
-//     },
-//     "Genre": ["Drama", "Thriller"],
-//     "SubGenre": ["Social Drama", "Crime Thriller"],
-//     "Screening": ["Film Festival", "Theatrical"],
-//     "Audience": ["Adult", "Young Adult"],
-//     "Distribution": {
-//       "needed": "Yes",
-//       "projects": [
-//         { "ProjectName": "Sapne Apne Apne", "Budget": "₹50 Lakhs – ₹1 Crore", "Role": "Director", "ReleaseDate": "2026-07", "_id": { "$oid": "66d000000000000000010008" } }
-//       ]
-//     },
-//     "Promotions": "Yes",
-//     "Support": { "needed": "Yes", "type": "Distribution Support" },
-//     "MainReason": "Looking to expand distribution network for upcoming projects across India and international markets.",
-//     "Certifications": {
-//       "active": "Yes",
-//       "items": [
-//         { "Name": "FTII Film Direction Diploma", "Certificate": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875193/movie_Project/trmkt1mhnrrwimqpx1il.pdf", "Date": "2015-06", "_id": { "$oid": "66d000000000000000010009" } }
-//       ]
-//     },
-//     "Collaboration": "No",
-//     "Comfortable": "No",
-//     "Role": "Director",
-//     "ExperienceLevel": "Experienced",
-//     "status": "pending",
-//     "attempts": 0,
-//     "editUntil": null,
-//     "lockedUntill": null,
-//     "createdAt": { "$date": "2026-01-05T05:00:00.000Z" },
-//     "updatedAt": { "$date": "2026-01-05T05:00:00.000Z" },
-//     "__v": 0
-//   },
-//   {
-//     "_id": { "$oid": "66c000000000000000000002" },
-//     "id": { "$oid": "66b000000000000000000002" },
-//     "username": "Priya Sharma",
-//     "email": "priya.sharma@gmail.com",
-//     "CountryCode": "+91",
-//     "number": "9123456789",
-//     "Country": "India",
-//     "state": "Karnataka",
-//     "City": "Bengaluru",
-//     "sameforlocalandpermanent": true,
-//     "localaddress": "45, Indiranagar 1st Stage, Bengaluru 560038",
-//     "permanentaddress": "45, Indiranagar 1st Stage, Bengaluru 560038",
-//     "gender": "Female",
-//     "image": "https://ui-avatars.com/api/?name=Priya+Sharma&background=random",
-//     "website": "https://priyasharmaproductions.in",
-//     "totalprojects": 5,
-//     "yearsexperience": "0",
-//     "Shortbio": "Aspiring independent producer focused on women-centric narratives in Kannada and Hindi cinema. Fresh out of Whistling Woods film school.",
-//     "NotableProjects": {
-//       "needed": "Yes",
-//       "items": [
-//         { "Name": "Akka (Short Film)", "Budget": "₹1 Lakh – ₹5 Lakhs", "Role": "Producer", "link": "https://priyasharmaproductions.in/akka", "_id": { "$oid": "66d000000000000000020001" } },
-//         { "Name": "Namma Ooru", "Budget": "₹5 Lakhs – ₹10 Lakhs", "Role": "Producer", "link": "https://priyasharmaproductions.in/namma", "_id": { "$oid": "66d000000000000000020002" } }
-//       ]
-//     },
-//     "SocialMedia": {
-//       "active": "Yes",
-//       "profiles": [
-//         { "Platform": "Instagram", "followers": "67000", "link": "https://www.instagram.com/priyasharmaproductions", "_id": { "$oid": "66d000000000000000020003" } },
-//         { "Platform": "YouTube", "followers": "34000", "link": "https://www.youtube.com/@priyasharmafilms", "_id": { "$oid": "66d000000000000000020004" } }
-//       ]
-//     },
-//     "ongoing": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Bengaluru Nights", "Script": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875191/movie_Project/rmbqmkzirhc84bv98mlu.pdf", "StartDate": "2026-02", "EndDate": "2026-08", "Released": "No", "_id": { "$oid": "66d000000000000000020005" } }
-//       ]
-//     },
-//     "planned": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Stree Ka Safar", "ProjectType": "", "ProjectStatus": "Pre-Production", "StartDate": "2026-05", "EndDate": "2026-12", "Released": "false", "_id": { "$oid": "66d000000000000000020006" } }
-//       ]
-//     },
-//     "Genre": ["Thriller"],
-//     "SubGenre": ["Psychological Thriller"],
-//     "Screening": ["OTT Platform"],
-//     "Audience": ["Young Adult"],
-//     "Distribution": {
-//       "needed": "Yes",
-//       "projects": [
-//         { "ProjectName": "Bengaluru Nights", "Budget": "₹25 Lakhs – ₹50 Lakhs", "Role": "Producer", "ReleaseDate": "2026-09", "_id": { "$oid": "66d000000000000000020007" } }
-//       ]
-//     },
-//     "Promotions": "Yes",
-//     "Support": { "needed": "Yes", "type": "Marketing Support" },
-//     "MainReason": "Seeking OTT platform partnerships for regional content distribution.",
-//     "Certifications": {
-//       "active": "Yes",
-//       "items": [
-//         { "Name": "PG Diploma in Film Production - Whistling Woods", "Certificate": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875193/movie_Project/trmkt1mhnrrwimqpx1il.pdf", "Date": "2025-05", "_id": { "$oid": "66d000000000000000020008" } }
-//       ]
-//     },
-//     "Collaboration": "Yes",
-//     "Comfortable": "Yes",
-//     "Role": "Producer",
-//     "ExperienceLevel": "Fresher",
-//     "status": "pending",
-//     "attempts": 0,
-//     "editUntil": null,
-//     "lockedUntill": null,
-//     "createdAt": { "$date": "2026-01-06T05:45:00.000Z" },
-//     "updatedAt": { "$date": "2026-01-06T05:45:00.000Z" },
-//     "__v": 0
-//   },
-//   {
-//     "_id": { "$oid": "66c000000000000000000003" },
-//     "id": { "$oid": "66b000000000000000000003" },
-//     "username": "Arjun Nair",
-//     "email": "arjun.nair@gmail.com",
-//     "CountryCode": "+91",
-//     "number": "9988776655",
-//     "Country": "India",
-//     "state": "Kerala",
-//     "City": "Kochi",
-//     "sameforlocalandpermanent": true,
-//     "localaddress": "78, Marine Drive, Ernakulam, Kochi 682031",
-//     "permanentaddress": "78, Marine Drive, Ernakulam, Kochi 682031",
-//     "gender": "Male",
-//     "image": "https://ui-avatars.com/api/?name=Arjun+Nair&background=random",
-//     "website": "https://arjunnairfilms.com",
-//     "totalprojects": 1,
-//     "yearsexperience": "0",
-//     "Shortbio": "Fresh graduate from NFDC film school passionate about Malayalam slice-of-life stories and art-house cinema.",
-//     "NotableProjects": {
-//       "needed": "Yes",
-//       "items": [
-//         { "Name": "Malabar Express (Short Film)", "Budget": "₹1 Lakh – ₹5 Lakhs", "Role": "Director", "link": "https://arjunnairfilms.com/malabar", "_id": { "$oid": "66d000000000000000030001" } }
-//       ]
-//     },
-//     "SocialMedia": {
-//       "active": "Yes",
-//       "profiles": [
-//         { "Platform": "Instagram", "followers": "28000", "link": "https://www.instagram.com/arjunnairfilms", "_id": { "$oid": "66d000000000000000030002" } },
-//         { "Platform": "YouTube", "followers": "12000", "link": "https://www.youtube.com/@arjunnairfilms", "_id": { "$oid": "66d000000000000000030003" } }
-//       ]
-//     },
-//     "ongoing": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Theeram", "Script": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875191/movie_Project/rmbqmkzirhc84bv98mlu.pdf", "StartDate": "2026-01", "EndDate": "2026-05", "Released": "No", "_id": { "$oid": "66d000000000000000030004" } }
-//       ]
-//     },
-//     "planned": {
-//       "active": "No",
-//       "items": []
-//     },
-//     "Genre": ["Comedy"],
-//     "SubGenre": ["Slice of Life"],
-//     "Screening": ["Theatrical"],
-//     "Audience": ["Family"],
-//     "Distribution": {
-//       "needed": "No",
-//       "projects": []
-//     },
-//     "Promotions": "No",
-//     "Support": { "needed": "Yes", "type": "Script Development Support" },
-//     "MainReason": "Looking for collaboration opportunities with experienced directors for debut feature film.",
-//     "Certifications": {
-//       "active": "Yes",
-//       "items": [
-//         { "Name": "Screenwriting Workshop - NFDC", "Certificate": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875193/movie_Project/trmkt1mhnrrwimqpx1il.pdf", "Date": "2025-08", "_id": { "$oid": "66d000000000000000030005" } }
-//       ]
-//     },
-//     "Collaboration": "Yes",
-//     "Comfortable": "Yes",
-//     "Role": "Director",
-//     "ExperienceLevel": "Fresher",
-//     "status": "pending",
-//     "attempts": 0,
-//     "editUntil": null,
-//     "lockedUntill": null,
-//     "createdAt": { "$date": "2026-01-07T04:15:00.000Z" },
-//     "updatedAt": { "$date": "2026-01-07T04:15:00.000Z" },
-//     "__v": 0
-//   },
-//   {
-//     "_id": { "$oid": "66c000000000000000000004" },
-//     "id": { "$oid": "66b000000000000000000004" },
-//     "username": "Deepika Reddy",
-//     "email": "deepika.reddy@gmail.com",
-//     "CountryCode": "+91",
-//     "number": "9012345678",
-//     "Country": "India",
-//     "state": "Telangana",
-//     "City": "Hyderabad",
-//     "sameforlocalandpermanent": true,
-//     "localaddress": "23, Jubilee Hills Road No. 36, Hyderabad 500033",
-//     "permanentaddress": "23, Jubilee Hills Road No. 36, Hyderabad 500033",
-//     "gender": "Female",
-//     "image": "https://ui-avatars.com/api/?name=Deepika+Reddy&background=random",
-//     "website": "https://deepikareddy.in",
-//     "totalprojects": 12,
-//     "yearsexperience": "15",
-//     "Shortbio": "Veteran producer in Telugu and Hindi cinema with a strong track record of commercially successful films spanning across multiple genres.",
-//     "NotableProjects": {
-//       "needed": "Yes",
-//       "items": [
-//         { "Name": "Charminar Tales", "Budget": "₹50 Lakhs – ₹1 Crore", "Role": "Producer", "link": "https://deepikareddy.in/charminar", "_id": { "$oid": "66d000000000000000040001" } },
-//         { "Name": "Hyderabad Blues 2", "Budget": "₹25 Lakhs – ₹50 Lakhs", "Role": "Producer", "link": "https://deepikareddy.in/hblues", "_id": { "$oid": "66d000000000000000040002" } },
-//         { "Name": "Golconda Nights", "Budget": "₹1 Crore – ₹5 Crores", "Role": "Producer", "link": "https://deepikareddy.in/golconda", "_id": { "$oid": "66d000000000000000040003" } }
-//       ]
-//     },
-//     "SocialMedia": {
-//       "active": "Yes",
-//       "profiles": [
-//         { "Platform": "LinkedIn", "followers": "5600", "link": "https://www.linkedin.com/in/deepikareddy", "_id": { "$oid": "66d000000000000000040004" } },
-//         { "Platform": "Instagram", "followers": "540000", "link": "https://www.instagram.com/deepikareddyofficial", "_id": { "$oid": "66d000000000000000040005" } }
-//       ]
-//     },
-//     "ongoing": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Queen of Deccan", "Script": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875191/movie_Project/rmbqmkzirhc84bv98mlu.pdf", "StartDate": "2026-01", "EndDate": "2026-07", "Released": "No", "_id": { "$oid": "66d000000000000000040006" } }
-//       ]
-//     },
-//     "planned": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Deccan Warriors", "ProjectType": "", "ProjectStatus": "Pre-Production", "StartDate": "2026-06", "EndDate": "2027-01", "Released": "false", "_id": { "$oid": "66d000000000000000040007" } }
-//       ]
-//     },
-//     "Genre": ["Action", "Drama"],
-//     "SubGenre": ["Action Drama", "Historical Drama"],
-//     "Screening": ["Theatrical", "OTT Platform"],
-//     "Audience": ["Adult"],
-//     "Distribution": {
-//       "needed": "Yes",
-//       "projects": [
-//         { "ProjectName": "Queen of Deccan", "Budget": "₹1 Crore – ₹5 Crores", "Role": "Producer", "ReleaseDate": "2026-08", "_id": { "$oid": "66d000000000000000040008" } }
-//       ]
-//     },
-//     "Promotions": "Yes",
-//     "Support": { "needed": "Yes", "type": "Distribution Support" },
-//     "MainReason": "Expanding presence in pan-India cinema and looking for theatrical distribution partners.",
-//     "Certifications": {
-//       "active": "No",
-//       "items": []
-//     },
-//     "Collaboration": "Yes",
-//     "Comfortable": "Yes",
-//     "Role": "Producer",
-//     "ExperienceLevel": "Experienced",
-//     "status": "pending",
-//     "attempts": 0,
-//     "editUntil": null,
-//     "lockedUntill": null,
-//     "createdAt": { "$date": "2026-01-08T08:50:00.000Z" },
-//     "updatedAt": { "$date": "2026-01-08T08:50:00.000Z" },
-//     "__v": 0
-//   },
-//   {
-//     "_id": { "$oid": "66c000000000000000000005" },
-//     "id": { "$oid": "66b000000000000000000005" },
-//     "username": "Vikram Singh",
-//     "email": "vikram.singh@gmail.com",
-//     "CountryCode": "+91",
-//     "number": "9556677889",
-//     "Country": "India",
-//     "state": "Punjab",
-//     "City": "Chandigarh",
-//     "sameforlocalandpermanent": true,
-//     "localaddress": "Sector 17, House No. 234, Chandigarh 160017",
-//     "permanentaddress": "Sector 17, House No. 234, Chandigarh 160017",
-//     "gender": "Male",
-//     "image": "https://ui-avatars.com/api/?name=Vikram+Singh&background=random",
-//     "website": "https://vikramsinghcinema.com",
-//     "totalprojects": 6,
-//     "yearsexperience": "8",
-//     "Shortbio": "Experienced director known for gritty Punjabi action dramas with strong social messages. Previously worked at Yash Raj Films as assistant director.",
-//     "NotableProjects": {
-//       "needed": "Yes",
-//       "items": [
-//         { "Name": "Punjab da Puttar", "Budget": "₹25 Lakhs – ₹50 Lakhs", "Role": "Director", "link": "https://vikramsinghcinema.com/punjab", "_id": { "$oid": "66d000000000000000050001" } },
-//         { "Name": "Golden Fields", "Budget": "₹10 Lakhs – ₹25 Lakhs", "Role": "Director", "link": "https://vikramsinghcinema.com/golden", "_id": { "$oid": "66d000000000000000050002" } }
-//       ]
-//     },
-//     "SocialMedia": {
-//       "active": "Yes",
-//       "profiles": [
-//         { "Platform": "YouTube", "followers": "56000", "link": "https://www.youtube.com/@vikramsinghcinema", "_id": { "$oid": "66d000000000000000050003" } },
-//         { "Platform": "Instagram", "followers": "150000", "link": "https://www.instagram.com/vikramsinghcinema", "_id": { "$oid": "66d000000000000000050004" } }
-//       ]
-//     },
-//     "ongoing": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Wheat and Dust", "Script": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875191/movie_Project/rmbqmkzirhc84bv98mlu.pdf", "StartDate": "2026-02", "EndDate": "2026-06", "Released": "No", "_id": { "$oid": "66d000000000000000050005" } }
-//       ]
-//     },
-//     "planned": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Border Lights", "ProjectType": "", "ProjectStatus": "Scripting", "StartDate": "2026-07", "EndDate": "2026-11", "Released": "false", "_id": { "$oid": "66d000000000000000050006" } }
-//       ]
-//     },
-//     "Genre": ["Action", "Romance"],
-//     "SubGenre": ["Action Thriller", "Musical Romance"],
-//     "Screening": ["Theatrical", "Film Festival"],
-//     "Audience": ["Young Adult", "Adult"],
-//     "Distribution": {
-//       "needed": "Yes",
-//       "projects": [
-//         { "ProjectName": "Wheat and Dust", "Budget": "₹10 Lakhs – ₹25 Lakhs", "Role": "Director", "ReleaseDate": "2026-07", "_id": { "$oid": "66d000000000000000050007" } }
-//       ]
-//     },
-//     "Promotions": "Yes",
-//     "Support": { "needed": "No", "type": null },
-//     "MainReason": "Want to expand from Punjabi cinema into pan-India Hindi market with upcoming projects.",
-//     "Certifications": {
-//       "active": "Yes",
-//       "items": [
-//         { "Name": "Advanced Direction Course - SRFTI", "Certificate": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875193/movie_Project/trmkt1mhnrrwimqpx1il.pdf", "Date": "2018-12", "_id": { "$oid": "66d000000000000000050008" } }
-//       ]
-//     },
-//     "Collaboration": "Yes",
-//     "Comfortable": "No",
-//     "Role": "Director",
-//     "ExperienceLevel": "Experienced",
-//     "status": "pending",
-//     "attempts": 0,
-//     "editUntil": null,
-//     "lockedUntill": null,
-//     "createdAt": { "$date": "2026-01-09T10:30:00.000Z" },
-//     "updatedAt": { "$date": "2026-01-09T10:30:00.000Z" },
-//     "__v": 0
-//   },
-//   {
-//     "_id": { "$oid": "66c000000000000000000006" },
-//     "id": { "$oid": "66b000000000000000000006" },
-//     "username": "Ananya Banerjee",
-//     "email": "ananya.banerjee@gmail.com",
-//     "CountryCode": "+91",
-//     "number": "9334455667",
-//     "Country": "India",
-//     "state": "West Bengal",
-//     "City": "Kolkata",
-//     "sameforlocalandpermanent": true,
-//     "localaddress": "14, Lake Gardens, Kolkata 700045",
-//     "permanentaddress": "14, Lake Gardens, Kolkata 700045",
-//     "gender": "Female",
-//     "image": "https://ui-avatars.com/api/?name=Ananya+Banerjee&background=random",
-//     "website": "",
-//     "totalprojects": 2,
-//     "yearsexperience": "0",
-//     "Shortbio": "Recent SRFTI graduate with passion for producing Bengali art-house cinema. Won Best Short Film at Kolkata International Film Festival 2025.",
-//     "NotableProjects": {
-//       "needed": "Yes",
-//       "items": [
-//         { "Name": "Kolkata Rhapsody (Short)", "Budget": "₹1 Lakh – ₹5 Lakhs", "Role": "Producer", "link": "https://vimeo.com/ananyabanerjee", "_id": { "$oid": "66d000000000000000060001" } }
-//       ]
-//     },
-//     "SocialMedia": {
-//       "active": "Yes",
-//       "profiles": [
-//         { "Platform": "LinkedIn", "followers": "6700", "link": "https://www.linkedin.com/in/ananyabanerjee", "_id": { "$oid": "66d000000000000000060002" } },
-//         { "Platform": "Instagram", "followers": "45000", "link": "https://www.instagram.com/ananyabanerjee", "_id": { "$oid": "66d000000000000000060003" } }
-//       ]
-//     },
-//     "ongoing": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Tollygunge Talkies", "Script": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875191/movie_Project/rmbqmkzirhc84bv98mlu.pdf", "StartDate": "2026-01", "EndDate": "2026-04", "Released": "No", "_id": { "$oid": "66d000000000000000060004" } }
-//       ]
-//     },
-//     "planned": {
-//       "active": "No",
-//       "items": []
-//     },
-//     "Genre": ["Horror", "Drama"],
-//     "SubGenre": ["Supernatural Horror"],
-//     "Screening": ["OTT Platform", "Film Festival"],
-//     "Audience": ["Adult"],
-//     "Distribution": {
-//       "needed": "No",
-//       "projects": []
-//     },
-//     "Promotions": "No",
-//     "Support": { "needed": "Yes", "type": "Post-Production Support" },
-//     "MainReason": "Seeking partnerships for post-production facilities and OTT distribution deals for Bengali content.",
-//     "Certifications": {
-//       "active": "Yes",
-//       "items": [
-//         { "Name": "Film Production Diploma - SRFTI", "Certificate": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875193/movie_Project/trmkt1mhnrrwimqpx1il.pdf", "Date": "2025-11", "_id": { "$oid": "66d000000000000000060005" } }
-//       ]
-//     },
-//     "Collaboration": "Yes",
-//     "Comfortable": "Yes",
-//     "Role": "Producer",
-//     "ExperienceLevel": "Fresher",
-//     "status": "pending",
-//     "attempts": 0,
-//     "editUntil": null,
-//     "lockedUntill": null,
-//     "createdAt": { "$date": "2026-01-10T03:00:00.000Z" },
-//     "updatedAt": { "$date": "2026-01-10T03:00:00.000Z" },
-//     "__v": 0
-//   },
-//   {
-//     "_id": { "$oid": "66c000000000000000000007" },
-//     "id": { "$oid": "66b000000000000000000007" },
-//     "username": "Suresh Iyer",
-//     "email": "suresh.iyer@gmail.com",
-//     "CountryCode": "+91",
-//     "number": "9445566778",
-//     "Country": "India",
-//     "state": "Tamil Nadu",
-//     "City": "Chennai",
-//     "sameforlocalandpermanent": false,
-//     "localaddress": "56, Adyar 2nd Main Road, Chennai 600020",
-//     "permanentaddress": "12, MG Road, Madurai 625001",
-//     "gender": "Male",
-//     "image": "https://ui-avatars.com/api/?name=Suresh+Iyer&background=random",
-//     "website": "https://sureshiyerdirector.com",
-//     "totalprojects": 0,
-//     "yearsexperience": "0",
-//     "Shortbio": "Fresh graduate from LV Prasad Film Academy passionate about directing Tamil sci-fi and fantasy short films.",
-//     "NotableProjects": {
-//       "needed": "No",
-//       "items": []
-//     },
-//     "SocialMedia": {
-//       "active": "Yes",
-//       "profiles": [
-//         { "Platform": "YouTube", "followers": "3200", "link": "https://www.youtube.com/@sureshiyerfilms", "_id": { "$oid": "66d000000000000000070001" } },
-//         { "Platform": "Instagram", "followers": "9500", "link": "https://www.instagram.com/sureshiyerfilms", "_id": { "$oid": "66d000000000000000070002" } }
-//       ]
-//     },
-//     "ongoing": {
-//       "active": "No",
-//       "items": []
-//     },
-//     "planned": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Chennai 2050", "ProjectType": "", "ProjectStatus": "Idea/Concept", "StartDate": "2026-09", "EndDate": "2027-03", "Released": "false", "_id": { "$oid": "66d000000000000000070003" } }
-//       ]
-//     },
-//     "Genre": ["Sci-Fi"],
-//     "SubGenre": ["Dystopian"],
-//     "Screening": ["Short Film Festival"],
-//     "Audience": ["Young Adult"],
-//     "Distribution": {
-//       "needed": "No",
-//       "projects": []
-//     },
-//     "Promotions": "No",
-//     "Support": { "needed": "Yes", "type": "Funding Support" },
-//     "MainReason": "Seeking funding and mentorship for debut feature-length science fiction film.",
-//     "Certifications": {
-//       "active": "Yes",
-//       "items": [
-//         { "Name": "Film Direction Diploma - LV Prasad Academy", "Certificate": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875193/movie_Project/trmkt1mhnrrwimqpx1il.pdf", "Date": "2025-06", "_id": { "$oid": "66d000000000000000070004" } }
-//       ]
-//     },
-//     "Collaboration": "Yes",
-//     "Comfortable": "No",
-//     "Role": "Director",
-//     "ExperienceLevel": "Fresher",
-//     "status": "pending",
-//     "attempts": 0,
-//     "editUntil": null,
-//     "lockedUntill": null,
-//     "createdAt": { "$date": "2026-01-11T06:30:00.000Z" },
-//     "updatedAt": { "$date": "2026-01-11T06:30:00.000Z" },
-//     "__v": 0
-//   },
-//   {
-//     "_id": { "$oid": "66c000000000000000000008" },
-//     "id": { "$oid": "66b000000000000000000008" },
-//     "username": "Meera Joshi",
-//     "email": "meera.joshi@gmail.com",
-//     "CountryCode": "+91",
-//     "number": "9667788990",
-//     "Country": "India",
-//     "state": "Gujarat",
-//     "City": "Ahmedabad",
-//     "sameforlocalandpermanent": true,
-//     "localaddress": "B-12, Navrangpura Society, Ahmedabad 380009",
-//     "permanentaddress": "B-12, Navrangpura Society, Ahmedabad 380009",
-//     "gender": "Female",
-//     "image": "https://ui-avatars.com/api/?name=Meera+Joshi&background=random",
-//     "website": "https://meerajoshi.in",
-//     "totalprojects": 4,
-//     "yearsexperience": "5",
-//     "Shortbio": "Experienced producer specializing in Gujarati cinema and documentary filmmaking with a focus on cultural heritage preservation across India.",
-//     "NotableProjects": {
-//       "needed": "Yes",
-//       "items": [
-//         { "Name": "Rann Utsav", "Budget": "₹10 Lakhs – ₹25 Lakhs", "Role": "Producer", "link": "https://meerajoshi.in/rann", "_id": { "$oid": "66d000000000000000080001" } },
-//         { "Name": "Kutch Calling", "Budget": "₹5 Lakhs – ₹10 Lakhs", "Role": "Producer", "link": "https://meerajoshi.in/kutch", "_id": { "$oid": "66d000000000000000080002" } }
-//       ]
-//     },
-//     "SocialMedia": {
-//       "active": "Yes",
-//       "profiles": [
-//         { "Platform": "LinkedIn", "followers": "4500", "link": "https://www.linkedin.com/in/meerajoshi", "_id": { "$oid": "66d000000000000000080003" } },
-//         { "Platform": "YouTube", "followers": "18000", "link": "https://www.youtube.com/@meerajoshifilms", "_id": { "$oid": "66d000000000000000080004" } },
-//         { "Platform": "Instagram", "followers": "38000", "link": "https://www.instagram.com/meerajoshifilms", "_id": { "$oid": "66d000000000000000080005" } }
-//       ]
-//     },
-//     "ongoing": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Sabarmati Ke Sant", "Script": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875191/movie_Project/rmbqmkzirhc84bv98mlu.pdf", "StartDate": "2026-01", "EndDate": "2026-05", "Released": "No", "_id": { "$oid": "66d000000000000000080006" } }
-//       ]
-//     },
-//     "planned": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Heritage of Gujarat", "ProjectType": "", "ProjectStatus": "Pre-Production", "StartDate": "2026-04", "EndDate": "2026-09", "Released": "false", "_id": { "$oid": "66d000000000000000080007" } }
-//       ]
-//     },
-//     "Genre": ["Documentary"],
-//     "SubGenre": ["Cultural Documentary"],
-//     "Screening": ["Film Festival", "OTT Platform"],
-//     "Audience": ["Family", "Adult"],
-//     "Distribution": {
-//       "needed": "Yes",
-//       "projects": [
-//         { "ProjectName": "Sabarmati Ke Sant", "Budget": "₹10 Lakhs – ₹25 Lakhs", "Role": "Producer", "ReleaseDate": "2026-06", "_id": { "$oid": "66d000000000000000080008" } }
-//       ]
-//     },
-//     "Promotions": "Yes",
-//     "Support": { "needed": "Yes", "type": "Festival Submission Support" },
-//     "MainReason": "Looking to submit documentaries to international film festivals and secure streaming deals.",
-//     "Certifications": {
-//       "active": "Yes",
-//       "items": [
-//         { "Name": "Documentary Filmmaking - NFAI Pune", "Certificate": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875193/movie_Project/trmkt1mhnrrwimqpx1il.pdf", "Date": "2021-09", "_id": { "$oid": "66d000000000000000080009" } }
-//       ]
-//     },
-//     "Collaboration": "No",
-//     "Comfortable": "Yes",
-//     "Role": "Producer",
-//     "ExperienceLevel": "Experienced",
-//     "status": "pending",
-//     "attempts": 0,
-//     "editUntil": null,
-//     "lockedUntill": null,
-//     "createdAt": { "$date": "2026-01-12T10:15:00.000Z" },
-//     "updatedAt": { "$date": "2026-01-12T10:15:00.000Z" },
-//     "__v": 0
-//   },
-//   {
-//     "_id": { "$oid": "66c000000000000000000009" },
-//     "id": { "$oid": "66b000000000000000000009" },
-//     "username": "Rohit Patil",
-//     "email": "rohit.patil@gmail.com",
-//     "CountryCode": "+91",
-//     "number": "9778899001",
-//     "Country": "India",
-//     "state": "Maharashtra",
-//     "City": "Pune",
-//     "sameforlocalandpermanent": true,
-//     "localaddress": "301, Koregaon Park Lane 5, Pune 411001",
-//     "permanentaddress": "301, Koregaon Park Lane 5, Pune 411001",
-//     "gender": "Male",
-//     "image": "https://ui-avatars.com/api/?name=Rohit+Patil&background=random",
-//     "website": "https://rohitpatilfilms.com",
-//     "totalprojects": 7,
-//     "yearsexperience": "6",
-//     "Shortbio": "Experienced director with a theatre background known for intense Marathi and Hindi crime dramas. Won National Award for Best Short Film 2024.",
-//     "NotableProjects": {
-//       "needed": "Yes",
-//       "items": [
-//         { "Name": "Sahyadri Shadows", "Budget": "₹25 Lakhs – ₹50 Lakhs", "Role": "Director", "link": "https://rohitpatilfilms.com/sahyadri", "_id": { "$oid": "66d000000000000000090001" } },
-//         { "Name": "Pune Noir", "Budget": "₹10 Lakhs – ₹25 Lakhs", "Role": "Director", "link": "https://rohitpatilfilms.com/punenoir", "_id": { "$oid": "66d000000000000000090002" } },
-//         { "Name": "Deccan Trap", "Budget": "₹50 Lakhs – ₹1 Crore", "Role": "Director", "link": "https://rohitpatilfilms.com/deccantrap", "_id": { "$oid": "66d000000000000000090003" } }
-//       ]
-//     },
-//     "SocialMedia": {
-//       "active": "Yes",
-//       "profiles": [
-//         { "Platform": "YouTube", "followers": "42000", "link": "https://www.youtube.com/@rohitpatilofficial", "_id": { "$oid": "66d000000000000000090004" } },
-//         { "Platform": "Instagram", "followers": "95000", "link": "https://www.instagram.com/rohitpatilofficial", "_id": { "$oid": "66d000000000000000090005" } }
-//       ]
-//     },
-//     "ongoing": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Shivaji's Sword", "Script": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875191/movie_Project/rmbqmkzirhc84bv98mlu.pdf", "StartDate": "2026-02", "EndDate": "2026-07", "Released": "No", "_id": { "$oid": "66d000000000000000090006" } }
-//       ]
-//     },
-//     "planned": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Mumbai Underground", "ProjectType": "", "ProjectStatus": "Scripting", "StartDate": "2026-08", "EndDate": "2027-02", "Released": "false", "_id": { "$oid": "66d000000000000000090007" } }
-//       ]
-//     },
-//     "Genre": ["Crime", "Thriller"],
-//     "SubGenre": ["Neo-Noir", "Crime Thriller"],
-//     "Screening": ["Theatrical"],
-//     "Audience": ["Adult"],
-//     "Distribution": {
-//       "needed": "Yes",
-//       "projects": [
-//         { "ProjectName": "Shivaji's Sword", "Budget": "₹50 Lakhs – ₹1 Crore", "Role": "Director", "ReleaseDate": "2026-08", "_id": { "$oid": "66d000000000000000090008" } }
-//       ]
-//     },
-//     "Promotions": "Yes",
-//     "Support": { "needed": "Yes", "type": "Distribution Support" },
-//     "MainReason": "Expanding into Hindi cinema market with upcoming crime thriller projects requiring nationwide distribution.",
-//     "Certifications": {
-//       "active": "Yes",
-//       "items": [
-//         { "Name": "Theatre Direction - NSD Delhi", "Certificate": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875193/movie_Project/trmkt1mhnrrwimqpx1il.pdf", "Date": "2020-04", "_id": { "$oid": "66d000000000000000090009" } }
-//       ]
-//     },
-//     "Collaboration": "Yes",
-//     "Comfortable": "Yes",
-//     "Role": "Director",
-//     "ExperienceLevel": "Experienced",
-//     "status": "pending",
-//     "attempts": 0,
-//     "editUntil": null,
-//     "lockedUntill": null,
-//     "createdAt": { "$date": "2026-01-13T04:40:00.000Z" },
-//     "updatedAt": { "$date": "2026-01-13T04:40:00.000Z" },
-//     "__v": 0
-//   },
-//   {
-//     "_id": { "$oid": "66c00000000000000000000a" },
-//     "id": { "$oid": "66b00000000000000000000a" },
-//     "username": "Kavita Deshmukh",
-//     "email": "kavita.deshmukh@gmail.com",
-//     "CountryCode": "+91",
-//     "number": "9223344556",
-//     "Country": "India",
-//     "state": "Rajasthan",
-//     "City": "Jaipur",
-//     "sameforlocalandpermanent": true,
-//     "localaddress": "42, C-Scheme, MI Road, Jaipur 302001",
-//     "permanentaddress": "42, C-Scheme, MI Road, Jaipur 302001",
-//     "gender": "Female",
-//     "image": "https://ui-avatars.com/api/?name=Kavita+Deshmukh&background=random",
-//     "website": "",
-//     "totalprojects": 0,
-//     "yearsexperience": "0",
-//     "Shortbio": "Recent film school graduate eager to break into producing for Hindi cinema with a focus on historical dramas set in Rajasthan.",
-//     "NotableProjects": {
-//       "needed": "Yes",
-//       "items": [
-//         { "Name": "Hawa Mahal (Thesis Film)", "Budget": "₹1 Lakh – ₹5 Lakhs", "Role": "Producer", "link": "https://vimeo.com/kavitadeshmukh", "_id": { "$oid": "66d0000000000000000a0001" } }
-//       ]
-//     },
-//     "SocialMedia": {
-//       "active": "Yes",
-//       "profiles": [
-//         { "Platform": "LinkedIn", "followers": "450", "link": "https://www.linkedin.com/in/kavitadeshmukh", "_id": { "$oid": "66d0000000000000000a0002" } },
-//         { "Platform": "Instagram", "followers": "5600", "link": "https://www.instagram.com/kavitadeshmukh", "_id": { "$oid": "66d0000000000000000a0003" } }
-//       ]
-//     },
-//     "ongoing": {
-//       "active": "No",
-//       "items": []
-//     },
-//     "planned": {
-//       "active": "Yes",
-//       "items": [
-//         { "ProjectName": "Sand and Silk", "ProjectType": "", "ProjectStatus": "Idea/Concept", "StartDate": "2026-10", "EndDate": "2027-04", "Released": "false", "_id": { "$oid": "66d0000000000000000a0004" } }
-//       ]
-//     },
-//     "Genre": ["Historical", "Drama"],
-//     "SubGenre": ["Period Drama"],
-//     "Screening": ["Film Festival"],
-//     "Audience": ["Family", "Adult"],
-//     "Distribution": {
-//       "needed": "No",
-//       "projects": []
-//     },
-//     "Promotions": "No",
-//     "Support": { "needed": "Yes", "type": "Mentorship Support" },
-//     "MainReason": "Seeking mentorship from experienced filmmakers and opportunities to co-produce feature scripts.",
-//     "Certifications": {
-//       "active": "Yes",
-//       "items": [
-//         { "Name": "BA Film Studies - Jamia Millia Islamia", "Certificate": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770875193/movie_Project/trmkt1mhnrrwimqpx1il.pdf", "Date": "2025-12", "_id": { "$oid": "66d0000000000000000a0005" } }
-//       ]
-//     },
-//     "Collaboration": "Yes",
-//     "Comfortable": "No",
-//     "Role": "Producer",
-//     "ExperienceLevel": "Fresher",
-//     "status": "pending",
-//     "attempts": 0,
-//     "editUntil": null,
-//     "lockedUntill": null,
-//     "createdAt": { "$date": "2026-01-14T12:00:00.000Z" },
-//     "updatedAt": { "$date": "2026-01-14T12:00:00.000Z" },
-//     "__v": 0
-//   }
-// ]
+{
+    "message": "date send ",
+    "success": true,
+    "data": {
+        "_id": "698e07c7a67e8289f002de48",
+        "locationName": "mumbai",
+        "locationurl": "https://google.com",
+        "TheatreInsideimages": [
+            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880274/movie_Project/z7crpwpeildlgukcrsnj.jpg",
+            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880274/movie_Project/uvfxvrsedqgeule7ebgp.jpg",
+            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880274/movie_Project/emkco9fujfb29y3nntnh.jpg",
+            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880274/movie_Project/lvttyv9anfvoxgoh0ewk.jpg"
+        ],
+        "Theatreoutsideimages": [
+            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880271/movie_Project/lnbsg9q3prtyc9wcemsi.jpg",
+            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880270/movie_Project/qfak62yrn0khw7l0hsce.jpg",
+            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880272/movie_Project/iafg722zg5nlak2k8deg.jpg",
+            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880272/movie_Project/vqborchimzstmvr7wr63.jpg"
+        ],
+        "typesofseatsAvailable": [
+            "D-BOX Motion",
+            "Wheelchair Accessible",
+            "Recliner",
+            "Premium",
+            "Bronze Class",
+            "Silver Class"
+        ],
+        "CustomMessage": [],
+        "movieScreeningType": [
+            "Dolby Cinema",
+            "MX4D",
+            "Standard Screen",
+            "IMAX 3D"
+        ],
+        "languagesAvailable": [
+            "Korean",
+            "Gujarati",
+            "English",
+            "Hindi",
+            "Spanish"
+        ],
+        "Theatrename": "hellings one q",
+        "theatreformat": [
+            "Laser Projection",
+            "2K Digital"
+        ],
+        "CreationDate": "Thu, 2026/02/12 12:41:11",
+        "showAlloted": [
+            "698d73302c70d5d3f8fae8f8"
+        ],
+        "ticketsReceived": [
+            "20000"
+        ],
+        "ticketsReceivedTime": [
+            "12/02/2026 12:53:57"
+        ],
+        "priceoftheTicket": [
+            "197"
+        ],
+        "TheatreOwner": "as",
+        "ticketCreation": [],
+        "parking": [
+            "Street Parking Only",
+            "Two-Wheeler Parking",
+            "No Parking Available"
+        ],
+        "Verified": true,
+        "status": "Approved",
+        "createdAt": "2026-02-12T17:03:03.395Z",
+        "updatedAt": "2026-02-12T17:03:03.395Z",
+        "__v": 0,
+        "Owner": "698d7d0fdac4cb85250dc892",
+        "VerifiedAt": "Thu, 2026/02/12 12:52:29",
+        "title": "one",
+        "tagline": "THis is the one",
+        "releasedate": "Thu, 26 Feb 2026",
+        "genre": "6981a3bb1dd9fb67cbef4915",
+        "SUbGenre": [
+            "6981a3c71dd9fb67cbef4933"
+        ],
+        "language": [
+            "68385db97d005d4ede75670b"
+        ],
+        "TotalDuration": "2s",
+        "Posterurl": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770877741/movie_Project/k9wyy7twhkd2xheepg69.jpg",
+        "trailerurl": "https://res.cloudinary.com/dp6kj5f6i/video/upload/v1770877744/movie_Project/kb9ipvglq6qscnal0cgc.mp4",
+        "showType": "Theatre",
+        "AllotedToTheNumberOfTheatres": [
+            "698d7d10dac4cb85250dc894",
+            "698d7d10dac4cb85250dc951",
+            "698d7d10dac4cb85250dc952",
+            "698d7d10dac4cb85250dc953"
+        ],
+        "castName": [
+            "698d6fdf2c70d5d3f8fae8aa",
+            "698d6ff22c70d5d3f8fae8b4"
+        ],
+        "uploaded": true,
+        "uploadingTime": "Thu Feb 12 2026 12:36:29 GMT+0530 (India Standard Time)",
+        "movieStatus": "Upcoming",
+        "VerifiedByTheAdmin": true,
+        "customeMessage": [],
+        "BannerLiked": 0,
+        "Comment": [],
+        "BannerDisLiked": 0,
+        "directorname": [
+            "asdf"
+        ],
+        "producername": [
+            "asdf"
+        ],
+        "writersname": [
+            "asddf"
+        ],
+        "totalbudget": "4500000",
+        "hashtags": [
+            "698d6ffd2c70d5d3f8fae8c2"
+        ],
+        "movieDuration": "12",
+        "ratingAndReviews": [],
+        "ticketspurchased": [],
+        "VerificationTime": "2026-02-12T06:55:28.791Z",
+        "totalticketsCreated": "698d7c19dac4cb85250dc875",
+        "showId": "698d73302c70d5d3f8fae8f8",
+        "userId": "698d7d0fdac4cb85250dc892",
+        "theatreId": "698d7d10dac4cb85250dc894",
+        "pricefromtheorg": 197,
+        "totalticketfromorg": "20000",
+        "ticketsCategory": [
+            {
+                "category": "Standard",
+                "ticketsCreated": 50,
+                "ticketsPurchaseafterRemaining": 50,
+                "price": 200,
+                "_id": "698e07c7a67e8289f002de49"
+            },
+            {
+                "category": "Premium",
+                "ticketsCreated": 20,
+                "ticketsPurchaseafterRemaining": 20,
+                "price": 400,
+                "_id": "698e07c7a67e8289f002de4a"
+            },
+            {
+                "category": "VIP",
+                "ticketsCreated": 20,
+                "ticketsPurchaseafterRemaining": 20,
+                "price": 400,
+                "_id": "698e07c7a67e8289f002de4b"
+            },
+            {
+                "category": "Family",
+                "ticketsCreated": 20,
+                "ticketsPurchaseafterRemaining": 20,
+                "price": 400,
+                "_id": "698e07c7a67e8289f002de4c"
+            },
+            {
+                "category": "Loyalty",
+                "ticketsCreated": 20,
+                "ticketsPurchaseafterRemaining": 20,
+                "price": 400,
+                "_id": "698e07c7a67e8289f002de4d"
+            }
+        ],
+        "Date": "18/02/2026",
+        "TicketsRemaining": "19870",
+        "timings": [],
+        "Status": "Upcoming",
+        "ticketsReceivingTime": "12/02/2026 12:53:57",
+        "ticketsPurchased": [],
+        "unsoldTickets": []
+    }
+}

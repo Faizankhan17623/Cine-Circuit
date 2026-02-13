@@ -68,7 +68,7 @@ const Settings = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-full min-h-full bg-richblack-900 flex flex-col items-center gap-6 px-4 sm:px-6 py-8 overflow-y-auto"
+      className="w-full min-h-full bg-richblack-900 flex flex-col items-center gap-6 px-4 sm:px-6 py-8 overflow-y-auto animate-fadeIn"
     >
       {/* Header */}
       <div className="w-full max-w-3xl flex flex-col gap-3">

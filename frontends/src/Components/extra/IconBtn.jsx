@@ -6,8 +6,8 @@ export default function IconBtn({
   outline = false,
   customClasses,
   type,
-  borderColor = 'border-yellow-50', 
-  bgColor = 'bg-yellow-50', 
+  borderColor = 'border-yellow-50',
+  bgColor = 'bg-yellow-50',
 }) {
   return (
     <button
@@ -15,7 +15,7 @@ export default function IconBtn({
       onClick={onclick}
       className={`flex items-center ${
         outline ? `border ${borderColor} bg-transparent` : bgColor
-      } cursor-pointer gap-x-2 rounded-md cc  font-semibold text-richblack-900 ${customClasses}`}
+      } cursor-pointer gap-x-2 rounded-lg px-4 py-2.5 font-semibold text-richblack-900 transition-all duration-200 hover:shadow-md hover:brightness-110 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed ${customClasses}`}
       type={type}
     >
       {children ? (

@@ -35,7 +35,7 @@ const Join = () => {
     <div className="min-h-screen w-full bg-richblack-900">
       <Navbar />
 
-      <div className="w-full max-w-7xl mx-auto px-6 py-10 flex flex-col lg:flex-row items-start justify-between gap-10">
+      <div className="w-full max-w-7xl mx-auto px-6 py-10 flex flex-col lg:flex-row items-start justify-between gap-10 animate-fadeIn">
 
         {/* Left Side - Form Area */}
         <div className="w-full lg:w-[50%] flex flex-col items-center">

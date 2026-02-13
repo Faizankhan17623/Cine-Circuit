@@ -71,7 +71,7 @@ const Slider = () => {
   }, [dispatch])
 
   return (
-    <div className='w-full max-w-6xl mx-auto px-2 py-20 lg:py-4'>
+    <div className='w-full max-w-6xl mx-auto px-4 py-8 lg:py-4'>
 
       <div className='text-center mb-5'>
         <h2 className='text-3xl lg:text-5xl font-bold text-white'>

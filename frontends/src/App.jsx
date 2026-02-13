@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import Navbar from './Components/Home/Navbar'
 import toast from 'react-hot-toast';
 import Slider from './Components/Home/Slider'
@@ -45,12 +46,24 @@ import CreateTicket from './Components/Dashboard/Tickets/CreateTicketes'
 import TicketAllotment from './Components/Dashboard/Tickets/TicketAllotment'
 import AllTickets from './Components/Dashboard/Tickets/GetAllTicket'
 import Chat from './Components/Dashboard/Chating/Chat'
+import { MdDesktopMac } from 'react-icons/md'
+
+const MobileBlocker = () => (
+  <div className="fixed inset-0 z-[9999] bg-richblack-900 flex flex-col items-center justify-center px-8 text-center">
+    <MdDesktopMac className="text-6xl text-yellow-50 mb-6" />
+    <h1 className="text-2xl font-bold text-white mb-3">Desktop Only</h1>
+    <p className="text-richblack-300 text-sm max-w-xs leading-relaxed">
+      Cine Circuit is optimized for tablet and desktop screens. Please switch to a device with a screen width of 768px or larger.
+    </p>
+    <div className="mt-6 w-16 h-1 bg-gradient-to-r from-yellow-400 to-yellow-200 rounded-full" />
+  </div>
+)
 
 const Homelayout = ({Notify}) =>{
   return(
     <div className={`bg-richblack-900 min-h-screen`}>
-    <div className="max-w-[1440px] mx-auto px-2 overflow-hidden">
-      <Navbar setColors={Notify}  />
+    <Navbar setColors={Notify}  />
+    <div className="max-w-[1440px] mx-auto px-2">
       <div className="">
         <Slider />
       </div>
@@ -79,6 +92,15 @@ const App = () => {
 const {user} = useSelector((state)=>state.profile)
 const dispatch = useDispatch()
 
+const [isMobile, setIsMobile] = useState(false)
+
+useEffect(() => {
+  const check = () => setIsMobile(window.innerWidth < 768)
+  check()
+  window.addEventListener('resize', check)
+  return () => window.removeEventListener('resize', check)
+}, [])
+
 
  if (user === null) {
     const storedUser = localStorage.getItem("userType");
@@ -91,7 +113,8 @@ const dispatch = useDispatch()
 
   return (
     <div className={`bg-richblack-800 min-h-screen`}>
-      
+      {isMobile && <MobileBlocker />}
+
       <Routes>
 
         <Route path='/' element={<Homelayout  Notify={notify}/>}/>

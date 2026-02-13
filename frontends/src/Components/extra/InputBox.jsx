@@ -12,7 +12,7 @@ const InputBox = () => {
     }
 
     return (
-        <div className='w-full bg-gradient-to-r from-yellow-400/10 via-yellow-400/5 to-yellow-400/10 border-y border-richblack-700'>
+        <div className='w-full bg-gradient-to-r from-yellow-400/10 via-yellow-400/5 to-yellow-400/10 border-y border-richblack-700/60 shadow-inner'>
             <div className='max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6'>
                 <div className='text-center md:text-left'>
                     <h3 className='text-xl font-bold text-white'>Stay in the Loop</h3>

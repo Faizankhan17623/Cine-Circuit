@@ -38,8 +38,8 @@ const Counter = () => {
     <div ref={counterRef} className='w-full bg-richblack-800 border-y border-richblack-700'>
       <div className='max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 py-12 lg:py-16 px-6'>
         {STATS.map((stat, i) => (
-          <div key={i} className='flex flex-col items-center gap-3 text-center'>
-            <div className={`w-14 h-14 rounded-2xl bg-richblack-700 flex items-center justify-center ${stat.color}`}>
+          <div key={i} className='group flex flex-col items-center gap-3 text-center'>
+            <div className={`w-14 h-14 rounded-2xl bg-richblack-700 flex items-center justify-center ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
               <stat.icon className='text-2xl' />
             </div>
             <div>

@@ -97,11 +97,11 @@ const LeftSide = ({direction}) => {
     { icon: CiChat1, label: 'Chat', path: '/Dashboard/Chats', id: 4 },
     { icon: MdReviews, label: 'Reviews', path: '/Dashboard/My-Venues', id: 5 },
     {
-      icon: IoSettings, 
+      icon: IoSettings,
       label: 'Organizer Verification',
       path: '/Dashboard/Organizer-Verification',
       id: 6,
-      disabled: isVerificationDisabled 
+      disabled: isVerificationDisabled
     },
   ];
 
@@ -192,19 +192,19 @@ const LeftSide = ({direction}) => {
 
   return (
 <div
-  className={`w-full h-full bg-richblack-800 flex flex-col text-richblack-900 transition duration-300 ease-in-out ${
-    direction ? "hidden" : "flex transition duration-300 ease-in-out h-full"
+  className={`w-full h-full bg-richblack-800 flex flex-col text-richblack-900 transition-all duration-300 ease-in-out ${
+    direction ? "hidden" : "flex h-full"
   }`}
 >
-      <nav className="flex flex-col gap-3 Sides text-richblack-100">
+      <nav className="flex flex-col gap-1 pt-4 px-3 text-richblack-100">
         {navigationItems.map(({ icon: Icon, label, path, id, disabled }) => (
           <div key={id} className="flex flex-col">
             {label === 'Create Show' ? (
               <>
                  <button
                   disabled={disabled}
-                 className={`flex items-center justify-between w-full text-left p-2 Drop rounded ${
-                    text === label ? 'bg-yellow-200 text-richblack-900' : 'hover:bg-richblack-700'
+                 className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                    text === label ? 'bg-gradient-to-r from-yellow-200/90 to-yellow-100/90 text-richblack-900 font-semibold shadow-sm' : 'hover:bg-richblack-700/70 hover:text-white'
                   } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
                   onClick={() => {
                     if (disabled) return;
@@ -213,37 +213,34 @@ const LeftSide = ({direction}) => {
                     setText(label);
                   }}
                 >
-                  <span className="flex items-center gap-2">
-                    {disabled && <FaLock />}
-                    <Icon />{label}
+                  <span className="flex items-center gap-2.5">
+                    {disabled && <FaLock className="text-xs" />}
+                    <Icon className="text-base" />{label}
                   </span>
-                  <FaCaretDown className={`transition-transform ${show ? 'rotate-180' : ''}`} />
+                  <FaCaretDown className={`transition-transform duration-200 text-xs ${show ? 'rotate-180' : ''}`} />
                 </button>
 
                 {show && !organizerLocked && (
-                  <div className="ml-8 mt-2 subMenu flex flex-col gap-2">
-                    <Link to="/Dashboard/Shows/Tags" className="hover:text-yellow-200 flex items-center gap-2">
+                  <div className="ml-4 mt-1 flex flex-col gap-0.5 border-l-2 border-richblack-600 pl-4">
+                    <Link to="/Dashboard/Shows/Tags" className="text-sm py-1.5 hover:text-yellow-200 flex items-center gap-2 transition-colors">
                       <FaHashtag className="text-xs" /> Manage Tags
                     </Link>
-                    <Link to="/Dashboard/Shows/Cast" className="hover:text-yellow-200 flex items-center gap-2">
+                    <Link to="/Dashboard/Shows/Cast" className="text-sm py-1.5 hover:text-yellow-200 flex items-center gap-2 transition-colors">
                       <FaUserFriends className="text-xs" /> Manage Cast
                     </Link>
-                    <Link to="/Dashboard/Shows/Create" className="hover:text-yellow-200 flex items-center gap-2">
+                    <Link to="/Dashboard/Shows/Create" className="text-sm py-1.5 hover:text-yellow-200 flex items-center gap-2 transition-colors">
                       <FaFilm className="text-xs" /> Manage Shows
                     </Link>
-                    <Link to="/Dashboard/Shows/Upload" className="hover:text-yellow-200 flex items-center gap-2">
+                    <Link to="/Dashboard/Shows/Upload" className="text-sm py-1.5 hover:text-yellow-200 flex items-center gap-2 transition-colors">
                       <FaUpload className="text-xs" /> Upload Show
                     </Link>
-                    {/* <Link to="/Dashboard/Shows/All" className="hover:text-yellow-200 flex items-center gap-2">
-                      <FaList className="text-xs" /> See All Shows
-                    </Link> */}
                   </div>
                 )}
-                <div className="flex flex-col">
+                <div className="flex flex-col mt-1">
                    <button
                   disabled={organizerLocked}
-                  className={`flex items-center justify-between w-full text-left p-2 Drop rounded ${
-                      text === 'Tickets' ? 'bg-yellow-200 text-richblack-900' : 'hover:bg-richblack-700'
+                  className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                      text === 'Tickets' ? 'bg-gradient-to-r from-yellow-200/90 to-yellow-100/90 text-richblack-900 font-semibold shadow-sm' : 'hover:bg-richblack-700/70 hover:text-white'
                     } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
                   onClick={() => {
                     if (organizerLocked) return;
@@ -251,22 +248,22 @@ const LeftSide = ({direction}) => {
                     setText('Tickets');
                   }}
                 >
-                  <span className="flex items-center gap-2">
-                    {organizerLocked && <FaLock />}
-                    <IoTicketSharp /> Tickets
+                  <span className="flex items-center gap-2.5">
+                    {organizerLocked && <FaLock className="text-xs" />}
+                    <IoTicketSharp className="text-base" /> Tickets
                   </span>
-                  <FaCaretDown className={`transition-transform ${ticket ? 'rotate-180' : ''}`} />
+                  <FaCaretDown className={`transition-transform duration-200 text-xs ${ticket ? 'rotate-180' : ''}`} />
                 </button>
 
                   {ticket && !organizerLocked &&(
-                    <div className="ml-8 mt-2 subMenu1 flex flex-col gap-2">
-                      <Link to="/Dashboard/Tickets/Create" className="hover:text-yellow-200">
+                    <div className="ml-4 mt-1 flex flex-col gap-0.5 border-l-2 border-richblack-600 pl-4">
+                      <Link to="/Dashboard/Tickets/Create" className="text-sm py-1.5 hover:text-yellow-200 transition-colors">
                         Create Ticket
                       </Link>
-                      <Link to="/Dashboard/Tickets/Update" className="hover:text-yellow-200">
+                      <Link to="/Dashboard/Tickets/Update" className="text-sm py-1.5 hover:text-yellow-200 transition-colors">
                         Ticket Allotment
                       </Link>
-                      <Link to="/Dashboard/Tickets/All" className="hover:text-yellow-200">
+                      <Link to="/Dashboard/Tickets/All" className="text-sm py-1.5 hover:text-yellow-200 transition-colors">
                         See All Tickets
                       </Link>
                     </div>
@@ -281,60 +278,22 @@ const LeftSide = ({direction}) => {
                  }}>
                 <button
                   disabled={disabled}
-                  className={`flex items-center gap-2 w-full p-2 rounded ${
-                    disabled ? "cursor-not-allowed opacity-50" : text === label ? "bg-yellow-200 text-richblack-900" : "hover:bg-richblack-700"
+                  className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                    disabled ? "cursor-not-allowed opacity-50" : text === label ? "bg-gradient-to-r from-yellow-200/90 to-yellow-100/90 text-richblack-900 font-semibold shadow-sm" : "hover:bg-richblack-700/70 hover:text-white"
                   }`}
                 >
-                  {disabled && <FaLock />}
-                  <Icon /> {label}
+                  {disabled && <FaLock className="text-xs" />}
+                  <Icon className="text-base" /> {label}
                 </button>
               </Link>
             )}
-            {/* {label === 'Org-Verification' ? (
-              <>
-                <div
-                      className={
-                        inside === 'Org-Verification'
-                          ? 'hover:text-yellow-200 flex items-center gap-4 cursor-pointer text-yellow-200'
-                          : 'flex items-center gap-4'
-                      }
-                      onClick={() => setInside((prev) => (prev === 'Org-Verification' ? '' : 'Org-Verification'))}
-                    >
-                      Org-Verification <FaCaretDown className={`${inside === 'Org-Verification' ? 'rotate-180' : ''}`} />
-                    </div>
-                    {inside === 'Org-Verification' && (
-                      <div className="ml-8 mt-2 flex flex-col gap-2 Tags1">
-                        <Link to="/Dashboard/Shows/Option1" className="hover:text-yellow-200">
-                          Create Show
-                        </Link>
-                        <Link to="/Dashboard/Shows/Option2" className="hover:text-yellow-200">
-                          Update Show Title
-                        </Link>
-                        <Link to="/Dashboard/Shows/Option3" className="hover:text-yellow-200">
-                          Update Tagline
-                        </Link>
-                        <Link to="/Dashboard/Shows/Option4" className="hover:text-yellow-200">
-                          Update Title Image
-                        </Link>
-                        <Link to="/Dashboard/Shows/Option5" className="hover:text-yellow-200">
-                          Update Trailer
-                        </Link>
-                        <Link to="/Dashboard/Shows/Option6" className="hover:text-yellow-200">
-                          Delete Show
-                        </Link>
-                      </div>
-                    )}
-              </>
-            ) : (
-            <></>
-            ) } */}
           </div>
         ))}
 
         {/* Verification Status Indicator */}
         {user.usertype === ACCOUNT_TYPE.ORGANIZER && (
 
-         <div className="mt-4 text-richblack-200 text-sm">
+         <div className="mt-3 mx-1 p-3 rounded-lg bg-richblack-700/50 border border-richblack-600/50 text-richblack-200 text-xs leading-relaxed">
   {status === "locked"
     ? "Your account is locked. Please message the admin to give you one more chance."
     : diffMs <= 0
@@ -351,20 +310,20 @@ const LeftSide = ({direction}) => {
       </nav>
 
 
-      <span className="inline-block w-35 h-[1px] bg-white my-2 DashLine"></span>
+      <div className="my-3 mx-3 h-[1px] bg-gradient-to-r from-transparent via-richblack-600 to-transparent"></div>
 
-      <div className="flex flex-col gap-3 Sides text-richblack-300">
+      <div className="flex flex-col gap-1 px-3 text-richblack-300">
         <Link to="/Dashboard/Settings">
           <button
-            className={`flex items-center gap-2 w-full text-left p-2 Close rounded ${
-              extra ? 'bg-yellow-200' : 'hover:bg-richblack-700'
+            className={`flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+              extra ? 'bg-gradient-to-r from-yellow-200/90 to-yellow-100/90 text-richblack-900 font-semibold shadow-sm' : 'hover:bg-richblack-700/70 hover:text-white'
             }`}
             onClick={(e) => {
               setExtra(e.target.innerText);
               setText('');
             }}
           >
-            <IoSettings />Settings
+            <IoSettings className="text-base" />Settings
           </button>
         </Link>
         <button
@@ -378,9 +337,9 @@ const LeftSide = ({direction}) => {
               btn2Handler: () => setConfirmationModal(null),
             })
           }
-          className="flex items-center gap-2 w-full text-left p-2 hover:bg-richblack-700 rounded"
+          className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-lg text-sm hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
         >
-          <IoLogOutOutline />LogOut
+          <IoLogOutOutline className="text-base" />LogOut
         </button>
       </div>
       {confirmationModal && <Logout modalData={confirmationModal} />}

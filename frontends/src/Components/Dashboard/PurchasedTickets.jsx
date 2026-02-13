@@ -54,16 +54,16 @@ const PurchasedTickets = () => {
   const totalTickets = Movies.reduce((sum, m) => sum + m.total_tickets_purchased, 0);
 
   return (
-    <div className="bg-[#0f1117] min-h-screen text-white Main">
+    <div className="bg-richblack-900 min-h-screen text-white p-4 md:p-6 animate-fadeIn">
       {/* Breadcrumb */}
-      <div className="text-sm text-gray-400 Home">
-        Home <span className="text-gray-600 Texts">/</span> Dashboard{" "}
-        <span className="text-gray-600 Texts">/</span>{" "}
-        <span className="text-yellow-400 Texts">Purchased Tickets</span>
+      <div className="text-sm text-gray-400 mb-1">
+        Home <span className="text-gray-600 mx-1">/</span> Dashboard{" "}
+        <span className="text-gray-600 mx-1">/</span>{" "}
+        <span className="text-yellow-400">Purchased Tickets</span>
       </div>
 
       {/* Heading */}
-      <h1 className="text-2xl font-bold Sixers">Purchased Tickets</h1>
+      <h1 className="text-2xl font-bold mb-4">Purchased Tickets</h1>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -82,7 +82,7 @@ const PurchasedTickets = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-4 Sixers">
+      <div className="flex space-x-4 mb-4">
         {["All", "Upcoming", "Completed"].map((tab) => (
           <button
             key={tab}
@@ -90,7 +90,7 @@ const PurchasedTickets = () => {
               setActiveTab(tab);
               setCurrentPage(1);
             }}
-            className={`Tabs rounded-lg font-medium transition-all duration-200 text-sm ${
+            className={`px-4 py-2.5 rounded-lg font-medium transition-all duration-200 text-sm ${
               activeTab === tab
                 ? "bg-yellow-400 text-black shadow-lg shadow-yellow-400/20"
                 : "bg-gray-800/80 text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -104,7 +104,7 @@ const PurchasedTickets = () => {
       {/* Table */}
       <div className="bg-gray-900/70 rounded-xl overflow-hidden shadow-2xl border border-gray-800/50 backdrop-blur-sm">
         {/* Table Header */}
-        <div className="grid grid-cols-5 TagLines text-gray-400 text-xs border-b border-gray-700/50 bg-gray-800/60 font-semibold uppercase tracking-wider">
+        <div className="grid grid-cols-5 px-5 py-3.5 text-gray-400 text-xs border-b border-gray-700/50 bg-gray-800/60 font-semibold uppercase tracking-wider">
           <span>Movie Name</span>
           <span>Show Date</span>
           <span className="text-center">Tickets</span>
@@ -131,7 +131,7 @@ const PurchasedTickets = () => {
           return (
             <div
               key={index}
-              className="grid grid-cols-5 items-center Data border-b border-gray-800/40 hover:bg-gray-800/40 transition-all duration-200 px-4 py-3 relative group"
+              className="grid grid-cols-5 items-center px-5 py-3.5 border-b border-gray-800/40 hover:bg-gray-800/40 transition-all duration-200 relative group"
             >
               {/* Movie Info */}
               <div className="flex items-center gap-3">
@@ -160,14 +160,14 @@ const PurchasedTickets = () => {
               </div>
 
               {/* Tickets */}
-              <div className="text-center Purchase">
+              <div className="text-center">
                 <span className="inline-flex items-center justify-center bg-gray-800/80 text-gray-200 text-sm font-semibold w-8 h-8 rounded-lg">
                   {movie.total_tickets_purchased}
                 </span>
               </div>
 
               {/* Price */}
-              <div className="text-center Progress">
+              <div className="text-center">
                 <span className="text-white font-semibold text-sm">&#8377;{price.toLocaleString()}</span>
                 <p className="text-[11px] text-gray-500 mt-0.5">&#8377;{movie.price}/ticket</p>
               </div>
@@ -175,7 +175,7 @@ const PurchasedTickets = () => {
               {/* Status + Menu */}
               <div className="flex justify-center items-center gap-2 relative">
                 <span
-                  className={`text-xs font-medium px-3 py-1.5 Aaaa rounded-full inline-flex items-center gap-1.5 ${
+                  className={`text-xs font-medium px-3 py-1.5 rounded-full inline-flex items-center gap-1.5 ${
                     status === "Upcoming"
                       ? "bg-blue-500/15 text-blue-400 ring-1 ring-blue-500/20"
                       : status === "Released"
@@ -201,11 +201,11 @@ const PurchasedTickets = () => {
 
                 {menuOpen === index && (
                   <div className="absolute right-0 top-10 w-44 bg-gray-800 rounded-xl shadow-xl shadow-black/40 z-50 border border-gray-700/50 overflow-hidden animate-scaleIn">
-                    <button className="block w-full text-left px-4 py-2.5 text-sm hover:bg-gray-700/60 Completion text-gray-200 transition-colors">
+                    <button className="block w-full text-left px-4 py-2.5 text-sm hover:bg-gray-700/60 text-gray-200 transition-colors">
                       View Full Details
                     </button>
                     <div className="border-t border-gray-700/50" />
-                    <button className="Completion block w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors">
+                    <button className="block w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors">
                       Delete
                     </button>
                   </div>
@@ -227,7 +227,7 @@ const PurchasedTickets = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between mt-5 Paginations">
+      <div className="flex items-center justify-between mt-5">
         <p className="text-sm text-gray-500">
           Showing <span className="text-gray-300 font-medium">{startIndex + 1}</span> - <span className="text-gray-300 font-medium">{Math.min(endIndex, Movies.length)}</span> of <span className="text-gray-300 font-medium">{Movies.length}</span> tickets
         </p>

@@ -1,7 +1,7 @@
 import Left from './LeftSide'
 import Navbar from '../Home/Navbar'
 import { Outlet ,useLocation } from 'react-router-dom'
-import { FaArrowRight,FaArrowLeft } from "react-icons/fa";
+import { FaChevronRight,FaChevronLeft } from "react-icons/fa";
 import { useState } from 'react';
 import Org from './OrganizerVerificationForm'
 const Connector = () => {
@@ -13,25 +13,25 @@ const Connector = () => {
   return (
     <div className='w-screen h-screen overflow-hidden flex flex-col'>
       <Navbar />
-      <div className='w-full h-full flex '>
+      <div className='w-full h-full flex'>
 
          <div
-          className={`h-full flex-shrink-0 transition-all duration-300 ${
-            direction ? "hidden" : "w-54 h-full"
+          className={`h-full flex-shrink-0 transition-all duration-300 ease-in-out border-r border-richblack-700 ${
+            direction ? "w-0 overflow-hidden" : "w-60"
           }`}
         >
           <Left direction={direction} />
         </div>
 
-        <div className="w-4 h-full Seperation">
+        <div className="relative">
           <button
-            className={`border w-10 bg-white relative top-60 rounded-md flex justify-center items-center -left-2 ${direction?"h-12":""}`}
+            className={`absolute top-1/2 -translate-y-1/2 z-10 w-6 h-12 rounded-r-lg bg-richblack-700 hover:bg-richblack-600 flex items-center justify-center transition-all duration-200 border border-l-0 border-richblack-600 hover:border-yellow-200/30`}
             onClick={() => Setdirection(prev => !prev)}
           >
             {direction ? (
-              <FaArrowRight className="text-3xl animate-bounce" />
+              <FaChevronRight className="text-xs text-richblack-300 hover:text-yellow-200" />
             ) : (
-              <FaArrowLeft className="text-2xl" />
+              <FaChevronLeft className="text-xs text-richblack-300 hover:text-yellow-200" />
             )}
           </button>
         </div>

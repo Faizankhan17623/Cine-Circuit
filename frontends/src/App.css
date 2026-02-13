@@ -144,27 +144,7 @@
     --breakpoint-lg: 1260px;
 }
 
-/* This is of thee  listting */
-
-.listing_one{
-  margin-top: 30px;
-}
-
-.join_card{
-  padding: 20px 20px;
-}
-
-.join_card_name{
-  margin: 10px 0px 0px 6px;
-}
-
-.mmls{
-  margin-left: 30px;
-}
-
-.card_Button{
-  margin-left: 50px;
-}
+/* Utility spacing classes */
 .slideers{
   margin: 10px 50px;
 }
@@ -174,45 +154,22 @@
 }
 
 
-.left_side{
-  padding-left: 20px;
-}
-
-.Finderr_btn{
-  margin-left: 10px;
-  padding: 20px 20px;
-}
-
-.liness{
-  margin-top: 0px;
-}
-
-.movv{
-  margin-top: 10px;
-}
-
-
-.input_box{
-  margin-top: 2px;
-}
-
-
-.input-caret {
-  padding-left: 12px; 
-}
 
 
 
 .swiper-pagination-bullet {
-  width: 12px;
-  height: 12px;
-  background: white;
-  opacity: 0.5;
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.4);
+  opacity: 1;
+  transition: all 0.3s ease;
 }
 
 .swiper-pagination-bullet-active {
-  background:white;
+  background: #FFD60A;
   opacity: 1;
+  width: 24px;
+  border-radius: 5px;
 }
 
 
@@ -230,7 +187,7 @@
 .swiper-slide {
   text-align: center;
   font-size: 18px;
-  background: white;
+  background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -243,51 +200,8 @@
   object-fit: cover;
 } 
 
-.navbar {
-  border-bottom-width: 2px;
-  margin-bottom: 5rem;
-}
-
 .swiper-container {
   margin-top: 2rem;
-}
-
-
-/* Thi is forr the buttton changes in tthe footerr */
-.BUTTON_DESIGN{
-  padding: 5px 10px 5px 10px;
-}
-
-
-.About_Button{
-  padding: 10px 10px 10px 10px;
-}
-
-.line{
-  margin-left: 10px;
-}
-
-.triangle-up {
-  width: 0; 
-  height: 0; 
-  border-left: 15px solid transparent;
-  border-right: 15px solid transparent; 
-  border-bottom: 15px solid ;
-}
-
-
-.lines{
-  padding-bottom: 10px;
-}
-
-
-.Day_Night{
-  padding: 10px 30px 10px 30px;
-}
-
-
-.Contentt{
-  padding: 5px 10px px 10px;
 }
 
 
@@ -429,8 +343,8 @@
 .loader {
     width: 48px;
     height: 48px;
-    border: 5px solid #FFF;
-    border-bottom-color: transparent;
+    border: 5px solid rgba(255,214,10,0.2);
+    border-bottom-color: #FFD60A;
     border-radius: 50%;
     display: inline-block;
     box-sizing: border-box;
@@ -648,138 +562,6 @@ input:checked + .slider:before {
   margin-bottom : 1px;
 }
 
-.Sides{
-  margin-top: 10px;
-  margin-left: 10px;
-}
-
-.DashLine{
-  margin-top: 10px;
-  margin-left: 8px;
-  margin-bottom: 10px;
-} 
-
-
-.Profiles{
-  padding:6px 6px 6px 6px;
-}
-
-
-.FirstProfile{
-  margin-bottom: 10px;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  margin-top: 10px;
-}
-
-.SecondProfile,.ThirdProfile,.FourthProfile{
-  padding: 8px 8px 8px 8px;
-}
-
-
-.BUttons{
-  margin-top: 20px;
-  padding: 10px 20px 10px 20px;
-}
-
-.Main{
-  padding: 16px 16px 16px 16px;
-}
-
-.Home{
-  margin-bottom: 4px;
-}
-.Texts{
-  margin-left: 4px;
-  margin-right: 4px;
-}
-
-.Sixers{
-  margin-bottom: 10px;
-}
-
-
-.Active{
-  padding: 6px 12px 6px 12px;
-  margin-left: 10px;
-}
-
-.TagLines{
-  padding: 18px 16px 12px 18px;
-}
-
-.Tabs{
-  padding: 12px 18px 12px 18px;
-  margin-left: 10px;
-}
-
-.Data{
-  padding: 16px 18px;
-}
-
-.Menu{
-  padding: 8px;
-}
-
-.CC{
-  margin-top: 8px;
-  padding: 8px 0px;
-}
-
-.Completion{
-  padding: 8px 16px 8px 16px;
-}
-
-.Shows{
-  padding-left: 40px;
-}
-
-.Duration{
-  padding: 12px 0px 12px 50px;
-}
-
-.Purchase{
-  padding: 12px 50px 12px 65px;
-}
-
-.Price{
-  padding: 0px 50px 0px 95px;
-}
-
-.Progress{ 
-  margin-left: 20px;
-}
-
-.Paginations{
-  margin-top: 8px;
-}
-
-.Aaaa{
-  padding: 4px 8px 4px 20px;
-}
-
-
-.Drop{
-  padding: 8px 8px 8px 8px;
-}
-
-.subMenu{
-  margin-left: 32px;
-  margin-top: 8px;
-}
-
-.Close{
-  padding:8px 8px 8px 8px;
-}
-
-.Tags1{
-  padding-left: 20px;
-}
-
-.subMenu1{
-  margin-left: 32px;
-  margin-top: 18px;
-}
 
 
 .Statusss{
@@ -952,9 +734,6 @@ input:checked + .slider:before {
   padding: 12px 20px 12px 20px;
 }
 
-.cc{
-  padding: 12px 16px 12px 16px;
-}
 
 .SelectionOne{
   margin-top: 24px;
@@ -1031,9 +810,6 @@ input:checked + .slider:before {
   margin-top: 20px;
 }
 
-.Seperation{
-  padding-left: 10px;
-}
 
 
 @keyframes scaleIn {
@@ -1049,4 +825,34 @@ input:checked + .slider:before {
 
 .animate-scaleIn {
   animation: scaleIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.3s ease-out;
 }

@@ -67,7 +67,7 @@ const Navbar = () => {
   )
 
   return (
-    <nav className='w-full h-[72px] flex justify-between items-center text-white bg-richblack-800 border-b border-richblack-700 px-6'>
+    <nav className='w-full h-[72px] flex justify-between items-center text-white bg-richblack-800/95 backdrop-blur-md sticky top-0 z-50 border-b border-richblack-700/80 px-6'>
       {/* Logo */}
       <Link to="/" className='flex-shrink-0'>
         <img

@@ -186,7 +186,7 @@
   const Listing = () => {
     const navigate = useNavigate()
     return (
-      <div className="text-white w-full min-h-screen flex flex-col items-center gap-2">
+      <div className="text-white w-full min-h-screen flex flex-col items-center gap-0">
 
         <JoinCard
           title="Become an Organizer with Us"
