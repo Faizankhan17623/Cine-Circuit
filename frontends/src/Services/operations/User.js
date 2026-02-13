@@ -133,7 +133,7 @@ export function Finders (locationname,moviename,theatrename,date){
                 theatre:theatrename,
                 date:date
              })
-
+// hello this is the for the tesing 
               if (response.data.success) {
             return { success: true, data: response.data };
         }
