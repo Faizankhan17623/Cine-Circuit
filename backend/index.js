@@ -27,24 +27,23 @@ const Theatre = require('./routes/Theatrer')
 const payment = require('./routes/Payment')
 // do not touch this above line because it is important for futur use
 const Visitor = require('./models/Visitor')
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        "https://mw-mocha.vercel.app"
+    ],
+    credentials: true
+}));
+
+
+app.use(cors())
+
 
 app.use(express.json())
 app.use(cookieParser ())
 app.use(morgan("dev"));
 
 app.use(VisitorCounter(Visitor))
-app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "https://mw-mocha.vercel.app/"
-    ],
-    credentials: true,
-    methods: ["GET","POST","PUT","DELETE","OPTIONS"],
-    allowedHeaders: ["Content-Type","Authorization"]
-}))
-
-
-app.use(cors())
 
 app.use(fileUpload({
     useTempFiles : true,
