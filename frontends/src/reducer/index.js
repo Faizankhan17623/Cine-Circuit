@@ -19,8 +19,8 @@ const rootReduers = combineReducers({
     theatre:theatreReducer,
     orgainezer:orgainezerReducer,
     tags:tagsReducer,
-    cast:castReducer
-    // payment:paymentReducer
+    cast:castReducer,
+    payment:paymentReducer
 })
 
 

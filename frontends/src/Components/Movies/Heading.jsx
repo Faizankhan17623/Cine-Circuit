@@ -1,26 +1,57 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Navbar from "../Home/Navbar"
 import { FaFilm, FaSearch, FaStar } from "react-icons/fa"
+import { useDispatch } from "react-redux"
+import { MovieFinding } from "../../Services/operations/User"
+import Loader from "../extra/Loading"
+import { useNavigate, useParams } from "react-router-dom"
+import Movie from './Movie'
 
 const Heading = () => {
   const currentUrl = window.location.href
   const token = currentUrl.split("/")
   const MainToken = decodeURIComponent(token[4])
 
-  // Dummy movies (replace later with backend data)
-  const allMovies = [
-    { id: 1, title: "Dark Night", rating: 4.5, image: "https://via.placeholder.com/300x400" },
-    { id: 2, title: "The Last War", rating: 4.2, image: "https://via.placeholder.com/300x400" },
-    { id: 3, title: "Silent River", rating: 4.8, image: "https://via.placeholder.com/300x400" },
-    { id: 4, title: "Ghost City", rating: 4.1, image: "https://via.placeholder.com/300x400" },
-    { id: 5, title: "Future World", rating: 4.6, image: "https://via.placeholder.com/300x400" }
-  ]
+  const {id} = useParams() 
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [allMovies, setAllMovies] = useState([]) // ✅ backend movies
 
+  // ✅ Filter using backend data
   const filteredMovies = allMovies.filter(movie =>
-    movie.title.toLowerCase().includes(search.toLowerCase())
+    movie.title?.toLowerCase().includes(search.toLowerCase())
   )
+
+  // console.log(filteredMovies)
+  useEffect(() => {
+    const handler = async () => {
+      setLoading(true)
+      try {
+        const Response = await dispatch(MovieFinding(MainToken))
+        if (Response?.success) {
+          // ✅ store backend movies
+          setAllMovies(Response.data.data || [])
+        }
+      } catch (error) {
+        console.log("Movie fetch error:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    handler()
+  }, [MainToken]) // ❌ removed currentUrl (caused extra rerenders)
+
+  if (loading) {
+    return (
+      <div className="w-full h-screen flex justify-center items-center">
+        <Loader />
+      </div>
+    )
+  }
 
   return (
     <div className="text-white min-h-screen bg-richblack-900">
@@ -66,19 +97,20 @@ const Heading = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredMovies.map((movie) => (
               <div
-                key={movie.id}
+                key={movie._id}
                 className="group bg-richblack-800 border border-richblack-700 rounded-2xl overflow-hidden hover:border-yellow-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/10"
               >
                 {/* Poster */}
                 <div className="relative">
                   <img
-                    src={movie.image}
+                    src={movie.Posterurl}
                     alt={movie.title}
                     className="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs text-yellow-400">
-                    <FaStar />
-                    {movie.rating}
+
+                  {/* Status Badge */}
+                  <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full text-xs text-yellow-400">
+                    {movie.movieStatus}
                   </div>
                 </div>
 
@@ -88,7 +120,15 @@ const Heading = () => {
                     {movie.title}
                   </h3>
 
-                  <button className="mt-3 w-full bg-yellow-400 hover:bg-yellow-300 text-black text-sm font-semibold py-2 rounded-lg transition-all">
+                  <p className="text-xs text-richblack-400 mt-1">
+                    {movie.releasedate}
+                  </p>
+
+                  <button className="mt-3 w-full bg-yellow-400 hover:bg-yellow-300 text-black text-sm font-semibold py-2 rounded-lg transition-all" onClick={()=>{
+                    navigate(`/movie/${movie._id}`,{
+                      state:{tag:MainToken}
+                    })
+                  }}>
                     View Details
                   </button>
                 </div>
@@ -112,31 +152,3 @@ const Heading = () => {
 }
 
 export default Heading
-
-// import React from 'react'
-// import Navbar from '../Home/Navbar'
-// import { FaFilm } from 'react-icons/fa'
-
-// const Heading = () => {
-//     const currentUrl = window.location.href
-//         const token = currentUrl.split('/')
-//         const MainToken = decodeURIComponent(token[4])
-
-//     return (
-//     <div className='text-white w-screen h-screen overflow-hidden bg-richblack-900'>
-//         <Navbar/>
-//         <div className='w-full h-full flex flex-col justify-center items-center animate-fadeIn'>
-//             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center mb-4 shadow-lg">
-//                 <FaFilm className="text-2xl text-white" />
-//             </div>
-//             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-//                 <span className="bg-gradient-to-r from-yellow-200 to-yellow-50 bg-clip-text text-transparent">{MainToken}</span> Movies
-//             </h1>
-//             <p className="text-richblack-300 text-sm">Browse movies in the {MainToken} genre</p>
-//             <div className="mt-4 w-16 h-1 bg-gradient-to-r from-yellow-400 to-yellow-200 rounded-full" />
-//         </div>
-//     </div>
-//   )
-// }
-
-// export default Heading

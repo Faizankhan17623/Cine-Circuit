@@ -16,7 +16,11 @@ import OpenRoute from './Hooks/OpenRoute'
 import PrivateRoute from './Hooks/PrivateRoute';
 import Dasboard from './Components/Dashboard/Connector'
 import Movies from './Components/Movies/Heading'
+import Movie from './Components/Movies/Movie'
 import Theatres from './Components/Theatres/Heading'
+import AllotedShows from './Components/Theatres/AllotedShows'
+import TheatreFullDetails from './Components/Theatres/TheatreFullDetails'
+import Purchase from './Components/Movies/Purchase'
 import Profile from './Components/Dashboard/Profile'
 import { useDispatch, useSelector } from 'react-redux'
 // import Error from './Components/extra/Extra'
@@ -46,6 +50,7 @@ import CreateTicket from './Components/Dashboard/Tickets/CreateTicketes'
 import TicketAllotment from './Components/Dashboard/Tickets/TicketAllotment'
 import AllTickets from './Components/Dashboard/Tickets/GetAllTicket'
 import Chat from './Components/Dashboard/Chating/Chat'
+import ReviewPopup from './Components/Movies/ReviewPopup'
 import { MdDesktopMac } from 'react-icons/md'
 
 const MobileBlocker = () => (
@@ -114,6 +119,7 @@ useEffect(() => {
   return (
     <div className={`bg-richblack-800 min-h-screen`}>
       {isMobile && <MobileBlocker />}
+      <ReviewPopup />
 
       <Routes>
 
@@ -125,19 +131,24 @@ useEffect(() => {
         <Route path='/OTP' element={<OPT/>}/>
 
         <Route path='/Movies/:id' element={<Movies/>}/>
+        <Route path='/Movie/:id' element={<Movie/>}/>
         <Route path='/Theatres/:id' element={<Theatres/>}/>
+        <Route path='/theatres/alloted-shows/:id' element={<AllotedShows/>}/>
+        <Route path='/theatre/full-details/:id' element={<TheatreFullDetails/>}/>
+
+        <Route path='/Purchase/:id' element={<Purchase/>}/>
 
           <Route path='/Forgot-Password' element={
-          // <OpenRoute>
+          <OpenRoute>
             <Forgot/>
-          // </OpenRoute> 
+           </OpenRoute> 
           }/>
 
         <Route path='/Reset-Password/:id' element={ 
-          // <OpenRoute>
+          <OpenRoute>
             <Reset/> 
-          // </OpenRoute>
-          }/>
+          </OpenRoute>
+        }/>
 
 
 <Route element={

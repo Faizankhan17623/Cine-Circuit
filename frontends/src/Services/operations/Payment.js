@@ -1,12 +1,14 @@
 import toast from 'react-hot-toast'
-import apiConnector from '../apiConnector'
-import {MakePayment,Verifypayment,DownloadTicketdata} from '../Apis/PaymentApi'
+import {apiConnector} from '../apiConnector'
+import {CreatePayment,paymentVerification,TicketDetails} from '../Apis/PaymentApi'
 import {setUser,setLoading} from '../../Slices/PaymentSlice'
 
-const {makepayment} = MakePayment
-const {downloadticketdata} = DownloadTicketdata
-const {verifypayment} = Verifypayment
+const {makepayment} = CreatePayment
+const {downloadticketdata} = TicketDetails
+const {verifypayment} = paymentVerification
+
 const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID
+
 function loadScript(src){
     return new Promise((resolve,reject)=>{
         const script = document.createElement("script")
@@ -21,101 +23,189 @@ function loadScript(src){
     })
 }
 
-export function MakePayment(showid,theatreid,ticketid,categories,totaltickets,time,token){
-    return async(dispatch)=>{
-        const toastId = toast.loading('...loading')
-        dispatch(setLoading(true))
-        try{
+export function MakePayment(
+  ShowId,
+  Theatreid,
+  Ticketid,
+  Categories,
+  totalTickets,
+  time,
+  userId,
+  token,
+  navigate,
+  setPaymentLoading
+) {
+  return async (dispatch) => {
+    const toastId = toast.loading("Processing Payment...");
+    dispatch(setLoading(true));
+    if (setPaymentLoading) setPaymentLoading(true);
 
-            const res  = await loadScript("https://checkout.razorpay.com/v1/checkout.js")
-            if (!res) {
-                toast.error(
-                  "Razorpay SDK failed to load. Check your Internet Connection."
-                )
-                return
-              }
+    try {
+      const res = await loadScript(
+        "https://checkout.razorpay.com/v1/checkout.js"
+      );
 
-            const response = await apiConnector("POST",makepayment,{
-                showid:showid,
-                theatreid:theatreid,
-                ticketid,
-                ticketCategorey:categories,
-                totalTicketpurchased:totaltickets,
-                time:time
-            },{
-                Authorization: `Bearer ${token}`,
-            })
+      if (!res) {
+        toast.error("Razorpay SDK failed to load");
+        if (setPaymentLoading) setPaymentLoading(false);
+        return;
+      }
 
-            
-            if(!response.data.success){
-                toast.error("There is an error while creating the razorpay order")
-                return
-            }
-            const options = {
-                key: process.env.RAZORPAY_KEY,
-                currency: response.data.data.currency,
-                amount: `${response.data.data.amount}`,
-                order_id: response.data.data.id,
-                name: "Movie_Website",
-                description: "Thank you for Purchasing the Course.",
-                image: rzpLogo,
-                prefill: {
-                  name: `${user_details.firstName} ${user_details.lastName}`,
-                  email: user_details.email,
-                },
-                handler: function (response) {
-                  sendPaymentSuccessEmail(response, orderResponse.data.data.amount, token)
-                  verifyPayment({ ...response, courses }, token, navigate, dispatch)
-                },
-              }
-              const paymentObject = new window.Razorpay(options)
-          
-              paymentObject.open()
-              paymentObject.on("payment.failed", function (response) {
-                toast.error("Oops! Payment Failed.")
-                console.log(response.error)
-            })
-            console.log("This is the response after creating the razorpay order",response)
-            dispatch(setUser(response.data.id))
-
-            toast.success("razorpay order created sucesfully")
-        }catch(error){
-            console.log(error)
-            console.log("There is an error while creating the razorpay order")
-            toast.error("There is an error while creating the razorpay order")
+      const response = await apiConnector(
+        "POST",
+        makepayment,
+        {
+          ShowId,
+          Theatreid,
+          Ticketid,
+          userId,
+          Categories,
+          totalTickets,
+          time,
+        },
+        {
+          Authorization: `Bearer ${token}`,
         }
-        toast.dismiss(toastId)
-        dispatch(setLoading(false))
+      );
+
+      if (!response.data.success) {
+        toast.error(response.data.message || "Order creation failed");
+        if (setPaymentLoading) setPaymentLoading(false);
+        return;
+      }
+
+      const order = response.data.order;
+      const paymentData = response.data.data;
+
+      const options = {
+        key: razorpayKey,
+        amount: order.amount,
+        currency: order.currency,
+        order_id: order.id,
+        name: "Movie Website",
+        description: "Ticket Purchase",
+
+        handler: async function (razorpayResponse) {
+          dispatch(
+            PaymentVerify(
+              razorpayResponse.razorpay_order_id,
+              razorpayResponse.razorpay_payment_id,
+              razorpayResponse.razorpay_signature,
+              userId,
+              paymentData._id,
+              token,
+              navigate,
+              setPaymentLoading
+            )
+          );
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+
+      paymentObject.on("payment.failed", function () {
+        toast.error("Payment Failed");
+        if (setPaymentLoading) setPaymentLoading(false);
+      });
+
+    } catch (error) {
+      console.log(error);
+      const errorMessage = error?.response?.data?.message || "Payment Error";
+      toast.error(errorMessage);
+      if (setPaymentLoading) setPaymentLoading(false);
     }
+
+    toast.dismiss(toastId);
+    dispatch(setLoading(false));
+  };
 }
 
+// razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, paymentId
+export function PaymentVerify(
+  razorpay_order_id,
+  razorpay_payment_id,
+  razorpay_signature,
+  userId,
+  paymentId,
+  token,
+  navigate,
+  setPaymentLoading
+) {
+  return async (dispatch) => {
+    const toastId = toast.loading("Verifying Payment...");
+    dispatch(setLoading(true));
 
-export function VERIFYPAYMENT(){
-    return async(dispatch)=>{
-        const toastId = toast.loading('...loading')
-        dispatch(setLoading(true))
-        try{
-
-            const response = await apiConnector("",{})
-            console.log("",response)
-
-            if(!response.data.success){
-                toast.error("")
-                return
-            }
-            dispatch(setUser(response.data.id))
-
-            toast.success("")
-        }catch(error){
-            console.log(error)
-            console.log("")
-            toast.error("")
+    try {
+      const response = await apiConnector(
+        "POST",
+        verifypayment,
+        {
+          razorpay_order_id,
+          razorpay_payment_id,
+          razorpay_signature,
+          userId,
+          paymentId,
+        },
+        {
+          Authorization: `Bearer ${token}`,
         }
-        toast.dismiss(toastId)
-        dispatch(setLoading(false))
+      );
+
+      if (!response.data.success) {
+        toast.error(response.data.message || "Payment Verification Failed");
+        return;
+      }
+
+      toast.success("Payment Successful! Please check your dashboard for ticket details");
+
+      if (navigate) {
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      }
+
+    } catch (error) {
+      console.log(error);
+      const errorMessage = error?.response?.data?.message || "Verification Error";
+      toast.error(errorMessage);
     }
+
+    toast.dismiss(toastId);
+    dispatch(setLoading(false));
+    if (setPaymentLoading) setPaymentLoading(false);
+  };
 }
 
+export function MakePdf(ticketId, token) {
+  return async () => {
+    try {
+      const response = await apiConnector(
+        "GET",
+        `${downloadticketdata}/${ticketId}`,
+        null,
+        {
+          Authorization: `Bearer ${token}`,
+        },
+        "blob"   // important for PDF
+      );
+
+      const url = window.URL.createObjectURL(
+        new Blob([response.data])
+      );
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `ticket-${ticketId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to download PDF");
+    }
+  };
+}
 
 
 

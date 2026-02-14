@@ -69,3 +69,13 @@ export const Ratings = {
     banner :BASE_URL+"/Banner",
     finder :BASE_URL+"/Finder"
 }
+
+
+export const Display = {
+    Movie:BASE_URL+"/Movie-Tags",
+    Theatre:BASE_URL+"/Theatre-Tags",
+    Details:BASE_URL+"/Movie-Details",
+    purchase:BASE_URL+"/Purchasing",
+    theatreshows:BASE_URL+"/Theatre-Shows",
+    singletheatre:BASE_URL+"/Single-Theatre"
+}

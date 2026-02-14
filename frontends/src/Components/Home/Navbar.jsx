@@ -12,12 +12,12 @@ const NAV_LINKS = [
 ]
 
 const MOVIE_TAGS = [
-  "Adventure", "Martial", "Superhero", "Disaster", "Spy Secret", "War", "Crime"
+  "Adventure", "Martial", "Superhero", "Disaster", "Spy Secret", "War", "Crime","Hello"
 ]
 
 const THEATRE_TYPES = [
   "Multiplex Theatre", "IMAX Theatre", "3D Theatre", "4DX Theatre",
-  "Drive-in Theatre", "Single Screen Theatre", "Open Air Theatre"
+  "Drive-in Theatre", "Single Screen Theatre", "Open Air Theatre","Laser Projection"
 ]
 
 const Navbar = () => {

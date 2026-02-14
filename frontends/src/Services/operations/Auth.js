@@ -485,52 +485,53 @@ export function GetCurrentUserDetails(){
 
 // here w will put some data of the personal details and this are all the function that are like  using the peersonal details and the personal slice
 
-export function bannerLike(id){
+export function bannerLike(id, token){
     return async(dispatch)=>{
-        const toastId = toast.loading("..loading")
+        const toastId = toast.loading("Liking...")
         dispatch(setloading(true))
         try {
-            const response = await apiConnector("PUT",LikeBanner,{
-                id
+            const response = await apiConnector("PUT", `${LikeBanner}?id=${id}`, null, {
+                Authorization: `Bearer ${token}`
             })
-            console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
-            dispatch(setlikes(response.data.likes))
-            toast.success("Banner Liked Successfully")
+            toast.success("Liked successfully")
+            return { success: true, likes: response.data.likes, dislikes: response.data.dislikes }
         } catch (error) {
-            console.log("Error in liking the banner",error)
-            console.log("Error in liking the banner")
+            const errorMessage = error?.response?.data?.message || "Error liking"
+            toast.error(errorMessage)
+            return { success: false }
+        } finally {
+            dispatch(setloading(false))
+            toast.dismiss(toastId)
         }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
     }
 }
 
-export function bannerDislike(id){
+export function bannerDislike(id, token){
     return async(dispatch)=>{
-        const toastId = toast.loading("..loading")
+        const toastId = toast.loading("Disliking...")
         dispatch(setloading(true))
         try {
-            const response = await apiConnector("PUT",DislikeBanner,{
-                id
+            const response = await apiConnector("PUT", `${DislikeBanner}?id=${id}`, null, {
+                Authorization: `Bearer ${token}`
             })
-            console.log("This is the responsee data",response)
 
             if (!response.data.success) {
-                toast.error(response.data.message)
                 throw new Error(response.data.message)
             }
-            dispatch(setdislikes(response.data.dislikes))
-            toast.success("Banner Disliked Successfully")
+            toast.success("Disliked successfully")
+            return { success: true, likes: response.data.likes, dislikes: response.data.dislikes }
         } catch (error) {
-            console.log("Error in disliking the banner",error)
-            console.log("Error in disliking the banner")
+            const errorMessage = error?.response?.data?.message || "Error disliking"
+            toast.error(errorMessage)
+            return { success: false }
+        } finally {
+            dispatch(setloading(false))
+            toast.dismiss(toastId)
         }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
     }
 }
 
@@ -739,72 +740,64 @@ export function ticketpurchasedfull(){
     }
 }
 
-export function createRating(rating,showid,review){
+export function createRating(rating, showId, review, token){
     return async(dispatch)=>{
-        const toastId = toast.loading("..loading")
+        const toastId = toast.loading("Submitting your review...")
         dispatch(setloading(true))
         try {
-            const response = await apiConnector("POST",CreateRating,{
-                rating:rating,
-                review:review,
-                course:showid,
-                user:setuser
+            const response = await apiConnector("POST", CreateRating, {
+                rating,
+                review,
+                showId,
+            }, {
+                Authorization: `Bearer ${token}`
             })
-            console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
-            toast.success("Rating Created Successfully")
+            toast.success("Rating submitted successfully")
+            return { success: true, data: response.data }
         } catch (error) {
-            console.log("Error in creating the rating",error)
-            console.log("Error in creating the rating")
+            console.log("Error in creating the rating", error)
+            const errorMessage = error?.response?.data?.message || "Error submitting rating"
+            toast.error(errorMessage)
+            return { success: false }
+        } finally {
+            dispatch(setloading(false))
+            toast.dismiss(toastId)
         }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
     }
 }   
 
 export function getAverageRating(Showid){
     return async(dispatch)=>{
-        const toastId = toast.loading("..loading")
-        dispatch(setloading(true))
         try {
-            const response = await apiConnector("GET",GetAverageRating,{
-                Showid
-            })
-            console.log("This is the responsee data",response)
+            const response = await apiConnector("GET", `${GetAverageRating}?Showid=${Showid}`)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
-            dispatch(setShow(response.data.show))
+            return { success: true, averageRating: response.data.averageRating }
         } catch (error) {
-            console.log("Error in getting the average rating",error)
-            console.log("Error in getting the average rating")
+            console.log("Error in getting the average rating", error)
+            return { success: false, averageRating: 0 }
         }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
     }
 }
 
 export function getAllRatingReview(){
     return async(dispatch)=>{
-        const toastId = toast.loading("..loading")
-        dispatch(setloading(true))
         try {
-            const response = await apiConnector("GET",GetAllRatingReview)
-            // console.log("This is the responsee data",response)
+            const response = await apiConnector("GET", GetAllRatingReview)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
-            dispatch(setShow(response.data.show))
+            return { success: true, data: response.data.data }
         } catch (error) {
-            console.log("Error in getting the all rating and review",error)
-            console.log("Error in getting the all rating and review")
+            console.log("Error in getting the all rating and review", error)
+            return { success: false, data: [] }
         }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
     }
 }
