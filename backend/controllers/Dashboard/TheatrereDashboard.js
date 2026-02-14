@@ -265,4 +265,109 @@ exports.getTheatreDetails = async (req,res)=>{
         res.status(500).json({message:"Internal Server Error"});        
     }
 }
-// abhe saare shows aayyenga and uske badk dusre isme to apun log theatres and unke received tickets hain wo ayenga adnd jo time pe aaye hain wo bhee show karenge
+
+exports.GetShowsDetails = async (req,res)=>{
+    try{
+        const {Theatreid} = req.query
+
+        if (!Theatreid) {
+            return res.status(400).json({
+                message: "Input is required",
+                success: false,
+            });
+        }
+
+        const theatre = await Theatres.findById(Theatreid)
+
+        if (!theatre) {
+            return res.status(404).json({
+                message: "No theatre found",
+                success: false,
+            });
+        }
+
+        if (!theatre.showAlloted || theatre.showAlloted.length === 0) {
+            return res.status(404).json({
+                message: "No shows alloted to this theatre",
+                success: false,
+            });
+        }
+
+        const shows = await CreateShow.find({_id: {$in: theatre.showAlloted}})
+
+        if (!shows || shows.length === 0) {
+            return res.status(404).json({
+                message: "No shows found",
+                success: false,
+            });
+        }
+
+        // Get all ticket data for this theatre
+        // const ticketData = await Theatrestickets.find({theatreId: Theatreid})
+
+        // // Combine show data with its ticket details
+        // const showsWithTickets = shows.map((show, index) => {
+        //     const showTickets = ticketData.filter(t => t.showId === show._id.toString())
+        //     return {
+        //         show: show,
+        //         ticketDetails: {
+        //             ticketsReceived: theatre.ticketsReceived[index] ? Number(theatre.ticketsReceived[index]) : 0,
+        //             receivedTime: theatre.ticketsReceivedTime[index] || null,
+        //             ticketPrice: theatre.priceoftheTicket[index] ? Number(theatre.priceoftheTicket[index]) : 0
+        //         },
+        //         tickets: showTickets
+        //     }
+        // })
+
+        return res.status(200).json({
+            message: "Shows fetched successfully",
+            success: true,
+            data: shows
+        })
+
+    }catch(error){
+        console.log(error)
+        console.log(error.message)
+        return res.status(500).json({
+            message: "Internal Server Error",
+            success: false
+        })
+    }
+}
+
+
+exports.GetSingleTheatreDetails = async (req,res)=>{
+    try{
+
+        const {theatreid}= req.query
+
+          if (!theatreid) {
+            return res.status(400).json({
+                message: "Input is required",
+                success: false,
+            });
+        }
+
+        const theatre = await Theatres.findById(theatreid)
+
+        if (!theatre) {
+            return res.status(404).json({
+                message: "No theatre found",
+                success: false,
+            });
+        }
+
+
+        return res.status(200).json({
+            message:"This is the date of single theatre deatisl",
+            success:true,
+            data:theatre
+        })
+
+    }catch(error){
+        console.log(error)
+        console.log(error.message)
+        console.log("There is an error in the get single theatre deatils ")
+    }
+}
+// abhe saare shows aayyenga and uske badk dusre isme to apun log theatres and unke received tickets hain wo ayenga adnd jo time pe aaye hain wo bhee show karenge  

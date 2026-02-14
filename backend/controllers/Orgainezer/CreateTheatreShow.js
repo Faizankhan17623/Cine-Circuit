@@ -710,17 +710,16 @@ exports.SendCustomMessage = async(req,res)=>{
 // tHIS IS THE FUNCTION THAT WILL HELP US SO THAT THE ROUTE IS THE USE ROUTE AND IT IS PRESENTED ON LINIE NO 42
 exports.PosterLike = async(req,res)=>{
     try{
-
         const id = req.query.id
         const userId = req.USER.id
-        // console.log("This is the user id",userId)
+
         if(!id){
             return res.status(400).json({
                 message:"The input is been required",
                 success:false
             })
         }
-        
+
         const Finding = await CreateShow.findById(id)
         if(!Finding){
             return res.status(400).json({
@@ -728,39 +727,43 @@ exports.PosterLike = async(req,res)=>{
                 success:false
             })
         }
-        const revise = await USER.findOne({UserBannerliked:id})
-        if(revise){
+
+        // Check if THIS user has already liked this show
+        const currentUser = await USER.findById(userId)
+        const alreadyLiked = currentUser.UserBannerliked.some(showId => showId.toString() === id)
+        if(alreadyLiked){
             return res.status(400).json({
-                message:"you have already liked this show",
+                message:"You have already liked this show",
                 success:false
             })
         }
 
-        let liking ;
+        // Increment like count
+        await CreateShow.findByIdAndUpdate(id, {$inc:{BannerLiked:1}}, {new:true})
+        // Add show to user's liked list
+        await USER.findByIdAndUpdate(userId, {$push:{UserBannerliked:id}})
 
-        if(Finding.BannerLiked < 0){
-            liking = await CreateShow.findByIdAndUpdate(id,{BannerLiked:0},{new:true})
+        // If user had previously disliked, remove the dislike
+        const hadDisliked = currentUser.UserBannerhated.some(showId => showId.toString() === id)
+        if(hadDisliked){
+            await USER.findByIdAndUpdate(userId, {$pull:{UserBannerhated:id}})
+            await CreateShow.findByIdAndUpdate(id, {$inc:{BannerDisLiked:-1}})
         }
 
-        if(Finding.BannerDisLiked < 0){
-            liking = await CreateShow.findByIdAndUpdate(id,{BannerDisLiked:0},{new:true})
-        }
+        // Fetch updated counts
+        const updatedShow = await CreateShow.findById(id)
 
-        liking = await CreateShow.findByIdAndUpdate(id,{$inc:{BannerLiked:1}},{new:true})
-        await USER.updateOne({$push:{UserBannerliked:id}})
-
-        const FindingFromuserDislike = await USER.findByIdAndUpdate(userId,{$pull:{UserBannerhated:id}},{new:true})
-        await CreateShow.findByIdAndUpdate(id,{$inc:{BannerDisLiked:-1}},{new:true})
-        console.log(FindingFromuserDislike)
         return res.status(200).json({
-            message:"you have liked the banner",
-            success:true
+            message:"You have liked the show",
+            success:true,
+            likes: Math.max(0, updatedShow.BannerLiked),
+            dislikes: Math.max(0, updatedShow.BannerDisLiked)
         })
     }catch(error){
         console.log(error)
         console.log(error.message)
         return res.status(500).json({
-            message:"There is an error in the update show title code",
+            message:"There is an error in the like code",
             success:false
         })
     }
@@ -772,6 +775,7 @@ exports.BannerDisliked = async(req,res)=>{
     try{
         const id = req.query.id
         const userId = req.USER.id
+
         if(!id){
             return res.status(404).json({
                 message:"The input fields are been required",
@@ -787,35 +791,36 @@ exports.BannerDisliked = async(req,res)=>{
             })
         }
 
-        const revise = await USER.findOne({UserBannerhated:id})
-        if(revise){
+        // Check if THIS user has already disliked this show
+        const currentUser = await USER.findById(userId)
+        const alreadyDisliked = currentUser.UserBannerhated.some(showId => showId.toString() === id)
+        if(alreadyDisliked){
             return res.status(400).json({
-                message:"you have already hated this show",
+                message:"You have already disliked this show",
                 success:false
             })
         }
 
-        let liking ;
+        // Increment dislike count
+        await CreateShow.findByIdAndUpdate(id, {$inc:{BannerDisLiked:1}}, {new:true})
+        // Add show to user's disliked list
+        await USER.findByIdAndUpdate(userId, {$push:{UserBannerhated:id}})
 
-        if(Finding.BannerLiked < 0){
-            liking = await CreateShow.findByIdAndUpdate(id,{BannerLiked:0},{new:true})
+        // If user had previously liked, remove the like
+        const hadLiked = currentUser.UserBannerliked.some(showId => showId.toString() === id)
+        if(hadLiked){
+            await USER.findByIdAndUpdate(userId, {$pull:{UserBannerliked:id}})
+            await CreateShow.findByIdAndUpdate(id, {$inc:{BannerLiked:-1}})
         }
 
-        if(Finding.BannerDisLiked < 0){
-            liking = await CreateShow.findByIdAndUpdate(id,{BannerDisLiked:0},{new:true})
-        }
-
-
-        liking = await CreateShow.findByIdAndUpdate(id,{$inc:{BannerDisLiked:1}},{new:true})
-        await USER.updateOne({$push:{UserBannerhated:id}})
-
-        const FindingFromuserDislike = await USER.findByIdAndUpdate(userId,{$pull:{UserBannerliked:id}},{new:true})
-        await CreateShow.findByIdAndUpdate(id,{$inc:{BannerLiked:-1}},{new:true})
-        console.log(FindingFromuserDislike)
+        // Fetch updated counts
+        const updatedShow = await CreateShow.findById(id)
 
         return res.status(200).json({
-            message:"you have disliked this show",
-            success:true
+            message:"You have disliked this show",
+            success:true,
+            likes: Math.max(0, updatedShow.BannerLiked),
+            dislikes: Math.max(0, updatedShow.BannerDisLiked)
         })
     }catch(error){
         console.log(error)

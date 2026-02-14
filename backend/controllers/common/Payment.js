@@ -16,7 +16,6 @@ const ticket = require('../../models/ticket')
 
 // Student Features api kar ke ek page hain github main usko dekh lena agay payment ke isme kuch issue aaye to 
 
-
 // This is the function that is present in the route of payment on line no 6
 exports.MakePayment = async(req,res) => {
     try {
@@ -26,6 +25,7 @@ exports.MakePayment = async(req,res) => {
         const userId = req.body.userId
         const{Categories,totalTickets,time} = req.body
 
+        // console.log(Categories)
         if(!userId){
             return res.status(400).json({
                 message:"You are not logged in please log in",
@@ -34,12 +34,12 @@ exports.MakePayment = async(req,res) => {
         }
 
         // Input validation checks
-        if(Categories.length !== totalTickets.length){
-            return res.status(400).json({
-                message:"The categories and the total tickets needed do not match check your inputs",
-                success:false
-            })
-        }
+        // if(Categories.length !== totalTickets.length){
+        //     return res.status(400).json({
+        //         message:"The categories and the total tickets needed do not match check your inputs",
+        //         success:false
+        //     })
+        // }
 
         // Verify user, show, theatre and tickets exist
         const [UserFinders, Showearching, Theatrearching, TheatreTicketsrearching] = await Promise.all([
@@ -84,6 +84,10 @@ exports.MakePayment = async(req,res) => {
         // Validate ticket categories and availability
         const results = await Promise.all(
                 Categories.map(async (categoryId, index) => {
+
+                    // console.log("This is the cat id",categoryId)
+                    // console.log("THis is the index",index)
+
                     const category = TheatreTicketsrearching.ticketsCategory.find(
                         ticket => ticket._id.toString() === categoryId
                     );
@@ -140,7 +144,7 @@ exports.MakePayment = async(req,res) => {
         for(let tickets of totalTickets){
             if(parseInt(tickets) > 5){
                 return res.status(400).json({
-                    message:"Cannot purchase more than 10 tickets per category",
+                    message:"Cannot purchase more than 5 tickets per category",
                     success:false
                 })
             }
@@ -212,6 +216,7 @@ exports.MakePayment = async(req,res) => {
         });
     }
 }
+
 // ghty jxxh msvw vkad
 // This is the function that is present in the route of payment on line no 7
 exports.Verifypayment = async(req,res) => {
@@ -406,8 +411,6 @@ exports.Verifypayment = async(req,res) => {
         });
     }
 }
-
-
 
 exports.MakePdf = async(req,res)=>{
     try{

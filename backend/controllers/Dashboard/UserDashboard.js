@@ -4,6 +4,12 @@ const CreateShow = require('../../models/CreateShow')
 const Theatre = require('../../models/Theatres');
 const genre = require('../../models/genre')
 const Theatrestickets = require('../../models/TheatresTicket')
+const subgenre = require('../../models/subgenre')
+const language = require('../../models/CreateLanguage')
+const cast = require('../../models/Createcast')
+const hashtags = require('../../models/CreateHashtags')
+
+// const CreateShow = require('../../models/CreateShow')
 
 exports.TicketPurchased = async(req,res)=>{
     try {
@@ -146,52 +152,65 @@ exports.TicketPurchasedFullDetails = async(req,res)=>{
 exports.BannerMovies = async(req,res)=>{
     try{
 
-        const AllMovies = await  CreateShow.find({ uploaded: true, VerifiedByTheAdmin: true })
-if (!AllMovies || AllMovies.length === 0) {
+        const AllMovies = await CreateShow.find({ uploaded: true, VerifiedByTheAdmin: true })
+            .populate("ratingAndReviews")
+
+        if (!AllMovies || AllMovies.length === 0) {
             return res.status(404).json({
                 message: "Movies not found",
                 success: false
             })
         }
 
-
-             const MostLiked = [...AllMovies].sort((a, b) => {
+        // 1. Trending - Most liked show
+        const MostLiked = [...AllMovies].sort((a, b) => {
             return (b.BannerLiked || 0) - (a.BannerLiked || 0)
-        })[0] // Take the first one (highest)
+        })[0]
 
-        // 2. Recently Created Movie (most recent createdAt)
+        // 2. New - Recently created movie
         const RecentlyCreated = [...AllMovies].sort((a, b) => {
             return new Date(b.createdAt) - new Date(a.createdAt)
-        })[0] // Take the first one (most recent)
+        })[0]
 
-              const ComingSoon = AllMovies.filter((movie) => {
+        // 3. Coming Soon - Upcoming movies
+        const ComingSoon = AllMovies.filter((movie) => {
             return movie.movieStatus === "Upcoming" || movie.movieStatus === "Coming Soon"
         }).sort((a, b) => {
             return new Date(a.releasedate) - new Date(b.releasedate)
-        }) // Sort by release date (earliest first)
+        })
 
+        // 4. Top Picks & Blockbuster - 2 movies with most tickets sold
+        const TopPicks = [...AllMovies].sort((a, b) => {
+            return (b.ticketspurchased?.length || 0) - (a.ticketspurchased?.length || 0)
+        }).slice(0, 2)
 
-        // Kep this we will work on this later onwrda
-        // const MostRates = [...AllMovies].sort((a, b) => {
-        //     return (b.BannerLiked || 0) - (a.BannerLiked || 0)
-        // })[0] // Take the first one (highest)
+        // 5. Highest Rated - movie with best average rating that is still playing (not expired)
+        const activeMovies = AllMovies.filter(movie => movie.movieStatus === "Released")
+        let HighestRated = null
+        if (activeMovies.length > 0) {
+            let bestAvg = -1
+            for (const movie of activeMovies) {
+                if (movie.ratingAndReviews && movie.ratingAndReviews.length > 0) {
+                    const avg = movie.ratingAndReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / movie.ratingAndReviews.length
+                    if (avg > bestAvg) {
+                        bestAvg = avg
+                        HighestRated = { ...movie.toObject(), averageRating: Math.round(avg * 10) / 10 }
+                    }
+                }
+            }
+        }
 
-          const TopThreeTrending = [...AllMovies].sort((a, b) => {
-            return (b.ticketspurchased || 0) - (a.ticketspurchased || 0)
-        }).slice(0,3) // Take the first one (highest)
-
-
-         return res.status(200).json({
+        return res.status(200).json({
             message: "Banner movies fetched successfully",
             success: true,
             data: {
                 mostLiked: MostLiked,
                 recentlyCreated: RecentlyCreated,
                 comingSoon: ComingSoon,
-                topTrending: TopThreeTrending // ✅ Array of 3 movies
+                topPicks: TopPicks,
+                highestRated: HighestRated
             }
         })
-
 
     }catch(error){
         console.log(error)
@@ -214,7 +233,7 @@ exports.FIndusingMOvieTags = async(req,res)=>{
         const Finder = await genre.findOne({genreName:movies})
           if (!Finder) {
       return res.status(404).json({
-        message: "Invalid tag",
+        message: "No Movies are Present for this tag",
         success: false,
       });
     }
@@ -317,3 +336,115 @@ exports.FindWholeMoviesData = async (req,res)=>{
         console.log("There is an error in the find whole movie date code ")
     }
 }
+
+
+exports.FindMovieById = async (req, res) => {
+    try {
+        const { id } = req.query;
+
+        if (!id) {
+            return res.status(400).json({
+                message: "Movie ID is required",
+                success: false
+            });
+        }
+
+        const movie = await CreateShow.findById(id)
+            .populate("genre")
+            .populate("SUbGenre")
+            .populate("language")
+            .populate("castName")
+            .populate("hashtags")
+            .populate("AllotedToTheNumberOfTheatres")
+            .populate("ratingAndReviews");
+
+        if (!movie) {
+            return res.status(404).json({
+                message: "Movie not found",
+                success: false
+            });
+        }
+
+        return res.status(200).json({
+            message: "Movie data fetched successfully",
+            success: true,
+            data: movie
+        });
+
+    } catch (error) {
+        console.log("Error in FindMovieById:", error.message);
+        return res.status(500).json({
+            message: "Internal Server Error",
+            success: false
+        });
+    }
+};
+
+exports.PurcahsingData = async (req, res) => {
+  try {
+    const { id } = req.query;
+
+    if (!id) {
+      return res.status(400).json({
+        message: "The inputs are required",
+        success: false
+      });
+    }
+
+    const Finding = await CreateShow.findById(id);
+
+    if (!Finding) {
+      return res.status(404).json({
+        message: "The show is not present",
+        success: false
+      });
+    }
+
+    // ✅ Get all theatres properly
+    const Theatres = await Theatre.find({
+      _id: { $in: Finding.AllotedToTheNumberOfTheatres }
+    });
+
+    if (!Theatres || Theatres.length === 0) {
+      return res.status(404).json({
+        message: "No theatre found",
+        success: false
+      });
+    }
+
+    // ✅ Extract all ticket IDs from all theatres
+    const allTicketIds = Theatres.flatMap(theatre => theatre.ticketCreation);
+
+    if (!allTicketIds || allTicketIds.length === 0) {
+      return res.status(404).json({
+        message: "No tickets created",
+        success: false
+      });
+    }
+
+    // ✅ Get all tickets
+    const TicketData = await Theatrestickets.find({
+      _id: { $in: allTicketIds }
+    });
+
+    return res.status(200).json({
+      message: "This is the data",
+      success: true,
+      data: {
+        show: Finding,
+        Theatres,
+        TicketData
+      }
+    });
+
+  } catch (error) {
+    console.log(error);
+    console.log(error.message);
+    console.log("There is an error in the purchasing data code");
+
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false
+    });
+  }
+};

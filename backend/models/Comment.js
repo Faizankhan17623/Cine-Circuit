@@ -14,4 +14,4 @@ const CreateComment = new mongoose.Schema({
         required:true
     }
 },{timestamps:true})
-module.exports = mongoose.model("Comment",CreateComment)
+module.exports = mongoose.model("Comment",CreateComment)    

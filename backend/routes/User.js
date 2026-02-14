@@ -11,8 +11,8 @@ const {AllShows,usingtitle} = require('../controllers/common/Showlist')
 const {createRating,getAverageRating,getAllRatingReview} = require("../controllers/common/RatingAndRviews")
 const {TicketPurchased,TicketPurchasedFullDetails} = require("../controllers/Dashboard/UserDashboard")
 const {GetAlluserDetails,FindUserNames,FindLoginEmail,FindNumber,FindCreationEmail} = require('../controllers/user/User')
-const {BannerMovies,FIndusingMOvieTags,FindWholeMoviesData} = require('../controllers/Dashboard/UserDashboard')
-const {getTheatreDetails} = require('../controllers/Dashboard/TheatrereDashboard')
+const {BannerMovies,FIndusingMOvieTags,FindWholeMoviesData,FindMovieById,PurcahsingData} = require('../controllers/Dashboard/UserDashboard')
+const {GetSingleTheatreDetails,getTheatreDetails, GetShowsDetails} = require('../controllers/Dashboard/TheatrereDashboard')
 // DONE 
 // This is the first route that will be used to create the user and all the things that the user will do releated to his personal info
 route.post("/Create-User",Createuser)
@@ -50,11 +50,12 @@ route.get("/Specific-Show",auth,IsUSER,usingtitle)
 // This are the route that are going to be used to like and dislike the banner
 route.put("/Like-Banner",auth, IsUSER,PosterLike) 
 route.put("/Dislike-Banner",auth, IsUSER,BannerDisliked) 
-route.get('/Banner',BannerMovies)
-route.get('/Movie-Tags',FIndusingMOvieTags)
-route.get('/Theatre-Tags',getTheatreDetails)
-route.post('/Finder',FindWholeMoviesData)
 
+route.get('/Banner',BannerMovies)
+route.post('/Movie-Tags',FIndusingMOvieTags)
+route.post('/Theatre-Tags',getTheatreDetails)
+route.post('/Finder',FindWholeMoviesData)
+route.get('/Movie-Details',FindMovieById)
 
 
 route.put("/Comment-Banner",auth, IsUSER,Comment) 
@@ -72,5 +73,9 @@ route.get("/Ticket-Purchased-FullDetails",auth, IsUSER,TicketPurchasedFullDetail
 route.post("/createRating", auth, IsUSER, createRating)
 route.get("/getAverageRating", getAverageRating)
 route.get("/getReviews", getAllRatingReview)
+
+route.get('/Purchasing',PurcahsingData)
+route.get('/Theatre-Shows', GetShowsDetails)
+route.get('/Single-Theatre', GetSingleTheatreDetails)
 module.exports = route      
 // memphis

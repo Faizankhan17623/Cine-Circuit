@@ -113,8 +113,6 @@ exports.TicketDistributionSystem = async (req, res) => {
         }
 
 
-  
-
 
         const formattedNow = new Date();
         formattedNow.setHours(0, 0, 0, 0);
@@ -179,10 +177,11 @@ if (parsedReleaseDate.getTime() === formattedNow.getTime()) {
             TicketsRemaining: Remaining
         });
 
-        await Theatre.updateOne({ TheatreOwner: userId }, { $push: { ticketCreation: TicketCreations._id } });
+  TheatreFinding.ticketCreation.push(TicketCreations._id);
+await TheatreFinding.save();
 
         return res.status(201).json({
-            message: "Ticket distribution created successfully",
+            message: "Ticket distribution created successully",
             success: true,
             data: TicketCreations
         });
@@ -258,126 +257,131 @@ exports.GetAllticketsCreated = async (req, res) => {
     }
 };
 // both the codes are the same
+const convertTimeToMs = (time) => {
+    const [hours, minutes] = time.split(':').map(Number);
 
-const  COnvertTime = (time) =>{
-    let Spliting = time.split(':')
-
-    let GetHours = Spliting[0]
-    let GetMinutes = Spliting[1]
-    let GetSeconds = Spliting[2]
-    let ConvertHours = (GetHours || 0 )* 3600000
-    let ConvertMinutes = (GetMinutes || 0 )* 60000
-    let ConvertSeconds = (GetSeconds || 0)* 1000
-    let ExtraThirty = 30 * 60 * 1000
-    let totalTime = ConvertHours+ConvertMinutes+ConvertSeconds+ExtraThirty
-    return totalTime
-}
-
-// THis is the function which is present in the theatre route on line no 28
+    return (hours * 60 * 60 * 1000) +
+           (minutes * 60 * 1000);
+};
 
 exports.UpdateTime = async (req, res) => {
     try {
         const userId = req.USER.id;
-        const theatreId = req.query.theatreId;
-        const ShowId = req.query.ShowId;
+        const { theatreId, ShowId } = req.query;
         const { Ticketid, time } = req.body;
 
         if (!userId) {
             return res.status(400).json({
-                message: "The user is not logged in",
+                message: "User not logged in",
                 success: false,
             });
         }
+
         if (!time || !Ticketid) {
             return res.status(400).json({
-                message: "The input fields are required",
+                message: "Time and Ticket ID are required",
                 success: false,
             });
         }
 
-        const TheatreFinding = await Theatre.findOne({ _id: theatreId });
+        const TheatreFinding = await Theatre.findById(theatreId);
         if (!TheatreFinding) {
             return res.status(400).json({
-                message: "The theatre is not found",
+                message: "Theatre not found",
                 success: false,
             });
         }
 
-        const ShowFinding = await CreateShow.findOne({ _id: ShowId });
+        const ShowFinding = await CreateShow.findById(ShowId);
         if (!ShowFinding) {
             return res.status(400).json({
-                message: "The show is not present, please check your inputs",
+                message: "Show not found",
                 success: false,
             });
         }
 
-        const Duration = ShowFinding.movieDuration;
-        let Spliting = time.split(':')
-        let hours = Spliting[0]
-        let minutes = Spliting[1]
-
-        if(hours > 24 ){
-            return res.status(400).json({
-                message: `The hours should be in between from 0 to 24`,
-                success: false,
-            });
-        }
-
-        
-        if(minutes > 60 || minutes < 0 ){
-            return res.status(400).json({
-                message: `The minutes should be in between from 0 to 59`,
-                success: false,
-            });
-        }
-
-        let Timers = COnvertTime(Duration);
-        console.log(Timers,"YHis is from the timers")
-
-
-
-        const TicketFinding = await Theatrestickets.findOne({ _id: Ticketid });
-        // console.log("prinintg the length of the sarray",TicketFinding.timings.length)
+        const TicketFinding = await Theatrestickets.findById(Ticketid);
 
         if (!TicketFinding) {
             return res.status(400).json({
-                message: "This ticket is not created, please check your input",
+                message: "Ticket not found",
                 success: false,
             });
         }
 
+        // ✅ Convert duration
+        const movieDurationMinutes = Number(ShowFinding.movieDuration);
+        const movieDurationMs = movieDurationMinutes * 60 * 1000;
 
-        if(TicketFinding.timings.length > 0){ 
-            let timers = TicketFinding.timings.length - 1
-            let lastTime = TicketFinding.timings[timers];
-            let extra = COnvertTime(lastTime)
-            let newTime = COnvertTime(time)
+        // ✅ 30 minute buffer
+        const bufferMs = 30 * 60 * 1000;
 
-            console.log(extra,"THis is from the extra")
-            
-            if(newTime < extra+Timers){
+        // ✅ Validate time format
+        const [hours, minutes] = time.split(":").map(Number);
+
+        if (isNaN(hours) || isNaN(minutes)) {
+            return res.status(400).json({
+                message: "Invalid time format. Use HH:mm",
+                success: false,
+            });
+        }
+
+        if (hours < 0 || hours > 23) {
+            return res.status(400).json({
+                message: "Hours must be between 0 and 23",
+                success: false,
+            });
+        }
+
+        if (minutes < 0 || minutes > 59) {
+            return res.status(400).json({
+                message: "Minutes must be between 0 and 59",
+                success: false,
+            });
+        }
+
+        // ✅ Convert new time to ms
+        const newStartTimeMs = convertTimeToMs(time);
+
+        // ✅ Only check timings inside THIS ticket document
+        if (TicketFinding.timings && TicketFinding.timings.length > 0) {
+
+            // Sort timings properly
+            const sortedTimings = TicketFinding.timings
+                .map(t => convertTimeToMs(t))
+                .sort((a, b) => a - b);
+
+            const lastStartTimeMs = sortedTimings[sortedTimings.length - 1];
+
+            const minimumNextStartTime =
+                lastStartTimeMs + movieDurationMs + bufferMs;
+
+            if (newStartTimeMs < minimumNextStartTime) {
                 return res.status(400).json({
-                    message: `New show timing must be at least ${Duration} + 30 min after the last show`,
+                    message: `Next show must start after movie duration (${movieDurationMinutes} mins) + 30 min buffer.`,
                     success: false,
                 });
             }
         }
-        // Push new timing into the array
 
-        await Theatrestickets.updateOne({showId:ShowId,userId:userId,theatreId:theatreId,_id:Ticketid},{ $push: { timings: time } })
+        // ✅ Push new timing
+        TicketFinding.timings.push(time);
+        await TicketFinding.save();
 
         return res.status(200).json({
-            message: "The date has been updated",
-            success: true
+            message: "Show timing added successfully",
+            success: true,
         });
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({
-            message: "There is an error in the update time code",
+            message: "Error in update time",
             success: false,
         });
     }
 };
+
 
 
 exports.UpcomigTickets = async (req, res) => {
