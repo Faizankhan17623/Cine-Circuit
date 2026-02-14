@@ -65,6 +65,8 @@ const MobileBlocker = () => (
 )
 
 const Homelayout = ({Notify}) =>{
+  const BASE_URL = import.meta.env.VITE_MAIN_BACKEND_URL_USER
+// console.log(BASE_URL)
   return(
     <div className={`bg-richblack-900 min-h-screen`}>
     <Navbar setColors={Notify}  />
