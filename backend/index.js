@@ -34,7 +34,7 @@ app.use(morgan("dev"));
 
 app.use(VisitorCounter(Visitor))
 app.use(cors({
-    origin : "http://localhost:5173",
+    origin : "https://mw-9z0s.onrender.com",
     credentials:true,
 }
 ))
