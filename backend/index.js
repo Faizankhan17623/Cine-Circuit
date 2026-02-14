@@ -34,10 +34,15 @@ app.use(morgan("dev"));
 
 app.use(VisitorCounter(Visitor))
 app.use(cors({
-    origin : "https://mw-9z0s.onrender.com",
-    credentials:true,
-}
-))
+    origin: [
+        "http://localhost:5173",
+        "https://mw-ia3kdi702-faizan-khans-projects-6a6ea604.vercel.app"
+    ],
+    credentials: true,
+    methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+    allowedHeaders: ["Content-Type","Authorization"]
+}))
+
 
 app.use(cors())
 
