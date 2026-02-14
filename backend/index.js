@@ -36,7 +36,7 @@ app.use(VisitorCounter(Visitor))
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://mw-ia3kdi702-faizan-khans-projects-6a6ea604.vercel.app"
+        "https://mw-mocha.vercel.app/"
     ],
     credentials: true,
     methods: ["GET","POST","PUT","DELETE","OPTIONS"],
