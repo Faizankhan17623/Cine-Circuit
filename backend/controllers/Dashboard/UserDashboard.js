@@ -448,3 +448,118 @@ exports.PurcahsingData = async (req, res) => {
     });
   }
 };
+
+
+exports.MostLikedMovies = async (req,res)=>{
+    try{
+        const AllMovies = await CreateShow.find({ uploaded: true, VerifiedByTheAdmin: true })
+            .populate("genre")
+            .populate("ratingAndReviews")
+
+        if(!AllMovies || AllMovies.length === 0){
+            return res.status(404).json({
+                message:"No movies found",
+                success:false
+            })
+        }
+
+        const MostLiked = [...AllMovies].sort((a,b)=>{
+            return (b.BannerLiked || 0) - (a.BannerLiked || 0)
+        })
+
+        return res.status(200).json({
+            message:"Most liked movies fetched successfully",
+            success:true,
+            data:MostLiked
+        })
+
+    }catch(error){
+        console.log(error)
+        console.log(error.message)
+        console.log("There is an error in the MostLikedMovies code")
+        return res.status(500).json({
+            message:"Internal Server Error",
+            success:false
+        })
+    }
+}
+
+exports.HighlyRatedMovies = async (req,res)=>{
+    try{
+        const AllMovies = await CreateShow.find({ uploaded: true, VerifiedByTheAdmin: true })
+            .populate("ratingAndReviews")
+            .populate("genre")
+
+        if(!AllMovies || AllMovies.length === 0){
+            return res.status(404).json({
+                message:"No movies found",
+                success:false
+            })
+        }
+
+        const Rated = AllMovies.map((movie)=>{
+            let averageRating = 0
+            if(movie.ratingAndReviews && movie.ratingAndReviews.length > 0){
+                const total = movie.ratingAndReviews.reduce((sum,r)=> sum + (r.rating || 0), 0)
+                averageRating = Math.round((total / movie.ratingAndReviews.length) * 10) / 10
+            }
+            return {
+                ...movie.toObject(),
+                averageRating
+            }
+        })
+
+        const HighlyRated = Rated.sort((a,b)=>{
+            return (b.averageRating || 0) - (a.averageRating || 0)
+        })
+
+        return res.status(200).json({
+            message:"Highly rated movies fetched successfully",
+            success:true,
+            data:HighlyRated
+        })
+
+    }catch(error){
+        console.log(error)
+        console.log(error.message)
+        console.log("There is an error in the HighlyRatedMovies code")
+        return res.status(500).json({
+            message:"Internal Server Error",
+            success:false
+        })
+    }
+}
+
+exports.RecentlyReleased = async (req,res)=>{
+    try{
+        const AllMovies = await CreateShow.find({ uploaded: true, VerifiedByTheAdmin: true, movieStatus: "Released" })
+            .populate("genre")
+            .populate("ratingAndReviews")
+
+        if(!AllMovies || AllMovies.length === 0){
+            return res.status(404).json({
+                message:"No movies found",
+                success:false
+            })
+        }
+
+        const Recent = [...AllMovies].sort((a,b)=>{
+            return new Date(b.createdAt) - new Date(a.createdAt)
+        })
+
+        return res.status(200).json({
+            message:"Recently released movies fetched successfully",
+            success:true,
+            data:Recent
+        })
+
+    }catch(error){
+        console.log(error)
+        console.log(error.message)
+        console.log("There is an error in the RecentlyReleased code")
+        return res.status(500).json({
+            message:"Internal Server Error",
+            success:false
+        })
+    }
+}

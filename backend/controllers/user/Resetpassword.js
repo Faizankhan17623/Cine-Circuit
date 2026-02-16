@@ -4,6 +4,7 @@ const USER = require('../../models/user')
 const bcrypt = require('bcrypt')
 const mailSenders = require('../../utils/mailsender')
 const ResetPasword = require("../../templates/userTemplates/Updatepasswordtemplate")
+const passwordChangedTemplate = require("../../templates/userTemplates/passwordChangedTemplate")
 // Done
 // tHIS IS THE FUNCTION THAT WILL HELP US SO THAT THE ROUTE IS THE USE ROUTE AND IT IS PRESENTED ON LINIE NO 32
 exports.LinkSend = async(req,res)=>{
@@ -30,7 +31,7 @@ exports.LinkSend = async(req,res)=>{
             const url = `http://localhost:5173/Reset-Password/${token}`
             
             await mailSenders(email,
-                'password reset',
+                'Reset Your Password - Cine Circuit',
                 ResetPasword(email,token)
             )
 
@@ -78,6 +79,14 @@ exports.ResetPassword = async(req,res)=>{
 
         const encryptinPassword = await bcrypt.hash(password,10)
         const PasswordChanging = await USER.findOneAndUpdate({token:token},{password:encryptinPassword,confirmpass:encryptinPassword,resetPasswordExpires:null},{new:true})
+
+        // Send password change confirmation email
+        await mailSenders(
+            TokenFinding.email,
+            "Your Password Has Been Changed - Cine Circuit",
+            passwordChangedTemplate(TokenFinding.email)
+        )
+
         return res.status(200).json({
             message:"The password is been updated",
             success:true,

@@ -10,6 +10,8 @@ const bcrypt = require('bcrypt')
 const SendMessage = require("../../models/Createmessage");
 const mailSender = require("../../utils/mailsender");
 const sendingOtpTeemplate = require("../../templates/userTemplates/emailTemplate");
+const theatreApprovedTemplate = require("../../templates/userTemplates/theatreApprovedTemplate");
+const theatreRejectedTemplate = require("../../templates/userTemplates/theatreRejectedTemplate");
 // const date = require('date-and-time')
 
 
@@ -602,6 +604,7 @@ exports.VerifyTheatrer = async (req, res) => {
     const {
       id,
       verify,    // true or false
+      rejectionReason,  // optional reason for rejection
     } = req.body;
 
     // console.log("=== THEATRE VERIFICATION REQUEST ===");
@@ -696,8 +699,8 @@ exports.VerifyTheatrer = async (req, res) => {
       
       await mailSender(
         user.email,
-        "Your Account Has Been Verified",
-        sendingOtpTeemplate("Account Verified")
+        "Your Theatre Has Been Approved - Cine Circuit",
+        theatreApprovedTemplate(org.Theatrename, user.name || user.userName || "User")
       );
 
       return res.status(200).json({
@@ -729,8 +732,8 @@ exports.VerifyTheatrer = async (req, res) => {
       
       await mailSender(
         user.email,
-        "Your Account Has Been Rejected",
-        sendingOtpTeemplate("Account Verification Failed")
+        "Your Theatre Application Needs Revision - Cine Circuit",
+        theatreRejectedTemplate(org.Theatrename, user.name || user.userName || "User", rejectionReason)
       );
 
       return res.status(200).json({

@@ -3,6 +3,8 @@ const {Orgdata} = require("../../models/Org_data");
 const SendMessage = require("../../models/Createmessage");
 const mailSender = require("../../utils/mailsender");
 const sendingOtpTeemplate = require("../../templates/userTemplates/emailTemplate");
+const orgApprovedTemplate = require("../../templates/userTemplates/orgApprovedTemplate");
+const orgRejectedTemplate = require("../../templates/userTemplates/orgRejectedTemplate");
 const directorfresher = require('../../models/DirectorFresher')
 const directorexperience = require('../../models/DirectorExperience')
 const producerexperience = require("../../models/ProducerExperience")
@@ -88,8 +90,8 @@ exports.VerifyOrgainezer = async (req, res) => {
       
       await mailSender(
         user.email,
-        "Your Account Has Been Verified",
-        sendingOtpTeemplate("Account Verified")
+        "Your Organizer Account Has Been Approved - Cine Circuit",
+        orgApprovedTemplate(user.name || user.userName || "User")
       );
 
       return res.status(200).json({
@@ -179,6 +181,9 @@ exports.VerifyOrgainezer = async (req, res) => {
 
       /* ================= SAVE ================= */
       // ✅ FIX: Use org._id and user._id
+      // Calculate attempts left before incrementing
+      const attemptsLeft = 3 - (org.attempts || 0);
+
      const orgReject =  await Orgdata.findByIdAndUpdate(org._id, {
         status: verificationStatus,
         $inc: { attempts: 1 },
@@ -197,10 +202,19 @@ exports.VerifyOrgainezer = async (req, res) => {
         typeOfmessage: 'Chat'
       });
 
+      // Format date for display (DD/MM/YYYY)
+      const formattedDate = ChangesDate;
+      const formattedTime = ChangesTime;
+
       await mailSender(
         user.email,
-        "Your Account Has Been Rejected",
-        sendingOtpTeemplate("Account Verification Failed")
+        "Your Organizer Application Needs Revision - Cine Circuit",
+        orgRejectedTemplate(
+          user.name || user.userName || "User",
+          formattedDate,
+          formattedTime,
+          attemptsLeft
+        )
       );
 
       return res.status(200).json({
@@ -222,83 +236,130 @@ exports.VerifyOrgainezer = async (req, res) => {
 // This route is present in the admin route on the line no 18
 exports.GetAllorg = async(req,res)=>{
     try{
-       const users = await USER.find({
-      usertype: "Organizer",
-    });
+      // Get the current user ID from the auth middleware
+      const currentUserId = req.USER.id;
+      console.log("Fetching org data for user:", currentUserId);
 
-    if (!users.length) {
+      // First, check if the current user has organizer data
+      const currentUser = await USER.findById(currentUserId);
+
+      if (!currentUser) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        });
+      }
+
+      // If user has orgainezerdata, fetch it
+      let organizersData = [];
+      let directorExperience = [];
+      let directorFresh = [];
+      let producerExperience = [];
+      let producerFresh = [];
+
+      if (currentUser.orgainezerdata) {
+        const orgData = await Orgdata.findById(currentUser.orgainezerdata);
+        if (orgData) {
+          organizersData = [orgData];
+
+          // Fetch role-specific data if exists
+          if (orgData.DirectorExperience) {
+            const dirExp = await directorexperience.findById(orgData.DirectorExperience);
+            if (dirExp) directorExperience = [dirExp];
+          }
+
+          if (orgData.DirectFresh) {
+            const dirFresh = await directorfresher.findById(orgData.DirectFresh);
+            if (dirFresh) directorFresh = [dirFresh];
+          }
+
+          if (orgData.ProducerExperience) {
+            const prodExp = await producerexperience.findById(orgData.ProducerExperience);
+            if (prodExp) producerExperience = [prodExp];
+          }
+
+          if (orgData.ProducerFresher) {
+            const prodFresh = await producerfresher.findById(orgData.ProducerFresher);
+            if (prodFresh) producerFresh = [prodFresh];
+          }
+        }
+      }
+
       return res.status(200).json({
         success: true,
-        message: "No organizers found",
+        message: "This is the Orgainezers Data",
         data: {
-          organizersData: [],
-          directorExperience: [],
-          directorFresh: [],
-          producerExperience: [],
-          producerFresh: [],
+          organizersData,
+          directorExperience,
+          directorFresh,
+          producerExperience,
+          producerFresh,
         },
       });
+
+    }catch(error){
+        console.log(error)
+        console.log(error.message)
+        return res.status(500).json({
+            message:"There is an error in the Get All orgainezer code",
+            success:false
+        })
     }
+}
 
-    // 2️⃣ Extract org profile IDs
-    const orgDataIds = users
-      .map(u => u.orgainezerdata)
-      .filter(Boolean);
+exports.OrgDetails = async(req,res)=>{
+    try{
+      // Get all organizers (all statuses) for admin dashboard
+      const users = await USER.find({ usertype:"Organizer" });
 
-    const organizersData = orgDataIds.length
-      ? await Orgdata.find({ _id: { $in: orgDataIds } })
-      : [];
+      if (!users || users.length === 0) {
+        return res.status(200).json({
+          success: true,
+          message: "No organizers found",
+          data: {
+            organizersData: [],
+            directorExperience: [],
+            directorFresh: [],
+            producerExperience: [],
+            producerFresh: [],
+          },
+        });
+      }
 
-    // 3️⃣ Collect role-based IDs
-    const directorExperienceIds = organizersData
-      .map(o => o.DirectorExperience)
-      .filter(Boolean);
+      // Collect org data IDs from all users
+      const orgDataIds = users
+        .map(u => u.orgainezerdata)
+        .filter(Boolean);
 
-    const directorFreshIds = organizersData
-      .map(o => o.DirectFresh)
-      .filter(Boolean);
+      const organizersData = orgDataIds.length
+        ? await Orgdata.find({ _id: { $in: orgDataIds } })
+        : [];
 
-    const producerExperienceIds = organizersData
-      .map(o => o.ProducerExperience)
-      .filter(Boolean);
+      // Collect role-specific IDs from all org data
+      const directorExperienceIds = organizersData.map(o => o.DirectorExperience).filter(Boolean);
+      const directorFreshIds = organizersData.map(o => o.DirectFresh).filter(Boolean);
+      const producerExperienceIds = organizersData.map(o => o.ProducerExperience).filter(Boolean);
+      const producerFreshIds = organizersData.map(o => o.ProducerFresher).filter(Boolean);
 
-    const producerFreshIds = organizersData
-      .map(o => o.ProducerFresher)
-      .filter(Boolean);
+      // Fetch all role-specific data in parallel
+      const [directorExperience, directorFresh, producerExperience, producerFresh] = await Promise.all([
+        directorExperienceIds.length ? directorexperience.find({ _id: { $in: directorExperienceIds } }) : [],
+        directorFreshIds.length ? directorfresher.find({ _id: { $in: directorFreshIds } }) : [],
+        producerExperienceIds.length ? producerexperience.find({ _id: { $in: producerExperienceIds } }) : [],
+        producerFreshIds.length ? producerfresher.find({ _id: { $in: producerFreshIds } }) : [],
+      ]);
 
-    // 4️⃣ Fetch role-based data safely
-    const [
-      directorExperience,
-      directorFresh,
-      producerExperience,
-      producerFresh,
-    ] = await Promise.all([
-      directorExperienceIds.length
-        ? directorexperience.find({ _id: { $in: directorExperienceIds } })
-        : [],
-      directorFreshIds.length
-        ? directorfresher.find({ _id: { $in: directorFreshIds } })
-        : [],
-      producerExperienceIds.length
-        ? producerexperience.find({ _id: { $in: producerExperienceIds } })
-        : [],
-      producerFreshIds.length
-        ? producerfresher.find({ _id: { $in: producerFreshIds } })
-        : [],
-    ]);
-
-    // 5️⃣ Return everything
-    return res.status(200).json({
-      success: true,
-      message: "This is the Orgainezers Data",
-      data: {
-        organizersData,
-        directorExperience,
-        directorFresh,
-        producerExperience,
-        producerFresh,
-      },
-    });
+      return res.status(200).json({
+        success: true,
+        message: "This is the Orgainezers Data",
+        data: {
+          organizersData,
+          directorExperience,
+          directorFresh,
+          producerExperience,
+          producerFresh,
+        },
+      });
 
     }catch(error){
         console.log(error)

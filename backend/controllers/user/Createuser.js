@@ -212,7 +212,7 @@ exports.updateUserName = async(req,res)=>{
 
         let updating = await USER.findByIdAndUpdate(user.id,{userName:newName,lastUsernameUpdate:ps},{new:true})
         // console.log(updating)
-        await mailSender(user.email,"The username is been updated",updateUsername(user.userName,newName))
+        await mailSender(user.email,"Your Username Has Been Updated - Cine Circuit",updateUsername(user.userName,newName))
 
         return res.status(200).json({
             message:"The username is been updated",
@@ -369,9 +369,9 @@ exports.UpdateImage= async(req,res)=>{
         // console.log(image)
         const updatinUser = await USER.findByIdAndUpdate(req.USER.id,{image:image.secure_url,lastImageUpdate:ps},{new:true})
         const {email,userName} = updatinUser
-        const AlertingUser = await mailSender(email,'The main profile image has been changed',imageUpdatimTemplate(userName,image.secure_url))
-        console.log("This is the data of the alerting user",AlertingUser)
-        console.log("This is the updates user",updatinUser)
+        const AlertingUser = await mailSender(email,'Your Profile Image Has Been Updated - Cine Circuit',imageUpdatimTemplate(userName,image.secure_url))
+        // console.log("This is the data of the alerting user",AlertingUser)
+        // console.log("This is the updates user",updatinUser)
       return res.status(200).json({
     message: "The user image has been updated",
     success: true,
@@ -438,7 +438,7 @@ exports.updateNUmber= async(req,res)=>{
 
         const UPdatingNumber = await USER.findByIdAndUpdate(req.USER.id,{number:newNumber,lastNumberUpdate:ps,countrycode:code},{new:true})
         console.log("THis is the new updated number",UPdatingNumber)
-        await mailSender(user.email,"The phone number is been updated",updateNumber(Finding.userName,newNumber))
+        await mailSender(user.email,"Your Phone Number Has Been Updated - Cine Circuit",updateNumber(userFindgin ? userFindgin.userName : "User",newNumber))
         return res.status(200).json({
             message:"The new number is been updated",
             success:true

@@ -94,7 +94,7 @@ exports.updateCastname = async (req,res)=>{
             })
         }
 
-        const timeNow = newDate(Date.now())
+        const timeNow = new Date(Date.now())
         const updating = await cast.findByIdAndUpdate(id,{name:newname,updatedAt:timeNow},{new:true})
 
         return res.status(200).json({

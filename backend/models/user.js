@@ -27,6 +27,10 @@ const userSchema =  new mongoose.Schema({
         lowercase:true,
         match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
     },
+    countrycode:{
+        type:String,
+        required:true
+    },
     usertype:{
         type:String,
         required:true,
@@ -41,10 +45,6 @@ const userSchema =  new mongoose.Schema({
         type:String,
         required:true,
         match: [/^\d{10}$/, "Invalid phone number"],
-    },
-    countrycode:{
-        type:String,
-        required:true
     },
     image:{
         type:String,

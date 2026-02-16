@@ -12,6 +12,7 @@ const mailSender = require('../../utils/mailsender')
 const generatePDF = require('../../templates/userTemplates/sendPdf')
 const TicketTemplate = require('../../templates/userTemplates/TicketTemplate')
 const PdfTemplate = require('../../templates/userTemplates/pdfTemplate')
+const paymentFailedTemplate = require('../../templates/userTemplates/paymentFailedTemplate')
 const ticket = require('../../models/ticket')
 
 // Student Features api kar ke ek page hain github main usko dekh lena agay payment ke isme kuch issue aaye to 
@@ -197,7 +198,7 @@ exports.MakePayment = async(req,res) => {
         // console.log(UserFinders)
         
         setTimeout(async () => {
-            const mailes = await mailSender(UserFinders.email,"Payment Success",TicketTemplate(PaymentStatus));
+            const mailes = await mailSender(UserFinders.email,"Your Booking is Confirmed - Cine Circuit",TicketTemplate(PaymentStatus));
             console.log("Email sent successfully:");
         },twominutes)
 
@@ -375,6 +376,13 @@ exports.Verifypayment = async(req,res) => {
                     paymentDate: ps,
                     failureReason: "Signature verification failed"
                 }
+            );
+
+            // Send payment failure email
+            await mailSender(
+                UserFinders.email,
+                "Payment Failed - Cine Circuit",
+                paymentFailedTemplate(UserFinders.name || UserFinders.userName || "User", PaymentVerifier?.amount, "Signature verification failed. Please try again.")
             );
 
             return res.status(400).json({

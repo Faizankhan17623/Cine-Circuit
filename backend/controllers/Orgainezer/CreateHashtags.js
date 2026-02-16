@@ -70,7 +70,7 @@ exports.Createtags = async(req, res) => {
 exports.updateTagsname = async(req,res)=>{
     try{
         const {id,newName} = req.body
-        if(!oldname || !newName){
+        if(!id || !newName){
             return res.status(400).json({
                 message:"The inputs are been required",
                 success:false
@@ -85,7 +85,7 @@ exports.updateTagsname = async(req,res)=>{
             })
         }
 
-        const updating = hashtags.findByIdAndUpdate(id,{name:newName},{new:true})
+        const updating = await hashtags.findByIdAndUpdate(id,{name:newName},{new:true})
         return res.status(200).json({
             message:'The hashtags is been updated',
             success:true,

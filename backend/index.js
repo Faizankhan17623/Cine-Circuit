@@ -36,14 +36,19 @@ app.use(cors({
 }));
 
 
-app.use(cors())
-
+// app.use(cors())
 
 app.use(express.json())
 app.use(cookieParser ())
 app.use(morgan("dev"));
 
 app.use(VisitorCounter(Visitor))
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> 9d71308 (Bugs Fixed)
 
 app.use(fileUpload({
     useTempFiles : true,

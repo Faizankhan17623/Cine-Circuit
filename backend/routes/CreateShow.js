@@ -4,7 +4,7 @@ const route = express.Router()
 const {Createtags,updateTagsname,DeleteTagsname,getAlltags,SearchTags} = require('../controllers/Orgainezer/CreateHashtags')
 const {auth,IsOrganizer} = require('../middlewares/verification')
 const {Getalllanguage,GetSingleLanguage} = require('../controllers/Orgainezer/CreateLanguage')
-const {CreateShow,updateMovieStatus,UpdateShowtitle,UpdateShowtagline,UpdateTitleImage,UpdateTitletrailer,deleteShow,DeleteAllShow} = require('../controllers/Orgainezer/CreateTheatreShow')
+const {CreateShow,UpdateShowtitle,UpdateShowtagline,UpdateTitleImage,UpdateTitletrailer,deleteShow,DeleteAllShow} = require('../controllers/Orgainezer/CreateTheatreShow')
 const {CreateCast,updateCastname,updatecastimage,deletecast,getwholecastlist,FindSingleCast} = require('../controllers/Orgainezer/CreateCast')
 const {uploadtheshow} = require('../controllers/Orgainezer/upload')
 const {getAllGenres} = require('../controllers/Administrator/CreateGenre')
@@ -21,7 +21,7 @@ route.get("/Get-Alltags",auth,IsOrganizer,getAlltags)
 route.get("/Search-tags",auth,IsOrganizer,SearchTags)
 // DONE
 
-route.get('/Both-Verified_data',auth,IsOrganizer,AllShows)
+route.get('/Both-Verified_data',auth,IsOrganizer,AllShows)      
 route.get('/genre',auth,IsOrganizer,getAllGenres)
 route.get('/sub-genre',auth,IsOrganizer,getAllgenre)
 // DONE

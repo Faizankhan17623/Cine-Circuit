@@ -11,9 +11,10 @@ const {AllShows,usingtitle} = require('../controllers/common/Showlist')
 const {createRating,getAverageRating,getAllRatingReview} = require("../controllers/common/RatingAndRviews")
 const {TicketPurchased,TicketPurchasedFullDetails} = require("../controllers/Dashboard/UserDashboard")
 const {GetAlluserDetails,FindUserNames,FindLoginEmail,FindNumber,FindCreationEmail} = require('../controllers/user/User')
-const {BannerMovies,FIndusingMOvieTags,FindWholeMoviesData,FindMovieById,PurcahsingData} = require('../controllers/Dashboard/UserDashboard')
+const {BannerMovies,FIndusingMOvieTags,FindWholeMoviesData,FindMovieById,PurcahsingData,MostLikedMovies,HighlyRatedMovies,RecentlyReleased} = require('../controllers/Dashboard/UserDashboard')
 const {GetSingleTheatreDetails,getTheatreDetails, GetShowsDetails} = require('../controllers/Dashboard/TheatrereDashboard')
 // DONE 
+const {TheatreNavbar,MovieNavbar}  = require('../controllers/common/Comment')
 // This is the first route that will be used to create the user and all the things that the user will do releated to his personal info
 route.post("/Create-User",Createuser)
 route.post("/Create-OTP",CreateOtp) 
@@ -29,6 +30,9 @@ route.put("/Update-Password",auth,updatePassword)
 route.put("/Update-Image",auth,UpdateImage) 
 route.put("/Update-Number",auth,updateNUmber) 
 route.get("/Current-UserDetails",auth,CurrentLoginUser)
+
+route.get("/Theatre-data", TheatreNavbar)
+route.get("/Movie-data", MovieNavbar)
 // DONE
 
 // DONE
@@ -75,6 +79,9 @@ route.get("/getAverageRating", getAverageRating)
 route.get("/getReviews", getAllRatingReview)
 
 route.get('/Purchasing',PurcahsingData)
+route.get('/Most-Liked',MostLikedMovies)
+route.get('/Highly-Rated',HighlyRatedMovies)
+route.get('/Recently-Released',RecentlyReleased)
 route.get('/Theatre-Shows', GetShowsDetails)
 route.get('/Single-Theatre', GetSingleTheatreDetails)
 module.exports = route      

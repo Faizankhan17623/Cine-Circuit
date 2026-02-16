@@ -165,7 +165,7 @@ exports.OrgaineserLogin = async(req,res)=>{
                 const options = {
                     expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
                       httpOnly:true,
-            secure: false, 
+            secure: true, 
             sameSite: 'Lax'
                 }
 
@@ -222,10 +222,31 @@ exports.OrgData = async (req, res) => {
 
     const Finding = await Orgdata.findOne({id:ID})
     if(Finding){
-      return res.status(400).json({
-        message:"You have already registered the data in the orgainzation form",
-        success:false
-      })
+      // If the organizer was rejected, delete old data so they can re-submit
+      if(Finding.status === "rejected"){
+        // Delete old role-specific data
+        if(Finding.DirectFresh){
+          await directorfresher.findByIdAndDelete(Finding.DirectFresh)
+        }
+        if(Finding.DirectorExperience){
+          await directorexperience.findByIdAndDelete(Finding.DirectorExperience)
+        }
+        if(Finding.ProducerFresher){
+          await producerfresher.findByIdAndDelete(Finding.ProducerFresher)
+        }
+        if(Finding.ProducerExperience){
+          await producerexperience.findByIdAndDelete(Finding.ProducerExperience)
+        }
+        // Delete old org data
+        await Orgdata.findByIdAndDelete(Finding._id)
+        // Remove reference from user
+        await USER.findByIdAndUpdate(ID, { orgainezerdata: null })
+      } else {
+        return res.status(400).json({
+          message:"You have already registered the data in the orgainzation form",
+          success:false
+        })
+      }
     }
 
     const {
@@ -264,7 +285,7 @@ exports.OrgData = async (req, res) => {
     // console.log("THis ist he check the image uplaod",ImageUpload)
 
 
-const Username = First + Last
+const Username = First + " " + Last
 
 const NotableKeys = Object.keys(req.body).filter(key => key.startsWith("notable["))
 // console.log("This is the notable",notableProjects)
@@ -1064,7 +1085,7 @@ const {Role , ExperienceLevel} = Finding
         SceneVisualization:sceneVisualization
       })
 
-      await Orgdata.updateOne({DirectFresh:Uploading._id})
+      await Orgdata.updateOne({id:Id},{DirectFresh:Uploading._id})
 
       return res.status(200).json({
         message:"The Director Fresher data is been created",
@@ -1310,7 +1331,7 @@ exports.DirectorExperience = async (req, res) => {
         TeamSize: String(teamSizeNum) // store string like before, but validation used numeric
       });
 
-      await Orgdata.updateOne({ DirectorExperience: Updating._id });
+      await Orgdata.updateOne({ id: Id }, { DirectorExperience: Updating._id });
 
       return res.status(200).json({
         message: "The data has been sent successfully",
@@ -1580,7 +1601,7 @@ exports.ProducerFresher = async (req, res) => {
       }
 
     });
-    await Orgdata.updateOne({ ProducerFresher: Uploading._id });
+    await Orgdata.updateOne({ id: Id }, { ProducerFresher: Uploading._id });
 
     return res.status(200).json({
       success: true,
@@ -1815,7 +1836,7 @@ if (Funding.length === 0) {
         RiskManagement:riskmanagement
       })
 
-    await Orgdata.updateOne({ ProducerExperience: Updating._id });
+    await Orgdata.updateOne({ id: Id }, { ProducerExperience: Updating._id });
 
 
       return res.status(200).json({
@@ -1836,6 +1857,198 @@ if (Funding.length === 0) {
       message: "There is an something wrong in the ProducerFresher code",
       success: false,
       error: error.message,
+    });
+  }
+};
+
+// New controller to get organizer's own data
+exports.GetMyOrgData = async (req, res) => {
+  try {
+    const userId = req.USER.id;
+    console.log("Fetching org data for user:", userId);
+
+    // Get the user
+    const user = await USER.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // If user doesn't have orgainezerdata, return empty
+    if (!user.orgainezerdata) {
+      return res.status(200).json({
+        success: true,
+        message: "No organizer data found",
+        data: {
+          organizerData: null,
+          directorFresher: null,
+          directorExperience: null,
+          producerFresher: null,
+          producerExperience: null,
+          status: "pending",
+          attempts: 0,
+          editUntil: null
+        }
+      });
+    }
+
+    // Get the organizer data
+    const organizerData = await Orgdata.findById(user.orgainezerdata);
+
+    if (!organizerData) {
+      return res.status(200).json({
+        success: true,
+        message: "No organizer data found",
+        data: {
+          organizerData: null,
+          directorFresher: null,
+          directorExperience: null,
+          producerFresher: null,
+          producerExperience: null,
+          status: "pending",
+          attempts: 0,
+          editUntil: null
+        }
+      });
+    }
+
+    // Get role-specific data
+    let directorFresher = null;
+    let directorExperience = null;
+    let producerFresher = null;
+    let producerExperience = null;
+
+    if (organizerData.DirectFresh) {
+      directorFresher = await directorfresher.findById(organizerData.DirectFresh);
+    }
+    if (organizerData.DirectorExperience) {
+      directorExperience = await directorexperience.findById(organizerData.DirectorExperience);
+    }
+    if (organizerData.ProducerFresher) {
+      producerFresher = await producerfresher.findById(organizerData.ProducerFresher);
+    }
+    if (organizerData.ProducerExperience) {
+      producerExperience = await producerexperience.findById(organizerData.ProducerExperience);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Organizer data fetched successfully",
+      data: {
+        organizerData,
+        directorFresher,
+        directorExperience,
+        producerFresher,
+        producerExperience,
+        status: organizerData.status,
+        attempts: organizerData.attempts,
+        editUntil: organizerData.editUntil,
+        lockedUntill: organizerData.lockedUntill
+      }
+    });
+
+  } catch (error) {
+    console.log("Error in GetMyOrgData:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching organizer data",
+      error: error.message
+    });
+  }
+};
+
+// New controller to get organizer's own data
+exports.GetOrganizerOwnData = async (req, res) => {
+  try {
+    const currentUserId = req.USER.id;
+    console.log("Fetching own org data for user:", currentUserId);
+
+    // Find user
+    const user = await USER.findById(currentUserId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // If user doesn't have org data linked, return empty
+    if (!user.orgainezerdata) {
+      return res.status(200).json({
+        success: true,
+        message: "No organizer data found",
+        data: {
+          organizersData: [],
+          directorExperience: [],
+          directorFresh: [],
+          producerExperience: [],
+          producerFresh: [],
+        },
+      });
+    }
+
+    // Fetch organizer's data
+    const orgData = await Orgdata.findById(user.orgainezerdata);
+    if (!orgData) {
+      return res.status(200).json({
+        success: true,
+        message: "No organizer data found",
+        data: {
+          organizersData: [],
+          directorExperience: [],
+          directorFresh: [],
+          producerExperience: [],
+          producerFresh: [],
+        },
+      });
+    }
+
+    // Fetch role-specific data
+    let directorExperience = [];
+    let directorFresh = [];
+    let producerExperience = [];
+    let producerFresh = [];
+
+    if (orgData.DirectorExperience) {
+      const dirExp = await directorexperience.findById(orgData.DirectorExperience);
+      if (dirExp) directorExperience = [dirExp];
+    }
+
+    if (orgData.DirectFresh) {
+      const dirFresh = await directorfresher.findById(orgData.DirectFresh);
+      if (dirFresh) directorFresh = [dirFresh];
+    }
+
+    if (orgData.ProducerExperience) {
+      const prodExp = await producerexperience.findById(orgData.ProducerExperience);
+      if (prodExp) producerExperience = [prodExp];
+    }
+
+    if (orgData.ProducerFresher) {
+      const prodFresh = await producerfresher.findById(orgData.ProducerFresher);
+      if (prodFresh) producerFresh = [prodFresh];
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Organizer data fetched successfully",
+      data: {
+        organizersData: [orgData],
+        directorExperience,
+        directorFresh,
+        producerExperience,
+        producerFresh,
+      },
+    });
+
+  } catch (error) {
+    console.log("Error in GetOrganizerOwnData:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching organizer data",
+      error: error.message
     });
   }
 };

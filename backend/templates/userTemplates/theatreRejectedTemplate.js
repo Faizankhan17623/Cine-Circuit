@@ -1,4 +1,5 @@
-]<!DOCTYPE html>
+const theatreRejectedTemplate = (theatreName, ownerName, rejectionReason) => {
+	return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -558,11 +559,11 @@
                         </div>
 
                         <!-- CTA -->
-                        <!-- <div class="cta-section">
+                        <div class="cta-section">
                             <a href="http://localhost:5173/dashboard" class="cta-btn">
                                 &#9998; &nbsp; Edit My Theatre
                             </a>
-                        </div> -->
+                        </div>
 
                         <!-- Contact Note -->
                         <div class="contact-section">
@@ -607,4 +608,6 @@
         </table>
     </div>
 </body>
-</html>
+</html>`;
+};
+module.exports = theatreRejectedTemplate;

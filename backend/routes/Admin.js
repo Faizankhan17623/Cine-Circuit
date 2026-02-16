@@ -4,7 +4,7 @@ const {auth,IsAdmin,IsOrganizer} = require('../middlewares/verification')
 const {Creategenre,Updategenre,deletegenre,deleteAllgenre,getAllGenres} = require('../controllers/Administrator/CreateGenre')
 const {GetAllTheatres,TheatreCreationRequest,CreateTheatres,VerifyTheatrer,GetTheatreDetails} = require('../controllers/Administrator/CreateTheatres')
 const {CreateSubgenre,UpdateSubGenre,deletesubgenre,deleteAllsubGenres,getAllgenre} = require('../controllers/Administrator/CreateSubGenre')
-const{VerifyOrgainezer,GetAllorg,deleteOrgainezer,DeleteAllOrgainezers} = require('../controllers/Administrator/AdminVerification')
+const{VerifyOrgainezer,GetAllorg,OrgDetails,deleteOrgainezer,DeleteAllOrgainezers} = require('../controllers/Administrator/AdminVerification')
 const {VerifyShow,GetAllShows,verifiedSHows,AllShows} = require('../controllers/Administrator/ShowVerify')
 
 const{CreateLanguage,updateLanguage,deleteLanguage,Getalllanguage,deleteallanguage,GetSingleLanguage} = require('../controllers/Orgainezer/CreateLanguage')
@@ -20,7 +20,9 @@ const {notUploadedShows,VerifiedButnotUploaded} = require("../controllers/common
 route.put("/Org-Verification",auth,IsAdmin,VerifyOrgainezer)
 route.delete("/delete-Org",auth,IsAdmin,deleteOrgainezer)
 route.delete("/delete-allOrg",auth,IsAdmin,DeleteAllOrgainezers)
-route.get("/Get-All-Orgs",auth,GetAllorg)
+route.get("/Get-All-Orgs",auth,IsOrganizer,GetAllorg)
+
+route.get("/Orgainezer-Details",auth,IsAdmin,OrgDetails)
 
 // DONE all the four are rpresetnt in the admin foldeer in the admin verification file
 
