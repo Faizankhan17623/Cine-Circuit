@@ -1,90 +1,194 @@
 [
-{
-  "_id": { "$oid": "698d7d10dac4cb85250dc951" },
-  "locationName": "Mumbai",
-  "locationurl": "https://maps.google.com/mumbai",
-  "TheatreInsideimages": [
-    "https://res.cloudinary.com/demo/image/upload/v1/inside1.jpg",
-    "https://res.cloudinary.com/demo/image/upload/v1/inside2.jpg"
-  ],
-  "Theatreoutsideimages": [
-    "https://res.cloudinary.com/demo/image/upload/v1/outside1.jpg"
-  ],
-  "typesofseatsAvailable": ["Recliner", "Premium", "Silver Class"],
-  "CustomMessage": [],
-  "movieScreeningType": ["IMAX 3D", "Dolby Cinema"],
-  "languagesAvailable": ["Hindi", "English"],
-  "Theatrename": "Galaxy Cinemas",
-  "theatreformat": ["Laser Projection", "2K Digital"],
-  "CreationDate": "Thu, 2026/02/12 13:00:01",
-  "showAlloted": [],
-  "ticketsReceived": [],
-  "ticketsReceivedTime": [],
-  "priceoftheTicket": [],
-  "TheatreOwner": "owner1",
-  "ticketCreation": [],
-  "parking": ["Two-Wheeler Parking", "Street Parking Only"],
-  "Verified": false,
-  "status": "Pending",
-  "createdAt": { "$date": "2026-02-12T08:00:01.000Z" },
-  "updatedAt": { "$date": "2026-02-12T08:00:01.000Z" },
-  "__v": 0,
-  "Owner": { "$oid": "698d7d0fdac4cb85250dc901" }
-},
-
-{
-  "_id": { "$oid": "698d7d10dac4cb85250dc952" },
-  "locationName": "Pune",
-  "locationurl": "https://maps.google.com/pune",
-  "TheatreInsideimages": ["https://res.cloudinary.com/demo/image/upload/v1/inside3.jpg"],
-  "Theatreoutsideimages": ["https://res.cloudinary.com/demo/image/upload/v1/outside3.jpg"],
-  "typesofseatsAvailable": ["Bronze Class", "Silver Class"],
-  "CustomMessage": [],
-  "movieScreeningType": ["Standard Screen"],
-  "languagesAvailable": ["Hindi", "Marathi"],
-  "Theatrename": "PVR Infinity",
-  "theatreformat": ["2K Digital"],
-  "CreationDate": "Thu, 2026/02/12 13:05:01",
-  "showAlloted": [],
-  "ticketsReceived": [],
-  "ticketsReceivedTime": [],
-  "priceoftheTicket": [],
-  "TheatreOwner": "owner2",
-  "ticketCreation": [],
-  "parking": ["Two-Wheeler Parking"],
-  "Verified": false,
-  "status": "Pending",
-  "createdAt": { "$date": "2026-02-12T08:05:01.000Z" },
-  "updatedAt": { "$date": "2026-02-12T08:05:01.000Z" },
-  "__v": 0,
-  "Owner": { "$oid": "698d7d0fdac4cb85250dc902" }
-},
-
-{
-  "_id": { "$oid": "698d7d10dac4cb85250dc953" },
-  "locationName": "Delhi",
-  "locationurl": "https://maps.google.com/delhi",
-  "TheatreInsideimages": [],
-  "Theatreoutsideimages": [],
-  "typesofseatsAvailable": ["Premium", "Recliner"],
-  "CustomMessage": [],
-  "movieScreeningType": ["Dolby Cinema"],
-  "languagesAvailable": ["Hindi", "English"],
-  "Theatrename": "Cinepolis Royal",
-  "theatreformat": ["Laser Projection"],
-  "CreationDate": "Thu, 2026/02/12 13:10:01",
-  "showAlloted": [],
-  "ticketsReceived": [],
-  "ticketsReceivedTime": [],
-  "priceoftheTicket": [],
-  "TheatreOwner": "owner3",
-  "ticketCreation": [],
-  "parking": ["Street Parking Only"],
-  "Verified": false,
-  "status": "Pending",
-  "createdAt": { "$date": "2026-02-12T08:10:01.000Z" },
-  "updatedAt": { "$date": "2026-02-12T08:10:01.000Z" },
-  "__v": 0,
-  "Owner": { "$oid": "698d7d0fdac4cb85250dc903" }
-}
+  {
+    "_id": {
+      "$oid": "800011bb38c1d5dfba9b0001"
+    },
+    "locationName": "andheri west",
+    "locationurl": "https://google.com",
+    "TheatreInsideimages": [
+      "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089097/movie_Project/sip5eh3bfxotgf8dpnpq.png"
+    ],
+    "Theatreoutsideimages": [
+      "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089096/movie_Project/oldrneaiwbfbjbdifqke.jpg",
+      "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089095/movie_Project/ofuprfhyji6ne41tggsd.jpg"
+    ],
+    "typesofseatsAvailable": [
+      "Standard",
+      "Premium",
+      "Recliner",
+      "Balcony"
+    ],
+    "CustomMessage": [],
+    "movieScreeningType": [
+      "Standard Screen",
+      "IMAX 2D",
+      "3D",
+      "Dolby Cinema"
+    ],
+    "languagesAvailable": [
+      "Hindi",
+      "English",
+      "Marathi"
+    ],
+    "Theatrename": "Star Cineplex Andheri",
+    "theatreformat": [
+      "Standard Cinema",
+      "IMAX",
+      "Dolby Atmos",
+      "2K Digital"
+    ],
+    "CreationDate": "Sat, 2026/02/15 11:20:00",
+    "showAlloted": [],
+    "ticketsReceived": [],
+    "ticketsReceivedTime": [],
+    "priceoftheTicket": [],
+    "TheatreOwner": "Rohit Sharma",
+    "ticketCreation": [],
+    "parking": [
+      "Four-Wheeler Parking",
+      "Two-Wheeler Parking"
+    ],
+    "Verified": false,
+    "status": "Pending",
+    "createdAt": {
+      "$date": "2026-02-15T05:50:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-02-15T05:50:00.000Z"
+    },
+    "__v": 0,
+    "Owner": {
+      "$oid": "700011aa38c1d5dfba9b0001"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "800022bb38c1d5dfba9b0002"
+    },
+    "locationName": "koramangala",
+    "locationurl": "https://google.com",
+    "TheatreInsideimages": [
+      "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089097/movie_Project/sip5eh3bfxotgf8dpnpq.png"
+    ],
+    "Theatreoutsideimages": [
+      "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089096/movie_Project/oldrneaiwbfbjbdifqke.jpg"
+    ],
+    "typesofseatsAvailable": [
+      "D-BOX Motion",
+      "Premium",
+      "Couple Seat",
+      "Wheelchair Accessible"
+    ],
+    "CustomMessage": [],
+    "movieScreeningType": [
+      "MX4D",
+      "Laser Projection",
+      "Standard Screen",
+      "4DX 2D"
+    ],
+    "languagesAvailable": [
+      "Kannada",
+      "English",
+      "Hindi",
+      "Telugu"
+    ],
+    "Theatrename": "Galaxy Theatre Bangalore",
+    "theatreformat": [
+      "4DX",
+      "Premium Cinema",
+      "Standard Cinema",
+      "4K Digital"
+    ],
+    "CreationDate": "Sat, 2026/02/15 13:45:30",
+    "showAlloted": [],
+    "ticketsReceived": [],
+    "ticketsReceivedTime": [],
+    "priceoftheTicket": [],
+    "TheatreOwner": "Priya Verma",
+    "ticketCreation": [],
+    "parking": [
+      "Four-Wheeler Parking",
+      "Two-Wheeler Parking",
+      "Street Parking Only"
+    ],
+    "Verified": false,
+    "status": "Pending",
+    "createdAt": {
+      "$date": "2026-02-15T08:15:30.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-02-15T08:15:30.000Z"
+    },
+    "__v": 0,
+    "Owner": {
+      "$oid": "700022aa38c1d5dfba9b0002"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "800033bb38c1d5dfba9b0003"
+    },
+    "locationName": "jubilee hills",
+    "locationurl": "https://google.com",
+    "TheatreInsideimages": [
+      "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089097/movie_Project/sip5eh3bfxotgf8dpnpq.png",
+      "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089095/movie_Project/ofuprfhyji6ne41tggsd.jpg"
+    ],
+    "Theatreoutsideimages": [
+      "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089096/movie_Project/oldrneaiwbfbjbdifqke.jpg"
+    ],
+    "typesofseatsAvailable": [
+      "Recliner",
+      "Standard",
+      "Premium",
+      "D-BOX Motion",
+      "Couple Seat"
+    ],
+    "CustomMessage": [],
+    "movieScreeningType": [
+      "IMAX 2D",
+      "Dolby Cinema",
+      "Standard Screen",
+      "Laser Projection",
+      "3D"
+    ],
+    "languagesAvailable": [
+      "Telugu",
+      "Hindi",
+      "English",
+      "Tamil"
+    ],
+    "Theatrename": "Royal Cinema Hyderabad",
+    "theatreformat": [
+      "IMAX",
+      "Dolby Atmos",
+      "4K Digital",
+      "Standard Cinema",
+      "Premium Cinema"
+    ],
+    "CreationDate": "Sat, 2026/02/15 16:10:15",
+    "showAlloted": [],
+    "ticketsReceived": [],
+    "ticketsReceivedTime": [],
+    "priceoftheTicket": [],
+    "TheatreOwner": "Arjun Reddy",
+    "ticketCreation": [],
+    "parking": [
+      "Four-Wheeler Parking",
+      "Two-Wheeler Parking",
+      "No Parking Available"
+    ],
+    "Verified": false,
+    "status": "Pending",
+    "createdAt": {
+      "$date": "2026-02-15T10:40:15.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-02-15T10:40:15.000Z"
+    },
+    "__v": 0,
+    "Owner": {
+      "$oid": "700033aa38c1d5dfba9b0003"
+    }
+  }
 ]

@@ -1,9 +1,109 @@
+// main theatre user data
+
 {
-    "Categories":["698f17d532ec3bddea6d8bf0","698f17d532ec3bddea6d8bf1","698f17d532ec3bddea6d8bf2","698f17d532ec3bddea6d8bf3","698f17d532ec3bddea6d8bf4"],
-    "totalTickets":["5","2","5","5","5"],
-    "time":"23:59",
-    "userId":"698a0ddac66d8877c186dcba",
-    "ShowId":"698d73302c70d5d3f8fae8f8",
-    "Theatreid":"698d7d10dac4cb85250dc894",
-    "Ticketid":"698f17d532ec3bddea6d8bef"
-}   
+  "_id": {
+    "$oid": "6990accb38c1d5dfba9b39c6"
+  },
+  "userName": "faizan moin khan ",
+  "password": "$2b$10$/8ERiilLX8Gt3trY3uvGfuXZiMwqB2ws0x4DMMDToT.hx3mBaMr9.",
+  "confirmpass": "$2b$10$/8ERiilLX8Gt3trY3uvGfuXZiMwqB2ws0x4DMMDToT.hx3mBaMr9.",
+  "email": "fk3702@gmail.com",
+  "usertype": "Theatrer",
+  "verified": true,
+  "number": "2222222222",
+  "image": "https://ui-avatars.com/api/?name=faizan%20moin%20khan%20&background=random",
+  "ticketCreated": [],
+  "showsCreated": [],
+  "Casttaken": [],
+  "createdAt": "Sat, 2026/02/14 22:41:39",
+  "lastlogin": [],
+  "UserBannerliked": [],
+  "UserBannerhated": [],
+  "messageReceived": [],
+  "comment": [],
+  "PaymentId": [],
+  "updatedAt": {
+    "$date": "2026-02-14T17:13:13.827Z"
+  },
+  "__v": 0,
+  "theatresCreated": {
+    "$oid": "6990accc38c1d5dfba9b39c8"
+  }
+}
+
+
+
+// theatre data 
+
+{
+  "_id": {
+    "$oid": "6990accc38c1d5dfba9b39c8"
+  },
+  "locationName": "thane ",
+  "locationurl": "https://google.com",
+  "TheatreInsideimages": [
+    "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089097/movie_Project/sip5eh3bfxotgf8dpnpq.png"
+  ],
+  "Theatreoutsideimages": [
+    "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089096/movie_Project/oldrneaiwbfbjbdifqke.jpg",
+    "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089095/movie_Project/ofuprfhyji6ne41tggsd.jpg"
+  ],
+  "typesofseatsAvailable": [
+    "D-BOX Motion",
+    "Premium",
+    "Wheelchair Accessible",
+    "Recliner",
+    "Couple Seat"
+  ],
+  "CustomMessage": [],
+  "movieScreeningType": [
+    "MX4D",
+    "Dolby Cinema",
+    "Laser Projection",
+    "Standard Screen",
+    "IMAX 2D",
+    "4DX 2D"
+  ],
+  "languagesAvailable": [
+    "Gujarati",
+    "English",
+    "Tamil",
+    "Hindi"
+  ],
+  "Theatrename": "pune",
+  "theatreformat": [
+    "Dolby Atmos",
+    "Standard Cinema",
+    "IMAX",
+    "4DX",
+    "Premium Cinema",
+    "4K Digital",
+    "2K Digital"
+  ],
+  "CreationDate": "Sat, 2026/02/14 22:41:39",
+  "showAlloted": [],
+  "ticketsReceived": [],
+  "ticketsReceivedTime": [],
+  "priceoftheTicket": [],
+  "TheatreOwner": "faizan moin khan ",
+  "ticketCreation": [],
+  "parking": [
+    "No Parking Available",
+    "Street Parking Only",
+    "Four-Wheeler Parking",
+    "Two-Wheeler Parking"
+  ],
+  "Verified": true,
+  "status": "Approved",
+  "createdAt": {
+    "$date": "2026-02-14T17:11:40.297Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T17:13:13.475Z"
+  },
+  "__v": 0,
+  "Owner": {
+    "$oid": "6990accb38c1d5dfba9b39c6"
+  },
+  "VerifiedAt": "Sat, 2026/02/14 22:43:13"
+}

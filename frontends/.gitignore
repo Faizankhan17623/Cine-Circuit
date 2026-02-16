@@ -22,3 +22,25 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ============================================
+# Custom Files to Ignore (Private/Sensitive)
+# ============================================
+
+# Personal files with sensitive information
+Personal\ Information\ \(All\ Experien.txt
+question\ to\ the\ mangaement.txt
+functionadding.ts
+
+# Deployment notes (contains sensitive URLs)
+DEPLOYMENT_URL_CHANGES.md
+
+# Environment variables (contains secrets)
+.env
+.env.local
+.env.*.local
+
+# Test files (if any)
+*.test.js
+*.test.ts
+__tests__/

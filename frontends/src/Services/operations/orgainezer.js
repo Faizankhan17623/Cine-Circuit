@@ -1,13 +1,13 @@
 import toast from 'react-hot-toast'
 import {apiConnector} from '../apiConnector'
 import {CreateOrgainezer,Ticket,AllotTheatre,GetAllSHowsDetails,GetAllTheatreDetails,orgainezerdata} from "../Apis/OranizaerApi"
-import {setLoading,setStatus} from '../../Slices/orgainezerSlice'
+import {setLoading,setStatus,setAttempts,setEditUntil,setRejectedData} from '../../Slices/orgainezerSlice'
 import {setToken,setLogin,setUserImage,setUser} from '../../Slices/authSlice.js'
 import {setloading, setuser} from '../../Slices/ProfileSlice.js'
 import Cookies from "js-cookie";
 
 const {createorgainezer,orgainezerlogin} = CreateOrgainezer
-const {OrgainezerData,DirectorFresher,DirectorExperience,ProducerFresher,ProducerExperience} = orgainezerdata
+const {OrgainezerData,DirectorFresher,DirectorExperience,ProducerFresher,ProducerExperience,GetMyOrgData} = orgainezerdata
 const {CreateTicket} = Ticket
 const {Allotment} = AllotTheatre
 const {Getalltheatredetails,ticketdetails,AllDetails} = GetAllTheatreDetails
@@ -28,7 +28,7 @@ export function Creation(name,password,email,number,otp,code){
                 password: password,
                 number: number,
                 countrycode:code,
-                otp:String(otp)
+                otp:String(otp),
             })
             //  console.log("This is the responsee data",response)
 
@@ -68,17 +68,24 @@ export function OrgainezerLogin(email,password,navigate){
                 toast.success('Congragulations you are logged in')
                 // console.log(response.data.user.verified)
 
+                 // Reset organizer slice to clean state before setting new user data
+                 dispatch(setStatus("pending"))
+                 dispatch(setAttempts(0))
+                 dispatch(setEditUntil(""))
+                 dispatch(setRejectedData(null))
+                 localStorage.removeItem('Data_Submitted')
+
                  dispatch(setToken(response.data.token))
                  dispatch(setLogin(true))
 
                      const userimage = response?.data?.user?.image
 
                       dispatch(setUserImage(userimage))
-                    
+
                     dispatch(setuser({ ...response.data.user ,usertype:response.data.user.usertype, image:userimage }))
             dispatch(setUser(response.data.user))
 
-                      Cookies.set('token', response.data.token, { expires: 3 }); 
+                      Cookies.set('token', response.data.token, { expires: 3 });
                       localStorage.setItem('token', JSON.stringify(response.data.token))
                       localStorage.setItem('Verified', JSON.stringify(response.data.user.verified))
                       localStorage.setItem('userImage', userimage)
@@ -790,17 +797,82 @@ export function Alldetails (token,navigate){
       }
     }catch(error){
        console.error("Ticket error", error);
-      
+
       // Better error handling
-      const errorMessage = error?.response?.data?.message 
-        || error?.message 
+      const errorMessage = error?.response?.data?.message
+        || error?.message
         || "Ticket error";
-      
+
       toast.error(errorMessage);
     }finally{
       toast.dismiss(ToastId);
       dispatch(setLoading(false));
     }
   }
+}
+
+// New function to get organizer's own data
+export function GetMyOrgDetails(token, navigate) {
+  return async (dispatch) => {
+    if (!token) {
+      if (navigate) {
+        navigate("/Login");
+        toast.error("Token is Expired Please Create a new One");
+      }
+      return { success: false, error: "Token missing" };
+    }
+
+    dispatch(setLoading(true));
+
+    try {
+      // Parse token if needed
+      let tokenStr = token;
+      try {
+        if (typeof token === "string" && (token.startsWith('"') || token.startsWith("{"))) {
+          tokenStr = JSON.parse(token);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      const response = await apiConnector("GET", GetMyOrgData, null, {
+        Authorization: `Bearer ${tokenStr}`
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Failed to fetch organizer details");
+      }
+
+      const data = response.data.data;
+      // console.log("Organizer data fetched:", data);
+
+      // Update Redux state
+      dispatch(setStatus(data.status || "pending"));
+      dispatch(setAttempts(data.attempts ?? 0));
+      dispatch(setEditUntil(data.editUntil ?? ""));
+
+      // If rejected, store the rejected data with role-specific data
+      if (data.status === "rejected" && data.organizerData) {
+        const rejectedData = {
+          ...data.organizerData,
+          directorFresherData: data.directorFresher,
+          directorExperienceData: data.directorExperience,
+          producerFresherData: data.producerFresher,
+          producerExperienceData: data.producerExperience
+        };
+        dispatch(setRejectedData(rejectedData));
+      } else {
+        dispatch(setRejectedData(null));
+      }
+
+      return { success: true, data: data };
+    } catch (error) {
+      console.error("Error fetching organizer details:", error);
+      toast.error(error.message || "Failed to fetch organizer details");
+      return { success: false, error: error.message };
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 }
 

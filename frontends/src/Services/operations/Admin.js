@@ -4,7 +4,7 @@ import  {Orgaineser, Genre, SubGenre, Language, VerifiedUsers, UnverifiedUsers, 
 import {apiConnector} from '../apiConnector'
 import {setLoading} from '../../Slices/orgainezerSlice'
 import {setAttempts,setStatus,setEditUntil,setRoleProfile,setRoleExperience,setRejectedData,setLockedUntill} from '../../Slices/orgainezerSlice'
-const {Org_details,Org_verification,Org_delete,Org_deleteAll} = Orgaineser
+const {Org_details,Org_detailing,Org_verification,Org_delete,Org_deleteAll} = Orgaineser
 import {setverification} from '../../Slices/ProfileSlice'
 import {setVerifiedShows, setUnverifiedShows, setAdminAllShows, setlaoding, setVerifyingShowId, moveToVerified, moveToUnverified} from '../../Slices/ShowSlice'
 import Loading from "../../Components/extra/Loading";
@@ -13,22 +13,25 @@ import Loading from "../../Components/extra/Loading";
 const { VerifyShow, UnverifiedShows, VerifiedShows, AllShows: AdminAllShows } = ShowVerification
 const {GetAllTheatres} = Theatre
 const {Verify_Theatres} = TheatreVerification
+ 
+
+
 export function GetAllOrgDetails (token,navigate){
     return async (dispatch) => {
         if(!token){
                                         navigate("/Login")
                                         toast.error("Token is Expired Please Create a new One")
                                     }
-                                    
+
                                     const ToastId = toast.loading("Fetching user details, please wait...");
                                     dispatch(setLoading(true))
-        
+
         try{
-                                    
+
             const response = await apiConnector("GET", Org_details, null, {
                 Authorization: `Bearer ${token}`
             });
-            
+
           if (!response.data.success) {
                         throw new Error(response.data.message || "Failed to fetch user details");
                     }
@@ -51,14 +54,37 @@ export function GetAllOrgDetails (token,navigate){
         detail.producerFresh?.[0] ||
         null;
 
+      // Fetch role-specific rejected data
+      const directorFreshData = detail.directorFresh?.[0] || null;
+      const directorExperData = detail.directorExperience?.[0] || null;
+      const producerFreshData = detail.producerFresh?.[0] || null;
+      const producerExperData = detail.producerExperience?.[0] || null;
+
       if (organizer) {
         dispatch(setAttempts(organizer.attempts ?? 0));
         dispatch(setStatus(organizer.status ?? "pending"));
         dispatch(setEditUntil(organizer.editUntil ?? ""));
 
+        // When status is "rejected", store the user's own rejected data
         if (organizer.status === "rejected") {
-          dispatch(setRejectedData(organizer));
+          // Combine all data for rejected user
+          const rejectedData = {
+            ...organizer,
+            directorFresherData: directorFreshData,
+            directorExperienceData: directorExperData,
+            producerFresherData: producerFreshData,
+            producerExperienceData: producerExperData
+          };
+          dispatch(setRejectedData(rejectedData));
+        } else {
+          dispatch(setRejectedData(null));
         }
+      } else {
+        // No organizer data found for this user - reset everything
+        dispatch(setStatus("pending"));
+        dispatch(setAttempts(0));
+        dispatch(setEditUntil(""));
+        dispatch(setRejectedData(null));
       }
 
       if (roleProfile) {
@@ -72,11 +98,57 @@ export function GetAllOrgDetails (token,navigate){
         }catch(error){
               console.error("Error fetching org details:", error);
             toast.error(error.message || "Failed to fetch details");
-            
+
             // ✅ FIX 7: Return error info
-            return { 
-                success: false, 
-                error: error.message 
+            return {
+                success: false,
+                error: error.message
+            };
+        }finally{
+              toast.dismiss(ToastId);
+                        dispatch(setLoading(false));
+        }
+    }
+}
+export function Orgainezerdetailing (token,navigate){
+    return async (dispatch) => {
+        if(!token){
+                                        navigate("/Login")
+                                        toast.error("Token is Expired Please Create a new One")
+                                    }
+
+                                    const ToastId = toast.loading("Fetching user details, please wait...");
+                                    dispatch(setLoading(true))
+
+        try{
+
+            const response = await apiConnector("GET", Org_detailing, null, {
+                Authorization: `Bearer ${token}`
+            });
+
+          if (!response.data.success) {
+                        throw new Error(response.data.message || "Failed to fetch user details");
+                    }
+
+            console.log("User details fetched successfully");
+
+            const detail = response?.data?.data
+            if (!detail || !detail.organizersData) {
+                throw new Error("Invalid response structure");
+            }
+
+      toast.success("Organizer details loaded");
+      return { success: true, data: detail };
+
+
+        }catch(error){
+              console.error("Error fetching org details:", error);
+            toast.error(error.message || "Failed to fetch details");
+
+            // ✅ FIX 7: Return error info
+            return {
+                success: false,
+                error: error.message
             };
         }finally{
               toast.dismiss(ToastId);
@@ -113,34 +185,7 @@ return async (dispatch)=>{
                         throw new Error(response.data.message || "Failed to fetch Org Details");
                     }
 
-                    const orgData = response.data?.data;
-
-                    if(status === "approved" && orgData){
-                      dispatch(setverification(true))
-                      dispatch(setAttempts(orgData.attempts ?? 0))
-                      dispatch(setStatus(orgData.status))
-                      dispatch(setEditUntil(orgData.editUntil))
-                      dispatch(setRoleProfile(orgData.Role))
-                      dispatch(setRoleExperience(orgData.ExperienceLevel))
-                    }
-
-                    if(status === "rejected" && orgData){
-                      dispatch(setverification(false))
-                      dispatch(setAttempts(orgData.attempts ?? 0))
-                      dispatch(setStatus(orgData.status))
-                      dispatch(setEditUntil(orgData.editUntil))
-                    }
-
-                    if(status === "locked" && orgData){
-                      dispatch(setverification(false))
-                      dispatch(setAttempts(orgData.attempts ?? 0))
-                      dispatch(setStatus(orgData.status))
-                      dispatch(setEditUntil(orgData.editUntil))
-                      dispatch(setLockedUntill(orgData.lockedUntill))
-                    }
-
-                    // console.log(response)
-                    console.log("Organizer date Verified succesfully");
+                    console.log("Organizer verified successfully");
                     return { success: true, data: response.data }
                                     }catch(error){
  console.error("Error Verifying the org details", error);
@@ -766,3 +811,4 @@ export function VerifyTheatres(token, navigate, id, verification) {
     }
   }
 }
+

@@ -11,24 +11,28 @@ const Join = () => {
   const [loading, setLoading] = useState(false)
 
   const handleSelect = (type) => {
-    setUser(type)
+    if (type === User) return // Don't reload if same type
     setLoading(true)
+    setUser(type)
     setTimeout(() => {
       setLoading(false)
-    }, 2000)
+    }, 5000)
   }
 
   const loader = (
-    <div className="w-full min-h-[300px] flex justify-center items-center">
-      <Loading data="relative" />
+    <div className="w-full min-h-[300px] flex flex-col justify-center items-center gap-4">
+      <div className="w-16 h-16 border-4 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-amber-600 font-semibold text-lg">Loading...</p>
     </div>
   )
 
   let content = null
-  if (User === 'User') {
-    content = loading ? loader : <Users />
+  if (loading) {
+    content = loader
+  } else if (User === 'User') {
+    content = <Users />
   } else if (User === 'Organizer') {
-    content = loading ? loader : <Org />
+    content = <Org />
   }
 
   return (

@@ -2,8 +2,8 @@ import toast from "react-hot-toast";
 import {apiConnector} from '../apiConnector.js'
 import {setUser,setLoading,setToken,setLogin,setUserImage} from '../../Slices/authSlice.js'
 import {setloading,setlikes,setdislikes,setuser,setverification} from '../../Slices/ProfileSlice.js'
-import {setStatus,setAttempts,setEditUntil} from '../../Slices/orgainezerSlice.js'
-import {CreateUser,SendOtp,Login,ResetPassword,UpdatePersonalDetails,PersonalChoice,GetAllShows,SpecificShow,Comment,SendMessage,TicketData,Ratings,AllDetails} from '../Apis/UserApi.js'
+import {setStatus,setAttempts,setEditUntil,setRejectedData} from '../../Slices/orgainezerSlice.js'
+import {CreateUser,SendOtp,Login,ResetPassword,UpdatePersonalDetails,PersonalChoice,GetAllShows,SpecificShow,Comment,SendMessage,TicketData,Ratings,AllDetails,MovieStats,NavbarData} from '../Apis/UserApi.js'
 import {setShow,setlaoding,setallShow} from '../../Slices/ShowSlice.js'
 import Cookies from "js-cookie";
 // import {setuser} from '../../Slices/ProfileSlice.js'
@@ -21,6 +21,8 @@ const {SendMessages,UpdateMessage,GetAllMessages} = SendMessage
 const {TicketPurchase,TicketPurchasedFullDetail} = TicketData
 const {CreateRating,GetAverageRating,GetAllRatingReview} = Ratings
 const {GetAllDetails,FindUserNames,FindloginEmail,FinduserEmail,FindNumber} = AllDetails
+const {MostLiked,HighlyRated,RecentlyReleased} = MovieStats
+const {TheatreData,MovieData} = NavbarData
 
 export function UserDetails (token){
     return async (dispatch) => {
@@ -53,6 +55,12 @@ export function UserDetails (token){
             } else if (orgData) {
               // orgainezerdata exists but wasn't populated (just an ID) — form was submitted
               dispatch(setStatus("submitted"));
+            } else {
+              // No orgainezerdata at all — new organizer, reset to pending
+              dispatch(setStatus("pending"));
+              dispatch(setAttempts(0));
+              dispatch(setEditUntil(""));
+              dispatch(setRejectedData(null));
             }
              return { success: true, data: response.data };
         } catch (error) {
@@ -182,13 +190,13 @@ export function NumberFinder(number) {
 }
 
 
-export function UserCreation(name,password,email,number,otp,countrycode){
+export function UserCreation(name,password,email,number,otp,code){
     return async (dispatch)=>{
         const toastId = toast.loading('...loading')
         dispatch(setLoading(true))
         try {
-             if (!name || !password || !email || !number || !otp || !countrycode) {
-                console.log(name,password,email,number,otp,countrycode)
+             if (!name || !password || !email || !number || !otp ) {
+                // console.log(name,password,email,number,otp)
         throw new Error('Missing required fields');
       }
             const response = await apiConnector("POST",createuser,{
@@ -197,7 +205,7 @@ export function UserCreation(name,password,email,number,otp,countrycode){
                 email:email,
                 number:number,
                 otp:String(otp),
-                countrycode
+                countrycode:code
             })
 
             //  console.log("This is the responsee data",response)
@@ -283,13 +291,17 @@ export function UserLogout(){
             dispatch(setToken(null))
             dispatch(setUser(null))
             localStorage.removeItem('token')
-            Cookies.remove('token'); 
+            Cookies.remove('token');
             localStorage.removeItem('userImage')
             localStorage.removeItem('user')
-            // localStorage.removeItem('Verified')
-            // localStorage.removeItem('Data Submitted')
+            localStorage.removeItem('Verified')
+            localStorage.removeItem('Data_Submitted')
 
             dispatch(setLogin(false))
+            dispatch(setStatus("pending"))
+            dispatch(setAttempts(0))
+            dispatch(setEditUntil(""))
+            dispatch(setRejectedData(null))
         }catch(error){
             console.log("There is an error in the logout process",error)
             console.log("unable to log out")
@@ -797,6 +809,107 @@ export function getAllRatingReview(){
             return { success: true, data: response.data.data }
         } catch (error) {
             console.log("Error in getting the all rating and review", error)
+            return { success: false, data: [] }
+        }
+    }
+}
+
+export function getMostLikedMovies(){
+    return async(dispatch)=>{
+        const toastId = toast.loading("..loading")
+        dispatch(setlaoding(true))
+        try {
+            const response = await apiConnector("GET",MostLiked)
+            console.log("This is the responsee data",response)
+
+            if (!response.data.success) {
+                throw new Error(response.data.message)
+            }
+            return { success: true, data: response.data.data }
+        } catch (error) {
+            console.log("Error in getting the most liked movies",error)
+            console.log("Error in getting the most liked movies")
+            return { success: false, data: [] }
+        }finally{
+            dispatch(setlaoding(false))
+            toast.dismiss(toastId)
+        }
+    }
+}
+
+export function getHighlyRatedMovies(){
+    return async(dispatch)=>{
+        const toastId = toast.loading("..loading")
+        dispatch(setlaoding(true))
+        try {
+            const response = await apiConnector("GET",HighlyRated)
+            console.log("This is the responsee data",response)
+
+            if (!response.data.success) {
+                throw new Error(response.data.message)
+            }
+            return { success: true, data: response.data.data }
+        } catch (error) {
+            console.log("Error in getting the highly rated movies",error)
+            console.log("Error in getting the highly rated movies")
+            return { success: false, data: [] }
+        }finally{
+            dispatch(setlaoding(false))
+            toast.dismiss(toastId)
+        }
+    }
+}
+
+export function getRecentlyReleasedMovies(){
+    return async(dispatch)=>{
+        const toastId = toast.loading("..loading")
+        dispatch(setlaoding(true))
+        try {
+            const response = await apiConnector("GET",RecentlyReleased)
+            console.log("This is the responsee data",response)
+
+            if (!response.data.success) {
+                throw new Error(response.data.message)
+            }
+            return { success: true, data: response.data.data }
+        } catch (error) {
+            console.log("Error in getting the recently released movies",error)
+            console.log("Error in getting the recently released movies")
+            return { success: false, data: [] }
+        }finally{
+            dispatch(setlaoding(false))
+            toast.dismiss(toastId)
+        }
+    }
+}
+
+export function getNavbarMovieData(){
+    return async(dispatch)=>{
+        try {
+            const response = await apiConnector("GET",MovieData)
+
+            if (!response.data.success) {
+                throw new Error(response.data.message)
+            }
+            return { success: true, data: response.data.data }
+        } catch (error) {
+            console.log("Error in getting the navbar movie data",error)
+            return { success: false, data: [] }
+        }
+    }
+}
+
+export function getNavbarTheatreData(){
+    return async(dispatch)=>{
+        try {
+            const response = await apiConnector("GET",TheatreData)
+
+            if (!response.data.success) {
+                throw new Error(response.data.message)
+            }
+            return { success: true, data: response.data.data }
+        } catch (error) {
+            console.log("Error in getting the navbar theatre data",error)
             return { success: false, data: [] }
         }
     }

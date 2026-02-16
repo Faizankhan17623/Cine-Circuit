@@ -157,7 +157,7 @@ const User = () => {
       email: data.Email,
       password: data.Password,
       confirmPassword: data.ConfirmPass,
-      countrycode: data.CountryCode,
+      countryCode: data.CountryCode,
       phoneNumber: data.Number,
        usertype:"Viewer"
     };

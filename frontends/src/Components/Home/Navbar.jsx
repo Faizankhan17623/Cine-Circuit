@@ -4,18 +4,18 @@ import { MdOutlineShoppingCart } from "react-icons/md"
 import { IoIosSearch, IoMdMenu, IoMdClose } from "react-icons/io"
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from "react-router-dom"
-import { UserLogout } from '../../Services/operations/Auth'
+import { UserLogout, getNavbarMovieData, getNavbarTheatreData } from '../../Services/operations/Auth'
 import { toast } from 'react-hot-toast'
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
 ]
 
-const MOVIE_TAGS = [
+const FALLBACK_MOVIE_TAGS = [
   "Adventure", "Martial", "Superhero", "Disaster", "Spy Secret", "War", "Crime","Hello"
 ]
 
-const THEATRE_TYPES = [
+const FALLBACK_THEATRE_TYPES = [
   "Multiplex Theatre", "IMAX Theatre", "3D Theatre", "4DX Theatre",
   "Drive-in Theatre", "Single Screen Theatre", "Open Air Theatre","Laser Projection"
 ]
@@ -28,10 +28,27 @@ const Navbar = () => {
 
   const [path, setPath] = useState('/')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [movieTags, setMovieTags] = useState(FALLBACK_MOVIE_TAGS)
+  const [theatreTypes, setTheatreTypes] = useState(FALLBACK_THEATRE_TYPES)
 
   useEffect(() => {
     setPath(window.location.pathname)
-  }, [])
+
+    const fetchNavbarData = async () => {
+      const movieResult = await dispatch(getNavbarMovieData())
+      if (movieResult?.success && movieResult.data.length > 0) {
+        const genres = movieResult.data.map((item) => item.genreName)
+        setMovieTags(genres)
+      }
+
+      const theatreResult = await dispatch(getNavbarTheatreData())
+      if (theatreResult?.success && theatreResult.data.length > 0) {
+        const formats = theatreResult.data.map((item) => item._id)
+        setTheatreTypes(formats)
+      }
+    }
+    fetchNavbarData()
+  }, [dispatch])
 
   const handleLogout = async () => {
     try {
@@ -92,14 +109,14 @@ const Navbar = () => {
 
         <DropdownMenu
           label="Movies"
-          items={MOVIE_TAGS}
+          items={movieTags}
           basePath="/Movies"
           isActive={path.startsWith('/Movies')}
         />
 
         <DropdownMenu
           label="Theatres"
-          items={THEATRE_TYPES}
+          items={theatreTypes}
           basePath="/Theatres"
           isActive={path.startsWith('/Theatres')}
         />

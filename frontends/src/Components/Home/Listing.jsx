@@ -1,3 +1,5 @@
+  import { useState, useEffect } from 'react';
+  import { useDispatch } from 'react-redux';
   import About from '../extra/AboutUs'
   import JoinCard from '../extra/joinCard'
   import { Swiper, SwiperSlide } from 'swiper/react';
@@ -10,92 +12,14 @@
   import Navbar from './Navbar';
   import { FaStar, FaFire, FaHeart, FaTheaterMasks, FaPlay, FaChevronRight } from 'react-icons/fa';
   import { useNavigate } from 'react-router-dom';
+  import { getMostLikedMovies, getHighlyRatedMovies, getRecentlyReleasedMovies } from '../../Services/operations/Auth';
 
   const PLACEHOLDER_IMG = 'https://res.cloudinary.com/dit2bnxnd/image/upload/v1767976754/2_phppq2.png';
-
-  const topRatedMovies = [
-    { id: 1, image: PLACEHOLDER_IMG, title: "Inception", genre: "Sci-Fi", rating: 9.2 },
-    { id: 2, image: PLACEHOLDER_IMG, title: "The Dark Knight", genre: "Action", rating: 9.0 },
-    { id: 3, image: PLACEHOLDER_IMG, title: "Interstellar", genre: "Sci-Fi", rating: 8.8 },
-    { id: 4, image: PLACEHOLDER_IMG, title: "Pulp Fiction", genre: "Crime", rating: 8.9 },
-    { id: 5, image: PLACEHOLDER_IMG, title: "Fight Club", genre: "Drama", rating: 8.8 },
-    { id: 6, image: PLACEHOLDER_IMG, title: "Forrest Gump", genre: "Drama", rating: 8.7 },
-    { id: 7, image: PLACEHOLDER_IMG, title: "The Matrix", genre: "Sci-Fi", rating: 8.7 },
-    { id: 8, image: PLACEHOLDER_IMG, title: "Goodfellas", genre: "Crime", rating: 8.6 },
-  ];
-
-  const highlyRatedMovies = [
-    { id: 9, image: PLACEHOLDER_IMG, title: "Parasite", genre: "Thriller", rating: 8.5 },
-    { id: 10, image: PLACEHOLDER_IMG, title: "Whiplash", genre: "Music", rating: 8.5 },
-    { id: 11, image: PLACEHOLDER_IMG, title: "Gladiator", genre: "Action", rating: 8.5 },
-    { id: 12, image: PLACEHOLDER_IMG, title: "The Prestige", genre: "Mystery", rating: 8.5 },
-    { id: 13, image: PLACEHOLDER_IMG, title: "Memento", genre: "Thriller", rating: 8.4 },
-    { id: 14, image: PLACEHOLDER_IMG, title: "The Departed", genre: "Crime", rating: 8.5 },
-    { id: 15, image: PLACEHOLDER_IMG, title: "Django", genre: "Western", rating: 8.4 },
-    { id: 16, image: PLACEHOLDER_IMG, title: "Joker", genre: "Drama", rating: 8.4 },
-  ];
-
-  const mostLikedMovies = [
-    { id: 17, image: PLACEHOLDER_IMG, title: "Avengers", genre: "Action", rating: 8.4 },
-    { id: 18, image: PLACEHOLDER_IMG, title: "Spider-Man", genre: "Action", rating: 8.3 },
-    { id: 19, image: PLACEHOLDER_IMG, title: "Frozen", genre: "Animation", rating: 7.5 },
-    { id: 20, image: PLACEHOLDER_IMG, title: "Titanic", genre: "Romance", rating: 7.9 },
-    { id: 21, image: PLACEHOLDER_IMG, title: "Avatar", genre: "Sci-Fi", rating: 7.9 },
-    { id: 22, image: PLACEHOLDER_IMG, title: "Toy Story", genre: "Animation", rating: 8.3 },
-    { id: 23, image: PLACEHOLDER_IMG, title: "The Lion King", genre: "Animation", rating: 8.5 },
-    { id: 24, image: PLACEHOLDER_IMG, title: "Up", genre: "Animation", rating: 8.3 },
-  ];
-
-  const topTheatres = [
-    { id: 25, image: PLACEHOLDER_IMG, title: "PVR Cinemas", genre: "Premium", rating: 4.5 },
-    { id: 26, image: PLACEHOLDER_IMG, title: "INOX Leisure", genre: "Multiplex", rating: 4.3 },
-    { id: 27, image: PLACEHOLDER_IMG, title: "Cinepolis", genre: "Luxury", rating: 4.4 },
-    { id: 28, image: PLACEHOLDER_IMG, title: "Carnival", genre: "Standard", rating: 4.2 },
-    { id: 29, image: PLACEHOLDER_IMG, title: "Miraj Cinemas", genre: "Premium", rating: 4.1 },
-    { id: 30, image: PLACEHOLDER_IMG, title: "Rajhans", genre: "Multiplex", rating: 4.0 },
-    { id: 31, image: PLACEHOLDER_IMG, title: "SRS Cinemas", genre: "Standard", rating: 3.9 },
-    { id: 32, image: PLACEHOLDER_IMG, title: "Fun Cinemas", genre: "Multiplex", rating: 4.0 },
-  ];
-
-  const sectionConfig = [
-    {
-      title: "Top Rated",
-      highlight: "Movies",
-      icon: <FaStar />,
-      iconColor: "from-yellow-400 to-amber-500",
-      badgeColor: "from-yellow-400 to-amber-500",
-      data: topRatedMovies,
-    },
-    {
-      title: "Highly Rated",
-      highlight: "Movies",
-      icon: <FaFire />,
-      iconColor: "from-orange-400 to-red-500",
-      badgeColor: "from-orange-400 to-red-500",
-      data: highlyRatedMovies,
-    },
-    {
-      title: "Most Liked",
-      highlight: "Movies",
-      icon: <FaHeart />,
-      iconColor: "from-pink-400 to-rose-500",
-      badgeColor: "from-pink-400 to-rose-500",
-      data: mostLikedMovies,
-    },
-    {
-      title: "Top Rated",
-      highlight: "Theatres",
-      icon: <FaTheaterMasks />,
-      iconColor: "from-purple-400 to-indigo-500",
-      badgeColor: "from-purple-400 to-indigo-500",
-      data: topTheatres,
-    },
-  ];
 
   const MovieCard = ({ slide, badgeColor }) => (
     <div className="group relative w-full h-[280px] sm:h-[300px] rounded-xl overflow-hidden cursor-pointer">
       <img
-        src={slide.image}
+        src={slide.Posterurl || PLACEHOLDER_IMG}
         alt={slide.title}
         loading="lazy"
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -106,12 +30,12 @@
       {/* Rating badge */}
       <div className={`absolute top-3 right-3 bg-gradient-to-r ${badgeColor} text-white text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-lg`}>
         <FaStar className="text-[10px]" />
-        {slide.rating}
+        {slide.averageRating || slide.BannerLiked || 0}
       </div>
 
       {/* Genre tag */}
       <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-white/20">
-        {slide.genre}
+        {slide.genre?.genreName || "Movie"}
       </div>
 
       {/* Play button on hover */}
@@ -175,7 +99,7 @@
         className="listing-swiper !pb-10"
       >
         {data.map((slide) => (
-          <SwiperSlide key={slide.id}>
+          <SwiperSlide key={slide._id}>
             <MovieCard slide={slide} badgeColor={badgeColor} />
           </SwiperSlide>
         ))}
@@ -185,6 +109,58 @@
 
   const Listing = () => {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const [mostLikedData, setMostLikedData] = useState([])
+    const [highlyRatedData, setHighlyRatedData] = useState([])
+    const [recentlyReleasedData, setRecentlyReleasedData] = useState([])
+
+    useEffect(() => {
+      const fetchData = async () => {
+        const mostLiked = await dispatch(getMostLikedMovies())
+        if (mostLiked?.success) {
+          setMostLikedData(mostLiked.data)
+        }
+
+        const highlyRated = await dispatch(getHighlyRatedMovies())
+        if (highlyRated?.success) {
+          setHighlyRatedData(highlyRated.data)
+        }
+
+        const recentlyReleased = await dispatch(getRecentlyReleasedMovies())
+        if (recentlyReleased?.success) {
+          setRecentlyReleasedData(recentlyReleased.data)
+        }
+      }
+      fetchData()
+    }, [dispatch])
+
+    const sectionConfig = [
+      {
+        title: "Top Rated",
+        highlight: "Movies",
+        icon: <FaStar />,
+        iconColor: "from-yellow-400 to-amber-500",
+        badgeColor: "from-yellow-400 to-amber-500",
+        data: highlyRatedData,
+      },
+      {
+        title: "Most Liked",
+        highlight: "Movies",
+        icon: <FaHeart />,
+        iconColor: "from-pink-400 to-rose-500",
+        badgeColor: "from-pink-400 to-rose-500",
+        data: mostLikedData,
+      },
+      {
+        title: "Recently Released",
+        highlight: "Movies",
+        icon: <FaFire />,
+        iconColor: "from-orange-400 to-red-500",
+        badgeColor: "from-orange-400 to-red-500",
+        data: recentlyReleasedData,
+      },
+    ];
+
     return (
       <div className="text-white w-full min-h-screen flex flex-col items-center gap-0">
 
@@ -197,16 +173,17 @@
         />
 
         {sectionConfig.map((section, index) => (
-          <MovieSection
-            key={index}
-            title={section.title}
-            highlight={section.highlight}
-            icon={section.icon}
-            iconColor={section.iconColor}
-            badgeColor={section.badgeColor}
-            data={section.data}
-            navigate={section.navigate}
-          />
+          section.data.length > 0 && (
+            <MovieSection
+              key={index}
+              title={section.title}
+              highlight={section.highlight}
+              icon={section.icon}
+              iconColor={section.iconColor}
+              badgeColor={section.badgeColor}
+              data={section.data}
+            />
+          )
         ))}
 
         <JoinCard
@@ -216,7 +193,7 @@
           imaage="https://res.cloudinary.com/dit2bnxnd/image/upload/v1767976754/2_phppq2.png"
            onClick={() => navigate("/Contact")}
         />
-        
+
         <About />
         <Footer />
       </div>

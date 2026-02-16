@@ -6,6 +6,7 @@ export const Orgaineser = {
     Org_delete:BASE_URL+"/delete-Org",
     Org_deleteAll:BASE_URL+"/delete-allOrg",
     Org_details:BASE_URL+"/Get-All-Orgs",
+    Org_detailing:BASE_URL+"/Orgainezer-Details"
 }
 
 export const Genre = {

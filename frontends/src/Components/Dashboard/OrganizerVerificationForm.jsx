@@ -19,8 +19,7 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import {GetAllUserDetails} from '../../Services/operations/User'
 import Loader from '../extra/Loading'
-import {Orgainezer_Data,DirectorFres,DirectorExperien,ProducerFreshe,ProducerExpe} from '../../Services/operations/orgainezer'
-import {GetAllOrgDetails} from '../../Services/operations/Admin'
+import {Orgainezer_Data,DirectorFres,DirectorExperien,ProducerFreshe,ProducerExpe,GetMyOrgDetails} from '../../Services/operations/orgainezer'
 
 const formatDateForInput = (dateStr, type = "date") => {
   if (!dateStr) return "";
@@ -40,6 +39,7 @@ const OrganizerVerificationForm = () => {
 
   const {
     register,
+    unregister,
     handleSubmit,
     watch,
     setValue,
@@ -65,6 +65,55 @@ const OrganizerVerificationForm = () => {
     }
   });
 
+  // Register common textarea fields (always required)
+  useEffect(() => {
+    register("bio", { required: "Bio is Required" });
+    register("JoiningReason", { required: "Joining Reason is Required" });
+  }, [register]);
+
+  // Dynamically register/unregister role-specific textarea fields
+  useEffect(() => {
+    // All role-specific textarea field names
+    const directorFresherFields = ["DirectorInspiration", "EarlyChallengs", "ProjectPlanning", "ProjectPromotion", "SceneVisualize"];
+    const directorExperiencedFields = ["RiskManagement"];
+    const producerFresherFields = ["DirectorInspiration", "EarlyChallengs", "BudgetHandling", "Networking", "FundDelays"];
+    const producerExperiencedFields = [];
+
+    const allRoleFields = [...new Set([...directorFresherFields, ...directorExperiencedFields, ...producerFresherFields, ...producerExperiencedFields])];
+
+    // Determine which fields should be required for the current selection
+    let requiredFields = [];
+    if (selectedRole === "Director" && experiences === "Fresher") {
+      requiredFields = directorFresherFields;
+    } else if (selectedRole === "Director" && experiences === "Experienced") {
+      requiredFields = directorExperiencedFields;
+    } else if (selectedRole === "Producer" && experiences === "Fresher") {
+      requiredFields = producerFresherFields;
+    } else if (selectedRole === "Producer" && experiences === "Experienced") {
+      requiredFields = producerExperiencedFields;
+    }
+
+    // Unregister fields that are NOT required for current selection
+    const fieldsToUnregister = allRoleFields.filter(f => !requiredFields.includes(f));
+    fieldsToUnregister.forEach(field => unregister(field, { keepValue: true }));
+
+    // Register fields that ARE required for current selection
+    const fieldLabels = {
+      DirectorInspiration: "Inspiration is required",
+      EarlyChallengs: "Early Challenges is required",
+      ProjectPlanning: "Project Planning is required",
+      ProjectPromotion: "Project Promotion is required",
+      SceneVisualize: "Scene Visualization is required",
+      RiskManagement: "Risk management description is required",
+      BudgetHandling: "Budget planning is required",
+      Networking: "Networking plan is required",
+      FundDelays: "Funding delays strategy is required",
+    };
+    requiredFields.forEach(field => {
+      register(field, { required: fieldLabels[field] });
+    });
+  }, [  register, unregister]);
+
   const iconMap = {
     FaLinkedin: FaLinkedin,
     FaYoutube: FaYoutube,
@@ -77,7 +126,8 @@ const OrganizerVerificationForm = () => {
 const Proceed = async (data) => {
 
   try {
-    setloading(true)
+    setConfirmationModal(null)
+    setSubmitting(true)
     const Response = await dispatch(Orgainezer_Data(data, token));
       // const userId = getState().Profile.user?._id;
       // console.log(Response)
@@ -136,7 +186,7 @@ const Proceed = async (data) => {
     console.log(error)
     console.log(error, error.message);
   }finally{
-    setloading(false)
+    setSubmitting(false)
   }
 };
 
@@ -251,6 +301,7 @@ const [duplicateAwardFestival, setduplicateAwardFestival] = useState(new Set());
 const [duplicateMovieName, setduplicateMovieName] = useState(new Set());
 const [data,setdata] = useState()
   const [loading,setloading] = useState(false)
+  const [submitting,setSubmitting] = useState(false)
   const [budget,setbudget] = useState("")
   const [earned,setearned] = useState("")
   const [affilitions,setaffilition] = useState("No")
@@ -262,6 +313,7 @@ const [direFresh,setDireFresh] = useState()
 const [direExper,setDireExper] = useState()
 // const [attempt,setAttempts] = useState()
 // console.log(typeof OrgData)
+// console.log(prodFresh)
 const myJSON = JSON.stringify(OrgData);
 
 // console.log(myJSON);
@@ -302,10 +354,10 @@ useEffect(() => {
 
 
 
-const [fields,setFields] = useState({
+const textareaDefaults = {
   bio:"",
   JoiningReason:"",
-  // Director Freshser 
+  // Director Freshser
   DirectorInspiration:"",
   EarlyChallengs:"",
   ProjectPlanning:"",
@@ -318,9 +370,14 @@ const [fields,setFields] = useState({
   BudgetHandling:"",
   Networking:"",
   FundDelays:"",
-  // Producer Experience 
+  // Producer Experience
   RiskManagement:""
-})
+};
+const [fields,setFields] = useState(textareaDefaults)
+const textareaValuesRef = useRef({...textareaDefaults});
+const debounceTimerRef = useRef(null);
+const duplicateDebounceRef = useRef(null);
+const [prePopKey, setPrePopKey] = useState(0);
 
   const { fields: Notable, append: appendprojects, remove: removeprojects } = useFieldArray({ control, name: "Notable" });
   const { fields: socials, append: appendSocial, remove: removeSocial } = useFieldArray({ control, name: "socials" });
@@ -356,16 +413,17 @@ const [fields,setFields] = useState({
 //   const localAddressValue = watch("LocalAddress");
 // const permanentAddressValue = watch("PermanentAddress");
 // console.log(data)
+// console.log(status)
    useEffect(() => {
-     if (data && !(status === "rejected" && rejectedData)) {
+     if (data) {
        const nameParts = data?.userName?.split(" ");
        setValue("First", nameParts?.[0] || "", { shouldValidate: true });
-       setValue("Last", nameParts?.[1] || "", { shouldValidate: true });
+       setValue("Last", nameParts?.slice(1)?.join(" ") || "", { shouldValidate: true });
        setValue("Email", data?.email || "", { shouldValidate: true });
        setValue("CountryCode", data?.countrycode || "", { shouldValidate: true });
        setValue("MobileNumber", data?.number || "", { shouldValidate: true });
      }
-   }, [data, setValue, status, rejectedData])
+   }, [data])
 // console.log(status)
      useEffect(() => {
      const handler = async () => {
@@ -374,16 +432,17 @@ const [fields,setFields] = useState({
      try {
      setloading(true)
 
-       const response = await dispatch(GetAllOrgDetails(token, navigate));
+       const response = await dispatch(GetMyOrgDetails(token, navigate));
       //  console.log(response)
-       // Safe access
+       // Safe access - new API returns organizerData, directorFresher, directorExperience, etc.
        const data = response?.data;
+      //  console.log(data)
        if (data) {
-         setOrgData(data.organizersData[0] || "");
-         setProdFresh(data.producerFresh[0] || "");
-         setProdExper(data.producerExperience[0] || "");
-         setDireFresh(data.directorFresh[0] || "");
-         setDireExper(data.directorExperience[0] || "");
+         setOrgData(data.organizerData || "");
+         setProdFresh(data.producerFresher || "");
+         setProdExper(data.producerExperience || "");
+         setDireFresh(data.directorFresher || "");
+         setDireExper(data.directorExperience || "");
        }
      setloading(false)
 
@@ -424,10 +483,12 @@ const [fields,setFields] = useState({
    }
    if (OrgData?.Shortbio) {
      setValue("bio", OrgData.Shortbio);
+     textareaValuesRef.current.bio = OrgData.Shortbio;
      setFields(prev => ({ ...prev, bio: OrgData.Shortbio }));
    }
    if (OrgData?.MainReason) {
      setValue("JoiningReason", OrgData.MainReason);
+     textareaValuesRef.current.JoiningReason = OrgData.MainReason;
      setFields(prev => ({ ...prev, JoiningReason: OrgData.MainReason }));
    }
    // Set role and experience level
@@ -465,22 +526,26 @@ useEffect(() => {
   
   if (roleData) {
     // Update all text area fields from role-specific data
-    setFields(prev => ({
-      ...prev,
-      bio: prev.bio || OrgData?.Shortbio || "",
-      JoiningReason: prev.JoiningReason || OrgData?.MainReason || "",
-      DirectorInspiration: roleData?.Inspiration || roleData?.DirectorInspiration || "",
+    // Producer Fresher uses different field names in backend: Producerinspiration, BudgetPlanning, industryRelation, FundingDelays
+    const newTextareaValues = {
+      bio: textareaValuesRef.current.bio || OrgData?.Shortbio || "",
+      JoiningReason: textareaValuesRef.current.JoiningReason || OrgData?.MainReason || "",
+      DirectorInspiration: roleData?.Producerinspiration || roleData?.Inspiration || roleData?.DirectorInspiration || "",
       EarlyChallengs: roleData?.EarlyChallenges || roleData?.EarlyChallengs || "",
       ProjectPlanning: roleData?.ProjectPlanning || "",
       ProjectPromotion: roleData?.ProjectPromotion || "",
       SceneVisualize: roleData?.SceneVisualize || "",
       ProjectDescription: roleData?.ProjectDescription || "",
-      Inspiration: roleData?.Inspiration || "",
-      BudgetHandling: roleData?.BudgetHandling || "",
-      Networking: roleData?.Networking || "",
-      FundDelays: roleData?.FundDelays || "",
+      // Producer Fresher - map backend field names to frontend field names
+      Inspiration: roleData?.Producerinspiration || roleData?.Inspiration || "",
+      BudgetHandling: roleData?.BudgetPlanning || roleData?.BudgetHandling || "",
+      Networking: roleData?.industryRelation || roleData?.Networking || "",
+      FundDelays: roleData?.FundingDelays || roleData?.FundDelays || "",
       RiskManagement: roleData?.RiskManagement || ""
-    }));
+    };
+    textareaValuesRef.current = { ...textareaValuesRef.current, ...newTextareaValues };
+    setFields(prev => ({ ...prev, ...newTextareaValues }));
+    setPrePopKey(prev => prev + 1);
     
     // Populate form fields and state variables for Director/Producer Experienced/Fresher
     if (OrgData?.Role === "Director" && OrgData?.ExperienceLevel === "Experienced" && direExper) {
@@ -555,10 +620,11 @@ useEffect(() => {
 // // Populate form fields with rejected data when status is rejected
 useEffect(() => {
   if (status === "rejected" && rejectedData) {
-    // Personal Information
-    const firstName = rejectedData?.username?.split(" ")?.[0] || "";
-    const lastName = rejectedData?.username?.split(" ")?.[1] || "";
-    
+    // Split username properly - use rejectedData username, handle names with multiple words
+    const nameParts = rejectedData?.username?.split(" ") || [];
+    const firstName = nameParts?.[0] || "";
+    const lastName = nameParts?.slice(1)?.join(" ") || "";
+
     // Use reset to update the form with all values at once
     reset({
       First: firstName,
@@ -580,6 +646,10 @@ useEffect(() => {
       YearExperience: rejectedData?.yearsexperience || "",
       bio: rejectedData?.Shortbio || "",
       JoiningReason: rejectedData?.MainReason || "",
+      // Producer/Director Fresher Inspiration - maps Producerinspiration from backend
+      DirectorInspiration: rejectedData?.producerFresherData?.Producerinspiration || rejectedData?.producerFresherData?.Inspiration ||
+                        rejectedData?.directorFresherData?.Producerinspiration || rejectedData?.directorFresherData?.Inspiration ||
+                        rejectedData?.Inspiration || "",
       Work: rejectedData?.NotableProjects?.needed || "No",
       mediaChoice: rejectedData?.SocialMedia?.active || "No",
       Ongoing: rejectedData?.ongoing?.active || "No",
@@ -591,6 +661,11 @@ useEffect(() => {
       Experience: rejectedData?.Experience || "No",
       Collaboration: rejectedData?.Collaboration || "No",
       Comfortable: rejectedData?.Comfortable || "No",
+      // Producer Fresher fields
+      fresherProjects: rejectedData?.producerFresherData?.ProjectsCount || "",
+      internshipExperience: rejectedData?.producerFresherData?.CrowdFunding?.needed === true ||
+                          rejectedData?.producerFresherData?.CrowdFunding?.needed === "true" ||
+                          rejectedData?.producerFresherData?.CrowdFunding?.needed === "Yes" ? "Yes" : "No",
     });
 
     // Update state variables as well
@@ -707,48 +782,84 @@ useEffect(() => {
     }
 
     // Set text area fields from rejectedData
-    setFields(prev => ({
-      ...prev,
+    const rejBioValues = {
       bio: rejectedData?.Shortbio || "",
       JoiningReason: rejectedData?.MainReason || "",
-    }));
+    };
+    textareaValuesRef.current = { ...textareaValuesRef.current, ...rejBioValues };
+    setFields(prev => ({ ...prev, ...rejBioValues }));
+    setPrePopKey(prev => prev + 1);
   }
 }, [status, rejectedData, reset, setValue]);
 
 // // Populate additional fields from role-specific rejected data
 useEffect(() => {
   if (status === "rejected" && rejectedData) {
+    // Get role-specific data from rejectedData
+    const producerFresherData = rejectedData?.producerFresherData;
+    const producerExperData = rejectedData?.producerExperienceData;
+    const directorFreshData = rejectedData?.directorFresherData;
+    const directorExperData = rejectedData?.directorExperienceData;
+
+    // Determine which role data to use based on rejectedData role
+    let roleData = null;
+    if (rejectedData?.Role === "Producer" && rejectedData?.ExperienceLevel === "Fresher" && producerFresherData) {
+      roleData = producerFresherData;
+    } else if (rejectedData?.Role === "Producer" && rejectedData?.ExperienceLevel === "Experienced" && producerExperData) {
+      roleData = producerExperData;
+    } else if (rejectedData?.Role === "Director" && rejectedData?.ExperienceLevel === "Fresher" && directorFreshData) {
+      roleData = directorFreshData;
+    } else if (rejectedData?.Role === "Director" && rejectedData?.ExperienceLevel === "Experienced" && directorExperData) {
+      roleData = directorExperData;
+    }
+
     // Update text area fields from rejectedData if available
-    setFields(prev => ({
-      ...prev,
-      bio: rejectedData?.Shortbio || prev.bio || "",
-      JoiningReason: rejectedData?.MainReason || prev.JoiningReason || "",
-      DirectorInspiration: rejectedData?.Inspiration || prev.DirectorInspiration || "",
-      EarlyChallengs: rejectedData?.EarlyChallenges || prev.EarlyChallengs || "",
-      ProjectPlanning: rejectedData?.ProjectPlanning || prev.ProjectPlanning || "",
-      ProjectPromotion: rejectedData?.ProjectPromotion || prev.ProjectPromotion || "",
-      SceneVisualize: rejectedData?.SceneVisualize || prev.SceneVisualize || "",
-      ProjectDescription: rejectedData?.ProjectDescription || prev.ProjectDescription || "",
-      Inspiration: rejectedData?.Inspiration || prev.Inspiration || "",
-      BudgetHandling: rejectedData?.BudgetHandling || prev.BudgetHandling || "",
-      Networking: rejectedData?.Networking || prev.Networking || "",
-      FundDelays: rejectedData?.FundDelays || prev.FundDelays || "",
-      RiskManagement: rejectedData?.RiskManagement || prev.RiskManagement || ""
-    }));
-    
+    const rejTextValues = {
+      bio: rejectedData?.Shortbio || textareaValuesRef.current.bio || "",
+      JoiningReason: rejectedData?.MainReason || textareaValuesRef.current.JoiningReason || "",
+      // Director fields
+      DirectorInspiration: roleData?.Producerinspiration || roleData?.Inspiration || roleData?.DirectorInspiration || rejectedData?.Producerinspiration || rejectedData?.Inspiration || rejectedData?.DirectorInspiration || textareaValuesRef.current.DirectorInspiration || "",
+      EarlyChallengs: roleData?.EarlyChallenges || roleData?.EarlyChallengs || rejectedData?.EarlyChallenges || textareaValuesRef.current.EarlyChallengs || "",
+      ProjectPlanning: roleData?.ProjectPlanning || rejectedData?.ProjectPlanning || textareaValuesRef.current.ProjectPlanning || "",
+      ProjectPromotion: roleData?.ProjectPromotion || rejectedData?.ProjectPromotion || textareaValuesRef.current.ProjectPromotion || "",
+      SceneVisualize: roleData?.SceneVisualize || rejectedData?.SceneVisualize || textareaValuesRef.current.SceneVisualize || "",
+      ProjectDescription: roleData?.ProjectDescription || rejectedData?.ProjectDescription || textareaValuesRef.current.ProjectDescription || "",
+      // Producer Fresher fields - map backend names to frontend
+      Inspiration: roleData?.Producerinspiration || roleData?.Inspiration || rejectedData?.Producerinspiration || rejectedData?.Inspiration || textareaValuesRef.current.Inspiration || "",
+      BudgetHandling: roleData?.BudgetPlanning || roleData?.BudgetHandling || rejectedData?.BudgetPlanning || rejectedData?.BudgetHandling || textareaValuesRef.current.BudgetHandling || "",
+      Networking: roleData?.industryRelation || roleData?.Networking || rejectedData?.industryRelation || rejectedData?.Networking || textareaValuesRef.current.Networking || "",
+      FundDelays: roleData?.FundingDelays || roleData?.FundDelays || rejectedData?.FundingDelays || rejectedData?.FundDelays || textareaValuesRef.current.FundDelays || "",
+      // Producer Experience fields
+      RiskManagement: roleData?.RiskManagement || rejectedData?.RiskManagement || textareaValuesRef.current.RiskManagement || ""
+    };
+    textareaValuesRef.current = { ...textareaValuesRef.current, ...rejTextValues };
+    setFields(prev => ({ ...prev, ...rejTextValues }));
+    setPrePopKey(prev => prev + 1);
+
     // Also set in form values
     setValue("JoiningReason", rejectedData?.MainReason || "");
-    setValue("DirectorInspiration", rejectedData?.Inspiration || "");
-    setValue("EarlyChallengs", rejectedData?.EarlyChallenges || "");
-    setValue("ProjectPlanning", rejectedData?.ProjectPlanning || "");
-    setValue("ProjectPromotion", rejectedData?.ProjectPromotion || "");
-    setValue("SceneVisualize", rejectedData?.SceneVisualize || "");
-    setValue("ProjectDescription", rejectedData?.ProjectDescription || "");
-    setValue("Inspiration", rejectedData?.Inspiration || "");
-    setValue("BudgetHandling", rejectedData?.BudgetHandling || "");
-    setValue("Networking", rejectedData?.Networking || "");
-    setValue("FundDelays", rejectedData?.FundDelays || "");
-    setValue("RiskManagement", rejectedData?.RiskManagement || "");
+    setValue("DirectorInspiration", roleData?.Producerinspiration || roleData?.Inspiration || rejectedData?.Producerinspiration || rejectedData?.Inspiration || "");
+    setValue("EarlyChallengs", roleData?.EarlyChallenges || roleData?.EarlyChallengs || rejectedData?.EarlyChallenges || "");
+    setValue("ProjectPlanning", roleData?.ProjectPlanning || rejectedData?.ProjectPlanning || "");
+    setValue("ProjectPromotion", roleData?.ProjectPromotion || rejectedData?.ProjectPromotion || "");
+    setValue("SceneVisualize", roleData?.SceneVisualize || rejectedData?.SceneVisualize || "");
+    setValue("ProjectDescription", roleData?.ProjectDescription || rejectedData?.ProjectDescription || "");
+    // Producer Fresher - use correct field mapping
+    setValue("Inspiration", roleData?.Producerinspiration || roleData?.Inspiration || rejectedData?.Producerinspiration || rejectedData?.Inspiration || "");
+    setValue("BudgetHandling", roleData?.BudgetPlanning || roleData?.BudgetHandling || rejectedData?.BudgetPlanning || rejectedData?.BudgetHandling || "");
+    setValue("Networking", roleData?.industryRelation || roleData?.Networking || rejectedData?.industryRelation || rejectedData?.Networking || "");
+    setValue("FundDelays", roleData?.FundingDelays || roleData?.FundDelays || rejectedData?.FundingDelays || rejectedData?.FundDelays || "");
+    setValue("RiskManagement", roleData?.RiskManagement || rejectedData?.RiskManagement || "");
+
+    // Producer Fresher - Projects Count (ProjectsCount from backend -> fresherProjects in form)
+    if (rejectedData?.Role === "Producer" && rejectedData?.ExperienceLevel === "Fresher" && roleData?.ProjectsCount) {
+      setValue("fresherProjects", roleData.ProjectsCount);
+    }
+
+    // Producer Fresher - CrowdFunding/Internship Experience
+    if (rejectedData?.Role === "Producer" && rejectedData?.ExperienceLevel === "Fresher" && roleData?.CrowdFunding) {
+      setValue("internshipExperience", roleData.CrowdFunding.needed === true || roleData.CrowdFunding.needed === "true" || roleData.CrowdFunding.needed === "Yes" ? "Yes" : "No");
+    }
   }
 }, [status, rejectedData]);
 
@@ -1015,13 +1126,22 @@ const onSubmit = async (data) => {
   };
 
   const handleChange = (e) => {
-    let {name,value} = e.target;
-    let words = countWords(value);
+    const {name, value} = e.target;
+    const words = countWords(value);
     if (words > 250) {
        toast.error(`${name} cannot exceed 250 words`);
-      return;
+       e.target.value = textareaValuesRef.current[name] || '';
+       return;
     }
-   setFields((prev) => ({ ...prev, [name]: value }));
+    // Store value in ref instantly (no re-render)
+    textareaValuesRef.current[name] = value;
+    // Sync to react-hook-form for submission
+    setValue(name, value, { shouldValidate: false, shouldDirty: true });
+    // Debounce the state update (only needed for word count display)
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      setFields((prev) => ({ ...prev, [name]: value }));
+    }, 400);
   };
 
 useEffect(() => {
@@ -1037,7 +1157,7 @@ useEffect(() => {
 
 // console.log("This is the timing ",timer)
 
-const Name = data?.userName.split(" ")
+const Name = data?.userName?.split(" ")
 
 if(loading){
   return (
@@ -1049,7 +1169,20 @@ if(loading){
 // console.log(attempts,typeof attempts)
 
   return (
-    <div className="flex justify-center h-fit w-full min-h-screen bg-richblack-900 overflow-y-scroll overflow-x-hidden">
+    <div className="flex justify-center h-fit w-full min-h-screen bg-richblack-900 overflow-y-scroll overflow-x-hidden relative">
+      {/* Full-screen submit loader overlay */}
+      {submitting && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-richblack-900/90 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-6 p-10 rounded-2xl bg-richblack-800 border border-richblack-700 shadow-2xl">
+            <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-yellow-400 mb-2">Submitting Verification Data</h3>
+              <p className="text-richblack-300 text-sm">Please do not close or refresh this page</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-[63rem] bg-richblack-900 rounded-xl shadow-lg p-8 Secondss text-white">
        <div className= {`${attempts === 0 ?"text-center":"flex justify-between items-center px-8 py-4 mb-6 w-full"}`}>
   {/* Left side - Attempt counter */}
@@ -1094,7 +1227,7 @@ if(loading){
             ? 'Your verification data has been submitted and is under review. You can only view it now.'
             : 'Fill in your details below to request verification as an Organizer. These details can only be submitted once and cannot be changed later. The Administrator Will Review Your Application and Reach back to You Via E-mail'}
         </p>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 text-white" autoComplete="off">
+          <form onSubmit={handleSubmit(onSubmit, (formErrors) => { console.log("Form validation errors:", formErrors); toast.error("Please fill all required fields"); })} className="space-y-6 text-white" autoComplete="off">
             {/* Personal Information */}
             <div className="w-full Form bg-richblack-800 rounded-xl border border-richblack-700 shadow-lg overflow-hidden">
               <div className="bg-gradient-to-r from-yellow-400/10 to-transparent border-b border-richblack-700 px-8 py-5">
@@ -1112,7 +1245,6 @@ if(loading){
                     <input
                       type="text"
                       placeholder="Enter Your First name"
-                      value={watch("First") || ''}
                       disabled
                       className={`w-full p-3 rounded-lg form-style bg-richblack-700 border border-richblack-600 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-white placeholder-gray-500 ${Name ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
                       {...register("First", { required: "First Name is required" })}
@@ -1127,7 +1259,6 @@ if(loading){
                     <input
                       type="text"
                       placeholder="Enter Your Last name"
-                      value={watch("Last") || ''}
                       disabled
                       className={`w-full p-3 rounded-lg form-style bg-richblack-700 border border-richblack-600 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-white placeholder-gray-500 ${Name ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
                       {...register("Last", { required: "Last Name is required" })}
@@ -1602,14 +1733,13 @@ if(loading){
                       <span className="text-red-500">*</span><span>Short Bio About Yourself</span>
                     </span>
                     <textarea
+                      key={`bio-${prePopKey}`}
                       id="bio"
                       name="bio"
                       placeholder="Write a short bio (max 250 characters)"
-                      maxLength={250}
                       rows={4}
-                      value={fields.bio}
+                      defaultValue={fields.bio}
                       className="w-full p-3 rounded-lg form-style bg-richblack-700 border border-richblack-600 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-white placeholder-gray-500 resize-none"
-                      {...register("bio", { required: "Bio is Required" })}
                       onChange={handleChange}
                     />
                     <div className="flex justify-between items-center">
@@ -1715,7 +1845,7 @@ if(loading){
     </div>
 
     {Notable.map((field, index) => (
-      <div className='grid grid-cols-1 md:grid-cols-[auto_1fr_1fr_1fr_1fr_auto] items-end gap-4 bg-richblack-800 rounded-lg p-4 border border-richblack-600' key={field.id}>
+      <div className='grid grid-cols-1 md:grid-cols-[auto_1.5fr_1fr_1fr_1fr_auto] items-end gap-4 bg-richblack-800 rounded-lg p-4 border border-richblack-600' key={field.id}>
         <span className="text-yellow-400 font-bold text-lg flex items-center justify-center w-8 h-8 rounded-full bg-richblack-700 border border-richblack-600">{index + 1}</span>
        <label className="flex flex-col gap-2">
   {duplicateNameIndices.has(index) && (
@@ -1759,22 +1889,23 @@ if(loading){
       shouldValidate: true,
       shouldDirty: true
     });
-// getValues
-    // Re-calculate duplicates with the absolute latest form values
-    const allNames = getValues("Notable").map((entry, i) =>
-      (i === index ? value : (entry?.name || ""))
-        .toLowerCase().replace(/\s+/g, " ").trim()
-    );
-    const counts = {};
-    allNames.forEach((n) => {
-      if (!n) return;
-      counts[n] = (counts[n] || 0) + 1;
-    });
-    const newDuplicates = new Set();
-    allNames.forEach((n, i) => {
-      if (n && counts[n] > 1) newDuplicates.add(i);
-    });
-    setDuplicateNameIndices(newDuplicates);
+    if (duplicateDebounceRef.current) clearTimeout(duplicateDebounceRef.current);
+    duplicateDebounceRef.current = setTimeout(() => {
+      const allNames = getValues("Notable").map((entry, i) =>
+        (i === index ? value : (entry?.name || ""))
+          .toLowerCase().replace(/\s+/g, " ").trim()
+      );
+      const counts = {};
+      allNames.forEach((n) => {
+        if (!n) return;
+        counts[n] = (counts[n] || 0) + 1;
+      });
+      const newDuplicates = new Set();
+      allNames.forEach((n, i) => {
+        if (n && counts[n] > 1) newDuplicates.add(i);
+      });
+      setDuplicateNameIndices(newDuplicates);
+    }, 300);
   }}
   />
 </label>
@@ -2017,7 +2148,8 @@ if(loading){
               if (val) {
                 val = Number(val).toLocaleString("en-US");
               }
-              setValue(`socials.${index}.follwers`, val, { shouldValidate: true, shouldDirty: true });
+              e.target.value = val;
+              setValue(`socials.${index}.follwers`, val, { shouldValidate: false, shouldDirty: true });
             }}
           />
           {errors.socials?.[index]?.follwers && (
@@ -2246,7 +2378,7 @@ if(loading){
                         <span className="text-yellow-400 font-bold text-lg flex items-center justify-center w-8 h-8 rounded-full bg-richblack-700 border border-richblack-600 flex-shrink-0 mb-1">{index + 1}</span>
 
                         {/* Project Name */}
-                        <label className="flex flex-col gap-1 min-w-0" style={{ flex: '1.5' }}>
+                        <label className="flex flex-col gap-1 min-w-0" style={{ flex: '2' }}>
                           <span className="text-sm font-semibold text-gray-300 flex items-center gap-1 whitespace-nowrap">
                             <span className="text-red-500">*</span><span>Name</span>
                             {duplicateongoingproject.has(index) && (
@@ -2277,20 +2409,23 @@ if(loading){
                             onChange={(e)=>{
                               const value = e.target.value
                               setValue(`ongoingProjects.${index}.ProName`,value,{ shouldValidate: true, shouldDirty: true})
-                              const allNames = getValues("ongoingProjects").map((entry,i) =>
-                                (i === index ? value : (entry?.ProName || "")
-                                ).toLowerCase().replace(/\s+/g," ").trim()
-                              )
-                              const counts = {}
-                              allNames.forEach((n) => {
-                                if(!n) return
-                                counts[n] = (counts[n] || 0) + 1
-                              })
-                              const newDuplicates = new Set()
-                              allNames.forEach((n,i) => {
-                                if(n && counts[n] > 1) newDuplicates.add(i)
-                              })
-                              setduplicateongoingproject(newDuplicates)
+                              if (duplicateDebounceRef.current) clearTimeout(duplicateDebounceRef.current);
+                              duplicateDebounceRef.current = setTimeout(() => {
+                                const allNames = getValues("ongoingProjects").map((entry,i) =>
+                                  (i === index ? value : (entry?.ProName || "")
+                                  ).toLowerCase().replace(/\s+/g," ").trim()
+                                )
+                                const counts = {}
+                                allNames.forEach((n) => {
+                                  if(!n) return
+                                  counts[n] = (counts[n] || 0) + 1
+                                })
+                                const newDuplicates = new Set()
+                                allNames.forEach((n,i) => {
+                                  if(n && counts[n] > 1) newDuplicates.add(i)
+                                })
+                                setduplicateongoingproject(newDuplicates)
+                              }, 300);
                             }}
                           />
                         </label>
@@ -2333,7 +2468,7 @@ if(loading){
                         </label>
 
                         {/* Start Date */}
-                        <label className='flex flex-col gap-1' style={{ width: '142px', maxWidth: '142px', flexShrink: 0 }}>
+                        <label className='flex flex-col gap-1' style={{ width: '138px', maxWidth: '138px', flexShrink: 0 }}>
                           <span className="text-sm font-semibold text-gray-300 flex items-center gap-1 whitespace-nowrap">
                             <span className="text-red-500">*</span><span>Start Date</span>
                             {errors.ongoingProjects?.[index]?.Start_Date && (
@@ -2351,7 +2486,7 @@ if(loading){
                         </label>
 
                         {/* End Date */}
-                        <label className='flex flex-col gap-1' style={{ width: '142px', maxWidth: '142px', flexShrink: 0 }}>
+                        <label className='flex flex-col gap-1' style={{ width: '138px', maxWidth: '138px', flexShrink: 0 }}>
                           <span className="text-sm font-semibold text-gray-300 flex items-center gap-1 whitespace-nowrap">
                             <span className="text-red-500">*</span><span>End Date</span>
                             {errors.ongoingProjects?.[index]?.Start_End && (
@@ -2452,7 +2587,7 @@ if(loading){
                         <span className="text-yellow-400 font-bold text-lg flex items-center justify-center w-8 h-8 rounded-full bg-richblack-700 border border-richblack-600 flex-shrink-0 mb-1">{index + 1}</span>
 
                         {/* Project Name */}
-                        <label className="flex flex-col gap-1 min-w-0" style={{ flex: '1' }}>
+                        <label className="flex flex-col gap-1 min-w-0" style={{ flex: '2' }}>
                           <span className="text-sm font-semibold text-gray-300 flex items-center gap-1 whitespace-nowrap">
                             <span className="text-red-500">*</span><span>Name</span>
                             {duplicateProjectsplanned.has(index) && (
@@ -2485,14 +2620,17 @@ if(loading){
                             onChange={(e) => {
                               const value = e.target.value;
                               setValue(`plannedProjects.${index}.Proname`, value, { shouldValidate: true, shouldDirty: true });
-                              const allNames = getValues("plannedProjects").map((entry, i) =>
-                                (i === index ? value : entry?.Proname || "").toLowerCase().replace(/\s+/g, "").trim()
-                              );
-                              const counts = {};
-                              allNames.forEach((n) => { if (!n) return; counts[n] = (counts[n] || 0) + 1; });
-                              const newDuplicates = new Set();
-                              allNames.forEach((n, i) => { if (n && counts[n] > 1) newDuplicates.add(i); });
-                              setduplicateProjectsplanned(newDuplicates);
+                              if (duplicateDebounceRef.current) clearTimeout(duplicateDebounceRef.current);
+                              duplicateDebounceRef.current = setTimeout(() => {
+                                const allNames = getValues("plannedProjects").map((entry, i) =>
+                                  (i === index ? value : entry?.Proname || "").toLowerCase().replace(/\s+/g, "").trim()
+                                );
+                                const counts = {};
+                                allNames.forEach((n) => { if (!n) return; counts[n] = (counts[n] || 0) + 1; });
+                                const newDuplicates = new Set();
+                                allNames.forEach((n, i) => { if (n && counts[n] > 1) newDuplicates.add(i); });
+                                setduplicateProjectsplanned(newDuplicates);
+                              }, 300);
                             }}
                           />
                         </label>
@@ -2517,7 +2655,7 @@ if(loading){
                         </label>
 
                         {/* Start Date */}
-                        <label className='flex flex-col gap-1' style={{ width: '142px', maxWidth: '142px', flexShrink: 0 }}>
+                        <label className='flex flex-col gap-1' style={{ width: '138px', maxWidth: '138px', flexShrink: 0 }}>
                           <span className="flex items-center gap-1 text-sm whitespace-nowrap">
                             <span className="text-red-500">*</span><span>Start Date</span>
                             {errors.plannedProjects?.[index]?.PStart && (
@@ -2533,7 +2671,7 @@ if(loading){
                         </label>
 
                         {/* End Date */}
-                        <label className='flex flex-col gap-1' style={{ width: '142px', maxWidth: '142px', flexShrink: 0 }}>
+                        <label className='flex flex-col gap-1' style={{ width: '138px', maxWidth: '138px', flexShrink: 0 }}>
                           <span className="flex items-center gap-1 text-sm whitespace-nowrap">
                             <span className="text-red-500">*</span><span>End Date</span>
                             {errors.plannedProjects?.[index]?.PEnd && (
@@ -2641,55 +2779,40 @@ if(loading){
 
   {/* ✅ Dropdown */}
   {showGenreDropdown && (
-    <div className="absolute left-0 bg-richblack-800 -top-67 mt-2 p-2 rounded shadow w-full h-[255px] z-10">
-      <div className="flex justify-around items-center gap-2 w-full h-full">
-        {/* Genre options */}
-        <div className="w-[80%] border-r-1 grid grid-cols-5 grid-rows-4 gap-2">
-          {Genre.genres.map((data, index) => (
-            <div
-              key={index}
-              className={`text-md font-edu-sa w-fit Datass rounded-lg px-4 py-2 cursor-pointer font-semibold
-                ${genres.includes(data.name)
-                  ? "bg-yellow-400 text-black"
-                  : "hover:bg-yellow-400 hover:text-black"}`}
-              onClick={() => {
-                if (genres.length >= 5) {
-                  setGenreError("You cannot select more than 5 genres");
-                  return;
-                }
-                setGenreError("");
-                if (!genres.includes(data.name)) {
-                  const updatedGenres = [...genres, data.name];
-                  setGenres(updatedGenres);
-                  setValue("genres", updatedGenres.join(","), {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  });
-                }
-              }}
-            >
-              {data.name}
-            </div>
-          ))}
-        </div>
-
-        {/* Selected Genres */}
-        <div className="h-full w-[18%] flex flex-col justify-between items-center py-2">
-          <div className="w-full flex justify-center items-center mb-2">
-            <h2 className="font-bold text-lg">Genres</h2>
-          </div>
-          <div className="flex flex-col justify-center items-center flex-1 gap-1">
-            {genres.length === 0 ? (
-              <div className="text-gray-400">Select Genre</div>
-            ) : (
-              genres.map((data, index) => (
-                <div
-                  key={index}
-                  className="bg-yellow-400 text-black text-md font-edu-sa w-full border rounded-md flex justify-around items-center gap-2"
-                >
-                  {data}
-                  <div
-                    onClick={() => {
+    <div className="absolute left-0 bottom-full mb-2 bg-richblack-700 p-4 rounded-xl shadow-lg w-full min-h-[240px] z-10 border border-richblack-700">
+      <div className="flex flex-col gap-2 w-full">
+        <div className="grid grid-cols-4 gap-2">
+          {Genre.genres.map((data, index) => {
+            const isSelected = genres.includes(data.name);
+            return (
+              <div
+                key={index}
+                className={`min-w-[140px] px-4 py-2 rounded-lg shadow-md font-semibold text-md cursor-pointer transition-all border border-richblack-700 flex gap-3 items-center justify-center
+                  ${isSelected
+                    ? "bg-yellow-400 text-black font-bold"
+                    : "bg-richblack-600 text-white hover:bg-yellow-400 hover:text-black"}`}
+                onClick={() => {
+                  if (!isSelected) {
+                    if (genres.length >= 5) {
+                      setGenreError("You cannot select more than 5 genres");
+                      return;
+                    }
+                    const updatedGenres = [...genres, data.name];
+                    setGenres(updatedGenres);
+                    setValue("genres", updatedGenres.join(","), {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                    setGenreError("");
+                  }
+                }}
+              >
+                <span>{data.name}</span>
+                {isSelected && (
+                  <span
+                    className="ml-2 cursor-pointer hover:text-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       const updatedGenres = genres.filter((_, i) => i !== index);
                       setGenres(updatedGenres);
                       setValue("genres", updatedGenres.join(","), {
@@ -2700,26 +2823,21 @@ if(loading){
                         setGenreError("");
                       }
                     }}
-                    className="cursor-pointer"
                   >
                     <RxCross1 />
-                  </div>
-                </div>
-              ))
-            )}
-
-            {/* Errors */}
-            {genreError && (
-              <span className="text-red-500 text-sm flex justify-center items-center">
-                {genreError}
-              </span>
-            )}
-            {errors.genres && (
-              <span className="text-red-500 text-sm">
-                {errors.genres.message}
-              </span>
-            )}
-          </div>
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="w-full flex justify-center items-center mt-2">
+          {genreError && (
+            <div className="text-red-500 font-bold">{genreError}</div>
+          )}
+          {errors.genres && (
+            <span className="text-red-500 text-sm">{errors.genres.message}</span>
+          )}
         </div>
       </div>
     </div>
@@ -3216,24 +3334,25 @@ if(loading){
                                   shouldValidate: true,
                                   shouldDirty: true,
                                 });
-                                const allNames = getValues("distributionsEntries").map((entry, i) =>
-                                  (i === index ? value : entry?.projectname || "")
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "")
-                                    .trim()
-                                );
-                                const counts = {};
-                                allNames.forEach((n) => {
-                                  if (!n) return;
-                                  counts[n] = (counts[n] || 0) + 1;
-                                });
-                                const newDuplicates = new Set();
-                                allNames.forEach((n, i) => {
-                                  if (n && counts[n] > 1) newDuplicates.add(i);
-                                });
-                                setduplicatedistributations(newDuplicates);
-                                // duplicateProjectsplanned, setduplicateProjectsplanned
-                                // duplicatedistributations, setduplicatedistributations
+                                if (duplicateDebounceRef.current) clearTimeout(duplicateDebounceRef.current);
+                                duplicateDebounceRef.current = setTimeout(() => {
+                                  const allNames = getValues("distributionsEntries").map((entry, i) =>
+                                    (i === index ? value : entry?.projectname || "")
+                                      .toLowerCase()
+                                      .replace(/\s+/g, "")
+                                      .trim()
+                                  );
+                                  const counts = {};
+                                  allNames.forEach((n) => {
+                                    if (!n) return;
+                                    counts[n] = (counts[n] || 0) + 1;
+                                  });
+                                  const newDuplicates = new Set();
+                                  allNames.forEach((n, i) => {
+                                    if (n && counts[n] > 1) newDuplicates.add(i);
+                                  });
+                                  setduplicatedistributations(newDuplicates);
+                                }, 300);
                               }}
                             />
                           </label>
@@ -3397,14 +3516,13 @@ if(loading){
                     </span>
                   </label>
                   <textarea
+                    key={`JoiningReason-${prePopKey}`}
                     id="JoiningReason"
                     name="JoiningReason"
                     placeholder="Write a short bio (max 250 characters)"
-                    maxLength={250}
                     rows={4}
-                    value={fields.JoiningReason}
+                    defaultValue={fields.JoiningReason}
                     className="w-full p-3 bg-richblack-700 border border-richblack-600 text-white rounded-lg outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none placeholder-gray-500"
-                    {...register("JoiningReason",{required:"Your reason for joining "})}
                     onChange={handleChange}
                   />
                   <p className="text-xs text-gray-400 flex justify-end">
@@ -4575,14 +4693,13 @@ if(loading){
                             </label>
 
                             <textarea
+                              key={`RiskManagement-${prePopKey}`}
                               id="RiskManagement"
                               name="RiskManagement"
                               placeholder="Describe your risk management approach with specific examples..."
-                              maxLength={250}
                               rows={4}
-                              value={fields.RiskManagement}
+                              defaultValue={fields.RiskManagement}
                               className="w-full p-3 bg-richblack-700 border border-richblack-600 rounded-lg text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none"
-                              {...register("RiskManagement", { required: "Risk management description is required" })}
                               onChange={handleChange}
                             />
 
@@ -4610,14 +4727,13 @@ if(loading){
                               {errors.DirectorInspiration && <span className="text-red-500 text-xs ml-2">{errors.DirectorInspiration.message}</span>}
                             </label>
                             <textarea
+                              key={`DirectorInspiration-${prePopKey}`}
                               id="DirectorInspiration"
                               name="DirectorInspiration"
                               placeholder="Tell Me Your Inspiration (max 250 characters)"
-                              maxLength={250}
                               rows={4}
-                              value={fields.DirectorInspiration}
+                              defaultValue={fields.DirectorInspiration}
                               className="w-full p-3 Texetions bg-richblack-700 border border-richblack-600 rounded-lg text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none"
-                              {...register("DirectorInspiration",{required:"Inspiration is required"})}
                               onChange={handleChange}
                             />
                             <p className="text-xs text-gray-400 flex justify-end">
@@ -4654,14 +4770,13 @@ if(loading){
                               {errors.EarlyChallengs && <span className="text-red-500 text-xs ml-2">{errors.EarlyChallengs.message}</span>}
                             </label>
                             <textarea
+                              key={`EarlyChallengs-${prePopKey}`}
                               id="EarlyChallengs"
                               name="EarlyChallengs"
                               placeholder="What Earl Challenges You have faced (max 250 characters)"
-                              maxLength={250}
                               rows={4}
-                              value={fields.EarlyChallengs}
+                              defaultValue={fields.EarlyChallengs}
                               className="w-full p-3 Texetions bg-richblack-700 border border-richblack-600 rounded-lg text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none"
-                              {...register("EarlyChallengs",{required:"Early Challenges is required"})}
                               onChange={handleChange}
                             />
                             <p className="text-xs text-gray-400 flex justify-end">
@@ -4680,14 +4795,13 @@ if(loading){
                               {errors.ProjectPlanning && <span className="text-red-500 text-xs ml-2">{errors.ProjectPlanning.message}</span>}
                             </label>
                             <textarea
+                              key={`ProjectPlanning-${prePopKey}`}
                               id="ProjectPlanning"
                               name="ProjectPlanning"
                               placeholder="Project Planning (max 250 characters)"
-                              maxLength={250}
                               rows={4}
-                              value={fields.ProjectPlanning}
+                              defaultValue={fields.ProjectPlanning}
                               className="w-full p-3 Texetions bg-richblack-700 border border-richblack-600 rounded-lg text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none"
-                              {...register("ProjectPlanning",{required:"Project Planning is required"})}
                               onChange={handleChange}
                             />
                             <p className="text-xs text-gray-400 flex justify-end">
@@ -4706,14 +4820,13 @@ if(loading){
                               {errors.ProjectPromotion && <span className="text-red-500 text-xs ml-2">{errors.ProjectPromotion.message}</span>}
                             </label>
                             <textarea
+                              key={`ProjectPromotion-${prePopKey}`}
                               id="ProjectPromotion"
                               name="ProjectPromotion"
                               placeholder="How do you Handle The Promotion (max 250 characters)"
-                              maxLength={250}
                               rows={4}
-                              value={fields.ProjectPromotion}
+                              defaultValue={fields.ProjectPromotion}
                               className="w-full p-3 Texetions bg-richblack-700 border border-richblack-600 rounded-lg text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none"
-                              {...register("ProjectPromotion",{required:"Project Promotion is required"})}
                               onChange={handleChange}
                             />
                             <p className="text-xs text-gray-400 flex justify-end">
@@ -4732,14 +4845,13 @@ if(loading){
                               {errors.SceneVisualize && <span className="text-red-500 text-xs ml-2">{errors.SceneVisualize.message}</span>}
                             </label>
                             <textarea
+                              key={`SceneVisualize-${prePopKey}`}
                               id="SceneVisualize"
                               name="SceneVisualize"
                               placeholder="Scene Visualization (max 250 characters)"
-                              maxLength={250}
                               rows={4}
-                              value={fields.SceneVisualize}
+                              defaultValue={fields.SceneVisualize}
                               className="w-full p-3 Texetions bg-richblack-700 border border-richblack-600 rounded-lg text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none"
-                              {...register("SceneVisualize",{required:"Scene Visualization is required"})}
                               onChange={handleChange}
                             />
                             <p className="text-xs text-gray-400 flex justify-end">
@@ -4769,15 +4881,13 @@ if(loading){
                             </label>
 
                             <textarea
+                              key={`DirectorInspirationPF-${prePopKey}`}
                               id="DirectorInspiration"
                               name="DirectorInspiration"
                               placeholder="Inspiration (max 250 words)"
                               rows={4}
-                              value={fields.DirectorInspiration}
+                              defaultValue={fields.DirectorInspiration}
                               className="w-full p-3 Texetions bg-richblack-700 border border-richblack-600 rounded-lg text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none"
-                              {...register("DirectorInspiration", {
-                                required: "Director Inspiration is required",
-                              })}
                               onChange={handleChange}
                             />
 
@@ -4820,14 +4930,13 @@ if(loading){
                             </label>
 
                             <textarea
+                              key={`BudgetHandling-${prePopKey}`}
                               id="BudgetHandling"
                               name="BudgetHandling"
                               placeholder="Budget planning and financial management... (max 250 words)"
-                              maxLength={250}
                               rows={4}
-                              value={fields.BudgetHandling}
+                              defaultValue={fields.BudgetHandling}
                               className="w-full p-3 Texetions bg-richblack-700 border border-richblack-600 rounded-lg text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none"
-                              {...register("BudgetHandling", { required: "Budget planning is required" })}
                               onChange={handleChange}
                             />
 
@@ -5103,14 +5212,13 @@ if(loading){
                             </label>
 
                             <textarea
+                              key={`Networking-${prePopKey}`}
                               id="Networking"
                               name="Networking"
                               placeholder="Networking strategy (max 250 words)"
-                              maxLength={250}
                               rows={3}
-                              value={fields.Networking}
+                              defaultValue={fields.Networking}
                               className="w-full p-3 Texetions bg-richblack-700 border border-richblack-600 rounded-lg text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none"
-                              {...register("Networking", { required: "Networking plan is required" })}
                               onChange={handleChange}
                             />
 
@@ -5133,14 +5241,13 @@ if(loading){
                             </label>
 
                             <textarea
+                              key={`FundDelays-${prePopKey}`}
                               id="FundDelays"
                               name="FundDelays"
                               placeholder="Risk Management (max 250 words)"
-                              maxLength={250}
                               rows={3}
-                              value={fields.FundDelays}
+                              defaultValue={fields.FundDelays}
                               className="w-full p-3 Texetions bg-richblack-700 border border-richblack-600 rounded-lg text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition resize-none"
-                              {...register("FundDelays", { required: "Funding delays strategy is required" })}
                               onChange={handleChange}
                             />
 
@@ -5180,8 +5287,8 @@ if(loading){
                   </label>
                   {errors.termsAndConditions && <span className="text-red-500 text-xs mt-1 block text-center">{errors.termsAndConditions.message}</span>}
                 </div>
-                <button type="submit" className="w-full py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-lg hover:from-yellow-500 hover:to-yellow-600 transition-all shadow-md hover:shadow-lg text-sm mt-2">
-                  Submit Application
+                <button type="submit" disabled={submitting} className={`w-full py-3 font-bold rounded-lg transition-all shadow-md hover:shadow-lg text-sm mt-2 ${submitting ? 'bg-richblack-600 text-richblack-400 cursor-not-allowed' : 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black hover:from-yellow-500 hover:to-yellow-600'}`}>
+                  {submitting ? 'Submitting...' : 'Submit Application'}
                 </button>
               </div>
             </div>

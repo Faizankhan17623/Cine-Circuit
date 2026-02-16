@@ -13,34 +13,87 @@ If you are developing a production application, we recommend using TypeScript wi
 
 
 
-<!-- This is the to explore on what commit we are standing  -->
-<!-- Commits start from 1.0.0 -->
-<!-- Ad then they will update in the order 1.0.1 -->
-<!-- if the third one ends then the second order will update  1.1.0-->
-<!-- if second is ends third will update 2.0.0 -->
+<!-- ============================================ -->
+<!-- NEW FEATURES TO ADD (TODO LIST) -->
+<!-- ============================================ -->
 
-<!-- making a new commit  -->
+---
+
+## 📌 Feature 1: Device & IP Tracking for Login Security
+
+### Description:
+When a user logs in, we will:
+1. Capture their IP address and device info (browser, OS, etc.)
+2. Save it to the database on first login
+3. On subsequent logins, check if it's a new device/IP
+4. If new device/IP detected, send an email alert to the user
+5. If user says "That's not me" - block the account until they unblock it
+
+### Implementation Steps:
+
+#### Backend - User Model Changes:
+Add these fields to `backend/models/user.js`:
+```javascript
+loginHistory: [{
+    ipAddress: String,
+    deviceInfo: String,
+    browser: String,
+    os: String,
+    lastLogin: Date,
+    isTrusted: Boolean
+}],
+isBlocked: { type: Boolean, default: false },
+blockedAt: Date,
+unblockedAt: Date
+```
+
+#### Backend - Login Controller Changes:
+In `backend/controllers/user/auth.js`:
+1. Get IP address from request (req.ip or req.headers['x-forwarded-for'])
+2. Get device info from user-agent
+3. Check if it's a new device/IP
+4. If new, send alert email
+5. Save login history
+
+#### Backend - New Endpoints:
+- POST `/api/v1/user/block-account` - Block own account
+- POST `/api/v1/user/unblock-account` - Unblock own account
+- POST `/api/v1/user/trust-device` - Trust a device
+
+#### Backend - Email Template:
+Create new template `backend/templates/userTemplates/newDeviceLoginTemplate.js`
+
+#### Frontend - New Components:
+- Add "Trust this device" checkbox on login
+- Add "My Devices" page to show login history
+- Add "Block Account" / "Unblock Account" buttons in profile
+
+---
+
+<!-- ============================================ -->
+<!-- COMPLETED / RESOLVED ITEMS -->
+<!-- ============================================ -->
+
+<!-- ✅ HttpOnly Cookies - Already implemented in backend (auth.js and CreateOrg.js) -->
+<!-- ✅ secure: true - Needs to be set to true for production deployment -->
+
+
+
+<!-- ============================================ -->
+<!-- OTHER NOTES -->
+<!-- ============================================ -->
+
+<!-- Commits start from 1.0.0 -->
+<!-- Then they will update in the order 1.0.1 -->
+<!-- if the third one ends then the second order will update 1.1.0 -->
+<!-- if second ends third will update 2.0.0 -->
+
+<!-- making a new commit -->
 <!-- 1.0.1 -->
 
-<!-- This thing i forgot to add i need to add this also  -->
-<!-- 
-// In your login function, send device info
-const deviceFingerprint = {
-    userAgent: navigator.userAgent,
-    screen: `${screen.width}x${screen.height}`,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-};
+<!-- Rememebr when the app is build like 100 percentage make the HttpOnly true so that it can be blocked by the attackers -->
 
-const response = await apiConnector("POST", login, {
-    email: email,
-    password: pass,
-    deviceInfo: deviceFingerprint
-});
-
-// Server validates device on each request -->
-
-
-<!-- Rememebr when  the appis build like 100 percentage make the HttpOnly  true so that it can be blocked byt the atackers  -->
-
-
-<!-- // "dev": "concurrently -n \"client,server\" -c \"bgRed,bgBlue\" \"npm start\" \"npm run server\"" -->
+<!-- For production deployment, update secure: false to secure: true in:
+- backend/controllers/user/auth.js (line 77)
+- backend/controllers/Orgainezer/CreateOrg.js (line 168)
+-->

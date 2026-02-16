@@ -1,174 +1,92 @@
-{
-    "message": "date send ",
-    "success": true,
-    "data": {
-        "_id": "698e07c7a67e8289f002de48",
-        "locationName": "mumbai",
-        "locationurl": "https://google.com",
-        "TheatreInsideimages": [
-            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880274/movie_Project/z7crpwpeildlgukcrsnj.jpg",
-            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880274/movie_Project/uvfxvrsedqgeule7ebgp.jpg",
-            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880274/movie_Project/emkco9fujfb29y3nntnh.jpg",
-            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880274/movie_Project/lvttyv9anfvoxgoh0ewk.jpg"
-        ],
-        "Theatreoutsideimages": [
-            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880271/movie_Project/lnbsg9q3prtyc9wcemsi.jpg",
-            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880270/movie_Project/qfak62yrn0khw7l0hsce.jpg",
-            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880272/movie_Project/iafg722zg5nlak2k8deg.jpg",
-            "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770880272/movie_Project/vqborchimzstmvr7wr63.jpg"
-        ],
-        "typesofseatsAvailable": [
-            "D-BOX Motion",
-            "Wheelchair Accessible",
-            "Recliner",
-            "Premium",
-            "Bronze Class",
-            "Silver Class"
-        ],
-        "CustomMessage": [],
-        "movieScreeningType": [
-            "Dolby Cinema",
-            "MX4D",
-            "Standard Screen",
-            "IMAX 3D"
-        ],
-        "languagesAvailable": [
-            "Korean",
-            "Gujarati",
-            "English",
-            "Hindi",
-            "Spanish"
-        ],
-        "Theatrename": "hellings one q",
-        "theatreformat": [
-            "Laser Projection",
-            "2K Digital"
-        ],
-        "CreationDate": "Thu, 2026/02/12 12:41:11",
-        "showAlloted": [
-            "698d73302c70d5d3f8fae8f8"
-        ],
-        "ticketsReceived": [
-            "20000"
-        ],
-        "ticketsReceivedTime": [
-            "12/02/2026 12:53:57"
-        ],
-        "priceoftheTicket": [
-            "197"
-        ],
-        "TheatreOwner": "as",
-        "ticketCreation": [],
-        "parking": [
-            "Street Parking Only",
-            "Two-Wheeler Parking",
-            "No Parking Available"
-        ],
-        "Verified": true,
-        "status": "Approved",
-        "createdAt": "2026-02-12T17:03:03.395Z",
-        "updatedAt": "2026-02-12T17:03:03.395Z",
-        "__v": 0,
-        "Owner": "698d7d0fdac4cb85250dc892",
-        "VerifiedAt": "Thu, 2026/02/12 12:52:29",
-        "title": "one",
-        "tagline": "THis is the one",
-        "releasedate": "Thu, 26 Feb 2026",
-        "genre": "6981a3bb1dd9fb67cbef4915",
-        "SUbGenre": [
-            "6981a3c71dd9fb67cbef4933"
-        ],
-        "language": [
-            "68385db97d005d4ede75670b"
-        ],
-        "TotalDuration": "2s",
-        "Posterurl": "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1770877741/movie_Project/k9wyy7twhkd2xheepg69.jpg",
-        "trailerurl": "https://res.cloudinary.com/dp6kj5f6i/video/upload/v1770877744/movie_Project/kb9ipvglq6qscnal0cgc.mp4",
-        "showType": "Theatre",
-        "AllotedToTheNumberOfTheatres": [
-            "698d7d10dac4cb85250dc894",
-            "698d7d10dac4cb85250dc951",
-            "698d7d10dac4cb85250dc952",
-            "698d7d10dac4cb85250dc953"
-        ],
-        "castName": [
-            "698d6fdf2c70d5d3f8fae8aa",
-            "698d6ff22c70d5d3f8fae8b4"
-        ],
-        "uploaded": true,
-        "uploadingTime": "Thu Feb 12 2026 12:36:29 GMT+0530 (India Standard Time)",
-        "movieStatus": "Upcoming",
-        "VerifiedByTheAdmin": true,
-        "customeMessage": [],
-        "BannerLiked": 0,
-        "Comment": [],
-        "BannerDisLiked": 0,
-        "directorname": [
-            "asdf"
-        ],
-        "producername": [
-            "asdf"
-        ],
-        "writersname": [
-            "asddf"
-        ],
-        "totalbudget": "4500000",
-        "hashtags": [
-            "698d6ffd2c70d5d3f8fae8c2"
-        ],
-        "movieDuration": "12",
-        "ratingAndReviews": [],
-        "ticketspurchased": [],
-        "VerificationTime": "2026-02-12T06:55:28.791Z",
-        "totalticketsCreated": "698d7c19dac4cb85250dc875",
-        "showId": "698d73302c70d5d3f8fae8f8",
-        "userId": "698d7d0fdac4cb85250dc892",
-        "theatreId": "698d7d10dac4cb85250dc894",
-        "pricefromtheorg": 197,
-        "totalticketfromorg": "20000",
-        "ticketsCategory": [
-            {
-                "category": "Standard",
-                "ticketsCreated": 50,
-                "ticketsPurchaseafterRemaining": 50,
-                "price": 200,
-                "_id": "698e07c7a67e8289f002de49"
-            },
-            {
-                "category": "Premium",
-                "ticketsCreated": 20,
-                "ticketsPurchaseafterRemaining": 20,
-                "price": 400,
-                "_id": "698e07c7a67e8289f002de4a"
-            },
-            {
-                "category": "VIP",
-                "ticketsCreated": 20,
-                "ticketsPurchaseafterRemaining": 20,
-                "price": 400,
-                "_id": "698e07c7a67e8289f002de4b"
-            },
-            {
-                "category": "Family",
-                "ticketsCreated": 20,
-                "ticketsPurchaseafterRemaining": 20,
-                "price": 400,
-                "_id": "698e07c7a67e8289f002de4c"
-            },
-            {
-                "category": "Loyalty",
-                "ticketsCreated": 20,
-                "ticketsPurchaseafterRemaining": 20,
-                "price": 400,
-                "_id": "698e07c7a67e8289f002de4d"
-            }
-        ],
-        "Date": "18/02/2026",
-        "TicketsRemaining": "19870",
-        "timings": [],
-        "Status": "Upcoming",
-        "ticketsReceivingTime": "12/02/2026 12:53:57",
-        "ticketsPurchased": [],
-        "unsoldTickets": []
+[
+  {
+    "_id": {
+      "$oid": "700011aa38c1d5dfba9b0001"
+    },
+    "userName": "Rohit Sharma",
+    "password": "$2b$10$aB3cD4eF5gH6iJ7kL8mN9oP0qR1sT2uV3wX4yZ5aB6cD7eF8gH9i",
+    "confirmpass": "$2b$10$aB3cD4eF5gH6iJ7kL8mN9oP0qR1sT2uV3wX4yZ5aB6cD7eF8gH9i",
+    "email": "rohit.sharma99@gmail.com",
+    "usertype": "Theatrer",
+    "verified": false,
+    "number": "9123456780",
+    "image": "https://ui-avatars.com/api/?name=Rohit%20Sharma&background=random",
+    "ticketCreated": [],
+    "showsCreated": [],
+    "Casttaken": [],
+    "createdAt": "Sat, 2026/02/15 11:20:00",
+    "lastlogin": [],
+    "UserBannerliked": [],
+    "UserBannerhated": [],
+    "messageReceived": [],
+    "comment": [],
+    "PaymentId": [],
+    "updatedAt": {
+      "$date": "2026-02-15T05:50:00.000Z"
+    },
+    "__v": 0,
+    "theatresCreated": {
+      "$oid": "800011bb38c1d5dfba9b0001"
     }
-}
+  },
+  {
+    "_id": {
+      "$oid": "700022aa38c1d5dfba9b0002"
+    },
+    "userName": "Priya Verma",
+    "password": "$2b$10$xY7zW8vU9tS0rQ1pO2nM3lK4jI5hG6fE7dC8bA9zY0xW1vU2tS3r",
+    "confirmpass": "$2b$10$xY7zW8vU9tS0rQ1pO2nM3lK4jI5hG6fE7dC8bA9zY0xW1vU2tS3r",
+    "email": "priya.verma21@yahoo.com",
+    "usertype": "Theatrer",
+    "verified": false,
+    "number": "8234567891",
+    "image": "https://ui-avatars.com/api/?name=Priya%20Verma&background=random",
+    "ticketCreated": [],
+    "showsCreated": [],
+    "Casttaken": [],
+    "createdAt": "Sat, 2026/02/15 13:45:30",
+    "lastlogin": [],
+    "UserBannerliked": [],
+    "UserBannerhated": [],
+    "messageReceived": [],
+    "comment": [],
+    "PaymentId": [],
+    "updatedAt": {
+      "$date": "2026-02-15T08:15:30.000Z"
+    },
+    "__v": 0,
+    "theatresCreated": {
+      "$oid": "800022bb38c1d5dfba9b0002"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "700033aa38c1d5dfba9b0003"
+    },
+    "userName": "Arjun Reddy",
+    "password": "$2b$10$mN3oP4qR5sT6uV7wX8yZ9aB0cD1eF2gH3iJ4kL5mN6oP7qR8sT9u",
+    "confirmpass": "$2b$10$mN3oP4qR5sT6uV7wX8yZ9aB0cD1eF2gH3iJ4kL5mN6oP7qR8sT9u",
+    "email": "arjun.reddy45@outlook.com",
+    "usertype": "Theatrer",
+    "verified": false,
+    "number": "7345678902",
+    "image": "https://ui-avatars.com/api/?name=Arjun%20Reddy&background=random",
+    "ticketCreated": [],
+    "showsCreated": [],
+    "Casttaken": [],
+    "createdAt": "Sat, 2026/02/15 16:10:15",
+    "lastlogin": [],
+    "UserBannerliked": [],
+    "UserBannerhated": [],
+    "messageReceived": [],
+    "comment": [],
+    "PaymentId": [],
+    "updatedAt": {
+      "$date": "2026-02-15T10:40:15.000Z"
+    },
+    "__v": 0,
+    "theatresCreated": {
+      "$oid": "800033bb38c1d5dfba9b0003"
+    }
+  }
+]

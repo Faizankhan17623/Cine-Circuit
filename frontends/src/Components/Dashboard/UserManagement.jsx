@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Loader from '../extra/Loading'
 import { FaCheckCircle, FaTimesCircle, FaTrash, FaEye, FaSearch, FaFilter, FaUsers, FaClock, FaUserCheck, FaUserTimes } from 'react-icons/fa'
-import {GetAllOrgDetails,VerifyOrgs,deleteorgs,deleteAllOrgs} from '../../Services/operations/Admin'
+import {Orgainezerdetailing,VerifyOrgs,deleteorgs,deleteAllOrgs} from '../../Services/operations/Admin'
 import { useDispatch,useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast'
@@ -58,8 +58,8 @@ const UserManagement = () => {
         if (!token) return;
       setloading(true)
       try{
-        const response = await dispatch(GetAllOrgDetails(token,navigate))
-        console.log(response)
+        const response = await dispatch(Orgainezerdetailing(token,navigate))
+        // console.log(response)
         if (response?.success) {
           setOrgdata(response.data.organizersData)
           setFullData(response.data)
@@ -84,7 +84,7 @@ const UserManagement = () => {
        if (response?.success) {
          console.log(response)
          toast.success("Organizer approved successfully")
-         setOrgdata(prev => prev.map(o => o.id === id ? {...o, status: 'approved'} : o))
+         setOrgdata(prev => prev.map(o => o.id === id ? {...o, status: 'Approved'} : o))
          setShowDetail(false)
        }
     }catch(error){
@@ -127,13 +127,14 @@ const UserManagement = () => {
 
 
   const filteredData = orgdata.filter((o) => {
+    const status = o.status?.toLowerCase()
     if (debouncedSearch) {
       return o.username?.toLowerCase().includes(debouncedSearch.toLowerCase()) || o.email?.toLowerCase().includes(debouncedSearch.toLowerCase())
     }
     if (filterStatus === 'all') {
-      return o.status?.toLowerCase() !== 'locked'
+      return status === 'pending' || status === 'rejected'
     }
-    return o.status?.toLowerCase() === filterStatus
+    return status === filterStatus
   })
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage)
@@ -226,7 +227,7 @@ const UserManagement = () => {
 
   const pendingCount = orgdata.filter((o) => o.status?.toLowerCase() === 'pending').length
   const approvedCount = orgdata.filter((o) => o.status?.toLowerCase() === 'approved').length
-  const rejectedCount = orgdata.filter((o) => o.status?.toLowerCase() === 'rejected' || o.status?.toLowerCase() === 'locked').length
+  const rejectedCount = orgdata.filter((o) => o.status?.toLowerCase() === 'rejected').length
 
   return (
     <div className="w-full h-full p-4 md:p-6 lg:p-8 text-white overflow-y-auto">
@@ -325,10 +326,10 @@ const UserManagement = () => {
             onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1) }}
             className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition cursor-pointer"
           >
-            <option value="all">All Status</option>
+            <option value="all">Pending & Rejected</option>
             <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
+            <option value="approved">Approved</option>
             <option value="locked">Locked</option>
           </select>
         </div>

@@ -47,6 +47,7 @@ const TheatrerForm = () => {
   const {token} = useSelector((state)=>state.auth)
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   // Multi-select states
   const [selectedSeats, setSelectedSeats] = useState([])
@@ -137,7 +138,6 @@ const TheatrerForm = () => {
 
 
   const onSubmit = async (data) => {
-    // console.log("This is the date on the submit",data)
     if (outsideImages.length === 0) {
       toast.error('Please upload at least one outside image of the theatre')
       return
@@ -147,8 +147,7 @@ const TheatrerForm = () => {
       return
     }
 
-
-    setLoading(true)
+    setSubmitting(true)
 
     try {
   const completeData = {
@@ -200,12 +199,11 @@ window.location.reload()
 
             // Reset form or navigate
     } catch (error) {
-        console.error('❌ Submit error:', error)
+        console.error('Submit error:', error)
         console.error('Error details:', error.message)
         toast.error(error?.message || 'Failed to submit. Please try again.')
     } finally {
-      setLoading(false)
-       console.log("✅ Loading set to false")
+      setSubmitting(false)
     }
   }
 
@@ -311,7 +309,20 @@ window.location.reload()
   )
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full h-full flex flex-col items-center px-4 py-3 overflow-y-auto">
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full h-full flex flex-col items-center px-4 py-3 overflow-y-auto relative">
+      {/* Full-screen submit loader overlay */}
+      {submitting && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-richblack-900/90 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-6 p-10 rounded-2xl bg-richblack-800 border border-richblack-700 shadow-2xl">
+            <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-yellow-400 mb-2">Submitting Theatre Details</h3>
+              <p className="text-richblack-300 text-sm">Please do not close or refresh this page</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <StepIndicator />
 
       {loading ? (
@@ -517,10 +528,10 @@ window.location.reload()
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={submitting}
                   className="flex items-center gap-2 px-8 py-2.5 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300 transition-colors text-sm disabled:opacity-50"
                 >
-                  {loading ? 'Submitting...' : 'Submit Request'}
+                  {submitting ? 'Submitting...' : 'Submit Request'}
                 </button>
               </div>
             </div>

@@ -79,3 +79,14 @@ export const Display = {
     theatreshows:BASE_URL+"/Theatre-Shows",
     singletheatre:BASE_URL+"/Single-Theatre"
 }
+
+export const MovieStats = {
+    MostLiked:BASE_URL+"/Most-Liked",
+    HighlyRated:BASE_URL+"/Highly-Rated",
+    RecentlyReleased:BASE_URL+"/Recently-Released"
+}
+
+export const NavbarData = {
+    TheatreData:BASE_URL+"/Theatre-data",
+    MovieData:BASE_URL+"/Movie-data"
+}

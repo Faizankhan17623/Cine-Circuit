@@ -143,7 +143,7 @@ const handleAccept = async (theatre, verification) => {
       VerifyTheatres(token, navigate, ownerId, verification)
     )
 
-    console.log("Verification response:", response)
+    // console.log("Verification response:", response)
 // 
     if (response?.reason === "NO_TOKEN") {
       const errorMsg = "Authentication token expired or invalid"

@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     
-    "dev": "vite",
+    "dev": "concurrently -n \"client,server\" -c \"bgRed,bgBlue\" \"npm start\" \"npm run server\"",
     "client": "vite",
-    "server": "npm run dev",
+    "server": "cd ../backend && npm run dev",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",

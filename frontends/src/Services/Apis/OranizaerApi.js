@@ -31,5 +31,6 @@ export const orgainezerdata = {
     DirectorFresher:BASE_URL + "/Dir-Fresh",
     DirectorExperience:BASE_URL + "/Dir-Experience",
     ProducerFresher:BASE_URL + "/Pro-Fresh",
-    ProducerExperience:BASE_URL + "/Pro-Expe"
+    ProducerExperience:BASE_URL + "/Pro-Expe",
+    GetMyOrgData: BASE_URL + "/My-Org-Data"
 }

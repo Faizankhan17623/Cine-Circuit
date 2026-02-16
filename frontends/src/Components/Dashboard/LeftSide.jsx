@@ -14,6 +14,7 @@ import { CiChat1 } from 'react-icons/ci';
 import { MdReviews } from 'react-icons/md';
 import { FaLock, FaHashtag, FaUserFriends, FaFilm, FaUpload, FaList } from 'react-icons/fa';
 import {UserDetails} from '../../Services/operations/Auth'
+import {GetMyOrgDetails} from '../../Services/operations/orgainezer'
 import { useNavigate } from 'react-router-dom';
 
 const LeftSide = ({direction}) => {
@@ -42,7 +43,7 @@ const LeftSide = ({direction}) => {
 
 
   const FormSubmited = localStorage.getItem("Data_Submitted") === "true";
-  const organizerLocked = localStorage.getItem("Verified") === "false";
+  const organizerLocked = user?.verified === false;
   const isSubmitted = status === "submitted" || status === "approved" || status === "Approved";
 
   const isVerificationDisabled =
@@ -67,6 +68,13 @@ const LeftSide = ({direction}) => {
 
         if (response?.success) {
           setdata(response.data.data.orgainezerdata);
+          // Update Verified in localStorage to stay in sync
+          localStorage.setItem('Verified', JSON.stringify(response.data.data.verified));
+        }
+
+        // Fetch org status for organizer users
+        if (user?.usertype === "Organizer") {
+          await dispatch(GetMyOrgDetails(token, navigate));
         }
       } catch (error) {
         console.log(error);
@@ -168,7 +176,7 @@ const LeftSide = ({direction}) => {
     localStorage.setItem("Data_Submitted", "false");
   }
 
-  if (status === "submitted" || status === "approved") {
+  if (status === "submitted" || status === "approved" || status === "Approved") {
     localStorage.setItem("Data_Submitted", "true");
   }
 
@@ -293,8 +301,14 @@ const LeftSide = ({direction}) => {
         {/* Verification Status Indicator */}
         {user.usertype === ACCOUNT_TYPE.ORGANIZER && (
 
-         <div className="mt-3 mx-1 p-3 rounded-lg bg-richblack-700/50 border border-richblack-600/50 text-richblack-200 text-xs leading-relaxed">
-  {status === "locked"
+         <div className={`mt-3 mx-1 p-3 rounded-lg text-xs leading-relaxed ${
+            status === "approved" || status === "Approved"
+              ? "bg-green-500/10 border border-green-500/30 text-green-400"
+              : "bg-richblack-700/50 border border-richblack-600/50 text-richblack-200"
+          }`}>
+  {status === "approved" || status === "Approved"
+    ? "Your account has been approved. You now have full access to all features."
+    : status === "locked"
     ? "Your account is locked. Please message the admin to give you one more chance."
     : diffMs <= 0
       ? "Edit time is over. You cannot edit now. Please message the admin for a new chance."
