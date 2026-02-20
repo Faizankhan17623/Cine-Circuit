@@ -43,7 +43,8 @@ export const SpecificShow = {
 
 export const Comment = {
     Comments:BASE_URL+"/Comment-Banner",
-    GetAllComment:BASE_URL+"/Get-Comment"
+    GetAllComment:BASE_URL+"/Get-Comment",
+    deleteComent:BASE_URL+"/delte-Comment"
 }
 
 export const PersonalChoice = {

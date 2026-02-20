@@ -200,9 +200,11 @@ const Purchase = () => {
 
   if (!show) {
     return (
-      <div className="min-h-screen bg-richblack-900 text-white flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-richblack-900 text-white">
         <Navbar />
-        <p className="text-richblack-300 text-lg">Show not found</p>
+        <div className="flex flex-col items-center justify-center pt-40">
+          <p className="text-richblack-300 text-lg">Show not found</p>
+        </div>
       </div>
     )
   }

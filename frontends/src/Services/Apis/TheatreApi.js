@@ -4,7 +4,7 @@ export const CreateTheatrere = {
     CreateTheatre:BASE_URL+"/Create-Theatre"
 }
 
-export const Theatreinfo = {
+export const theatreinfos = {
     tt:BASE_URL+"/Theatre-info"
 }
 
@@ -36,7 +36,7 @@ export const totalsale = {
     TotalSale:BASE_URL+"/CalculateTotalSale"
 }
 
-export const GetShowAllotedDetails = {
+export const GetShowAllotedDetailss = {
     getshowalloteddetails:BASE_URL+"/Show-Alloted-Details"
 }
 
@@ -44,6 +44,6 @@ export const GetAllTicketsDetails = {
     getallticketsdetails:BASE_URL+"/All-Tickets-Details"
 }
 
-export const GetSingleShowDetails = {
+export const GetSingleShowDetailss = {
     getsingleshowdetails:BASE_URL+"/GetSingleShowDetails"
 }

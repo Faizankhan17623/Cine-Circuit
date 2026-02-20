@@ -377,3 +377,4 @@ export function SingleTheatreDetails(theatreId) {
         }
     }
 }
+

@@ -1,6 +1,7 @@
 import React from 'react'
 
 const JoinCard = ({ title, subttitle, btn, imaage, onClick }) => {
+  
   return (
     <div className='group max-w-5xl w-full mx-auto rounded-2xl flex flex-col md:flex-row items-center gap-6 p-6 md:p-8 bg-gradient-to-br from-richblack-800 to-richblack-800/80 border border-richblack-700/60 shadow-xl my-6'>
 

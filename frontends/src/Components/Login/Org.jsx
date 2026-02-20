@@ -14,7 +14,7 @@ const Org = () => {
 
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [username, setusername] = useState("")
+  const [username, setUsername] = useState("")
   const [names, setNames] = useState("")
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -108,7 +108,7 @@ const Org = () => {
         <input
           type="email"
           {...register("Email", { required: "Email is required" })}
-          onChange={(e) => setusername(e.target.value)}
+          onChange={(e) => setUsername(e.target.value)}
           className={`w-full px-4 py-2.5 bg-richblack-700 border rounded-lg text-white text-sm placeholder:text-richblack-300 outline-none transition-all duration-200 focus:ring-2 focus:ring-yellow-200/50 focus:border-yellow-200/50 ${errors.Email ? "border-red-500" : "border-richblack-600"}`}
           placeholder="you@example.com"
           autoComplete="email"

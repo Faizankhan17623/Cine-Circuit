@@ -16,7 +16,7 @@ const {LikeBanner,DislikeBanner} = PersonalChoice
 const {UpdateUsername,UpdatePassword,UpdateImage,UpdateNumber,CurrentUserDetails} = UpdatePersonalDetails
 const {AllShows} = GetAllShows
 const {specificshow} = SpecificShow
-const {Comments,GetAllComment} = Comment
+const {Comments,GetAllComment,deleteComent} = Comment
 const {SendMessages,UpdateMessage,GetAllMessages} = SendMessage
 const {TicketPurchase,TicketPurchasedFullDetail} = TicketData
 const {CreateRating,GetAverageRating,GetAllRatingReview} = Ratings
@@ -24,14 +24,15 @@ const {GetAllDetails,FindUserNames,FindloginEmail,FinduserEmail,FindNumber} = Al
 const {MostLiked,HighlyRated,RecentlyReleased} = MovieStats
 const {TheatreData,MovieData} = NavbarData
 
-export function UserDetails (token){
+export function UserDetails (token, navigate){
     return async (dispatch) => {
         dispatch(setloading(true))
         const toastId = toast.loading("Loading...")
         try {
                if(!token){
-                          navigate("/Login")
+                          if(navigate) navigate("/Login")
                           toast.error("Token is Expired Please Create a new One")
+                          return
                       }
 
             const response = await apiConnector("GET", GetAllDetails,null, { Authorization: `Bearer ${token}` })
@@ -246,8 +247,12 @@ export function UserLogin(email,pass,navigate){
             // console.log(response)
 
             console.log("User is been logged in ")
-            toast.success('Congragulations you are logged in')
 
+            if (!response.data.success) {
+                throw new Error(response.data.message)
+            }
+
+            toast.success('Congragulations you are logged in')
 
             dispatch(setToken(response.data.token))
             dispatch(setLogin(true))
@@ -256,17 +261,13 @@ export function UserLogin(email,pass,navigate){
             // console.log("This is the user image",userimage)
             dispatch(setUserImage(userimage))
             localStorage.setItem("userImage", userimage)
-            
+
             dispatch(setuser({...response.data.user, usertype:response.data.user.usertype, image: userimage}))
             dispatch(setUser(response.data.user))
-            Cookies.set('token', response.data.token, { expires: 2 }); 
+            Cookies.set('token', response.data.token, { expires: 2 });
             localStorage.setItem('token', JSON.stringify(response.data.token))
             localStorage.setItem('Verified', JSON.stringify(response.data.user.verified))
             navigate('/Dashboard/My-Profile')
-
-      if (!response.data.success) {
-                throw new Error(response.data.message)
-            }
 
             
         }catch(error){
@@ -542,6 +543,101 @@ export function bannerDislike(id, token){
             return { success: false }
         } finally {
             dispatch(setloading(false))
+            toast.dismiss(toastId)
+        }
+    }
+}
+
+// ==================== COMMENT FUNCTIONS ====================
+
+// Create a comment for a movie
+export function createComment(movieId, commentText, token) {
+    return async (dispatch) => {
+        const toastId = toast.loading("Posting comment...")
+        dispatch(setLoading(true))
+        try {
+            console.log("Creating comment with:", { commentText, movieId })
+
+            const response = await apiConnector("POST", Comments, {
+                comment: commentText,
+                movie_id: movieId  // Backend expects movie_id not movieId
+            }, {
+                Authorization: `Bearer ${token}`
+            })
+
+            console.log("Create comment response:", response)
+
+            if (!response.data.success) {
+                throw new Error(response.data.message)
+            }
+            toast.success("Comment posted successfully")
+            return { success: true, data: response.data.data }
+        } catch (error) {
+            console.log("Error creating comment:", error)
+            const errorMessage = error?.response?.data?.message || "Error posting comment"
+            toast.error(errorMessage)
+            return { success: false }
+        } finally {
+            dispatch(setLoading(false))
+            toast.dismiss(toastId)
+        }
+    }
+}
+
+// Get all comments for a movie
+export function getAllComments(movieId, token) {
+    return async (dispatch) => {
+        dispatch(setLoading(true))
+        try {
+            console.log("Fetching comments for movieId:", movieId)
+
+            if (!token) {
+                return { success: false, data: [] }
+            }
+
+            // API requires authentication - use movie_id as parameter
+            const response = await apiConnector("GET", `${GetAllComment}?movie_id=${movieId}`, null, {
+                Authorization: `Bearer ${token}`
+            })
+            console.log("API Response:", response)
+
+            if (response?.data) {
+                const commentsData = response.data.data || response.data.comments || response.data
+                console.log("Comments found:", commentsData)
+                return { success: true, data: Array.isArray(commentsData) ? commentsData : [] }
+            }
+
+            return { success: false, data: [] }
+        } catch (error) {
+            console.log("Error fetching comments:", error)
+            return { success: false, data: [] }
+        } finally {
+            dispatch(setLoading(false))
+        }
+    }
+}
+
+// Delete a comment
+export function deleteComment(movieId, commentId, token) {
+    return async (dispatch) => {
+        const toastId = toast.loading("Deleting comment...")
+        dispatch(setLoading(true))
+        try {
+            const response = await apiConnector("DELETE", `${deleteComent}?movie_id=${movieId}&commentId=${commentId}`, null, {
+                Authorization: `Bearer ${token}`
+            })
+
+            if (!response.data.success) {
+                throw new Error(response.data.message)
+            }
+            toast.success("Comment deleted successfully")
+            return { success: true }
+        } catch (error) {
+            const errorMessage = error?.response?.data?.message || "Error deleting comment"
+            toast.error(errorMessage)
+            return { success: false }
+        } finally {
+            dispatch(setLoading(false))
             toast.dismiss(toastId)
         }
     }
@@ -843,7 +939,7 @@ export function getHighlyRatedMovies(){
         dispatch(setlaoding(true))
         try {
             const response = await apiConnector("GET",HighlyRated)
-            console.log("This is the responsee data",response)
+            // console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)

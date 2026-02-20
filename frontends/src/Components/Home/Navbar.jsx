@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FaChevronDown } from "react-icons/fa"
+import { FaChevronDown, FaRobot } from "react-icons/fa"
 import { MdOutlineShoppingCart } from "react-icons/md"
 import { IoIosSearch, IoMdMenu, IoMdClose } from "react-icons/io"
 import { useDispatch, useSelector } from 'react-redux'

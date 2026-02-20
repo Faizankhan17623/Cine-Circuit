@@ -11,7 +11,7 @@ import { UserCreation, sendOtp } from '../../Services/operations/Auth';
 import { Creation } from '../../Services/operations/orgainezer';
 
 const OTP_TIMER_KEY = 'otp_timer_expiry';
-const OTP_DURATION = 60; // seconds
+const OTP_DURATION = 120; // seconds — matches backend OTP TTL (2 minutes)
 
 const OTP = ({ Style }) => {
   const dispatch = useDispatch();

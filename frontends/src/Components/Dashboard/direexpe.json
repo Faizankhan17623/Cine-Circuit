@@ -1,109 +1,140 @@
-// main theatre user data
-
 {
-  "_id": {
-    "$oid": "6990accb38c1d5dfba9b39c6"
-  },
-  "userName": "faizan moin khan ",
-  "password": "$2b$10$/8ERiilLX8Gt3trY3uvGfuXZiMwqB2ws0x4DMMDToT.hx3mBaMr9.",
-  "confirmpass": "$2b$10$/8ERiilLX8Gt3trY3uvGfuXZiMwqB2ws0x4DMMDToT.hx3mBaMr9.",
-  "email": "fk3702@gmail.com",
-  "usertype": "Theatrer",
-  "verified": true,
-  "number": "2222222222",
-  "image": "https://ui-avatars.com/api/?name=faizan%20moin%20khan%20&background=random",
-  "ticketCreated": [],
-  "showsCreated": [],
-  "Casttaken": [],
-  "createdAt": "Sat, 2026/02/14 22:41:39",
-  "lastlogin": [],
-  "UserBannerliked": [],
-  "UserBannerhated": [],
-  "messageReceived": [],
-  "comment": [],
-  "PaymentId": [],
-  "updatedAt": {
-    "$date": "2026-02-14T17:13:13.827Z"
-  },
-  "__v": 0,
-  "theatresCreated": {
-    "$oid": "6990accc38c1d5dfba9b39c8"
-  }
+  "_id": { "$oid": "740000000000000000000021" },
+  "name": "urdu",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
 }
-
-
-
-// theatre data 
-
 {
-  "_id": {
-    "$oid": "6990accc38c1d5dfba9b39c8"
-  },
-  "locationName": "thane ",
-  "locationurl": "https://google.com",
-  "TheatreInsideimages": [
-    "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089097/movie_Project/sip5eh3bfxotgf8dpnpq.png"
-  ],
-  "Theatreoutsideimages": [
-    "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089096/movie_Project/oldrneaiwbfbjbdifqke.jpg",
-    "https://res.cloudinary.com/dp6kj5f6i/image/upload/v1771089095/movie_Project/ofuprfhyji6ne41tggsd.jpg"
-  ],
-  "typesofseatsAvailable": [
-    "D-BOX Motion",
-    "Premium",
-    "Wheelchair Accessible",
-    "Recliner",
-    "Couple Seat"
-  ],
-  "CustomMessage": [],
-  "movieScreeningType": [
-    "MX4D",
-    "Dolby Cinema",
-    "Laser Projection",
-    "Standard Screen",
-    "IMAX 2D",
-    "4DX 2D"
-  ],
-  "languagesAvailable": [
-    "Gujarati",
-    "English",
-    "Tamil",
-    "Hindi"
-  ],
-  "Theatrename": "pune",
-  "theatreformat": [
-    "Dolby Atmos",
-    "Standard Cinema",
-    "IMAX",
-    "4DX",
-    "Premium Cinema",
-    "4K Digital",
-    "2K Digital"
-  ],
-  "CreationDate": "Sat, 2026/02/14 22:41:39",
-  "showAlloted": [],
-  "ticketsReceived": [],
-  "ticketsReceivedTime": [],
-  "priceoftheTicket": [],
-  "TheatreOwner": "faizan moin khan ",
-  "ticketCreation": [],
-  "parking": [
-    "No Parking Available",
-    "Street Parking Only",
-    "Four-Wheeler Parking",
-    "Two-Wheeler Parking"
-  ],
-  "Verified": true,
-  "status": "Approved",
-  "createdAt": {
-    "$date": "2026-02-14T17:11:40.297Z"
-  },
-  "updatedAt": {
-    "$date": "2026-02-14T17:13:13.475Z"
-  },
-  "__v": 0,
-  "Owner": {
-    "$oid": "6990accb38c1d5dfba9b39c6"
-  },
-  "VerifiedAt": "Sat, 2026/02/14 22:43:13"
+  "_id": { "$oid": "740000000000000000000022" },
+  "name": "turkish",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000023" },
+  "name": "persian",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000024" },
+  "name": "thai",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000025" },
+  "name": "vietnamese",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000026" },
+  "name": "indonesian",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000027" },
+  "name": "malay",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000028" },
+  "name": "filipino",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000029" },
+  "name": "swahili",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000030" },
+  "name": "dutch",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000031" },
+  "name": "greek",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000032" },
+  "name": "polish",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000033" },
+  "name": "ukrainian",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000034" },
+  "name": "romanian",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000035" },
+  "name": "hungarian",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000036" },
+  "name": "czech",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000037" },
+  "name": "swedish",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000038" },
+  "name": "norwegian",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000039" },
+  "name": "danish",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
+}
+{
+  "_id": { "$oid": "740000000000000000000040" },
+  "name": "finnish",
+  "createdAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "updatedAt": { "$date": "2026-02-16T13:03:36.533Z" },
+  "__v": 0
 }

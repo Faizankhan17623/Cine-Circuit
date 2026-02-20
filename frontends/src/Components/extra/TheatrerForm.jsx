@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import CountryCode from '../../data/CountryCode.json'
 import Loading from './Loading'
 import toast from 'react-hot-toast'
 import { FaUpload, FaTrash, FaChevronRight, FaChevronLeft } from 'react-icons/fa'
-import { Theatreinfo } from '../../Services/Apis/TheatreApi'
+// import { theatreinfo } from '../../Services/Apis/TheatreApi'
 import {SendTheatreDetails} from '../../Services/operations/Theatre'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -63,6 +63,14 @@ const TheatrerForm = () => {
   const [insidePreviews, setInsidePreviews] = useState([])
 
   const totalSteps = 3
+
+  // Cleanup object URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      outsidePreviews.forEach(url => URL.revokeObjectURL(url))
+      insidePreviews.forEach(url => URL.revokeObjectURL(url))
+    }
+  }, [])
 
   const toggleSelection = (item, selected, setSelected, max) => {
     if (selected.includes(item)) {

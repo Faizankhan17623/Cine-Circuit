@@ -82,9 +82,9 @@ const UserManagement = () => {
     try{
       const response = await dispatch(VerifyOrgs(token,id,true,null,null,"approved",navigate))
        if (response?.success) {
-         console.log(response)
+// \         console.log(response)
          toast.success("Organizer approved successfully")
-         setOrgdata(prev => prev.map(o => o.id === id ? {...o, status: 'Approved'} : o))
+         setOrgdata(prev => prev.map(o => o._id === id ? {...o, status: 'Approved'} : o))
          setShowDetail(false)
        }
     }catch(error){
@@ -397,14 +397,14 @@ const UserManagement = () => {
                   <tr
                     key={org._id}
                     className={`border-b border-gray-700/20 hover:bg-white/[0.03] transition ${
-                      selectedIds.includes(org.id) ? 'bg-purple-500/[0.05]' : ''
+                      selectedIds.includes(org._id) ? 'bg-purple-500/[0.05]' : ''
                     }`}
                   >
                     <td className="p-4">
                       <input
                         type="checkbox"
-                        checked={selectedIds.includes(org.id)}
-                        onChange={() => toggleSelectId(org.id)}
+                        checked={selectedIds.includes(org._id)}
+                        onChange={() => toggleSelectId(org._id)}
                         className="accent-purple-500 cursor-pointer w-4 h-4"
                       />
                     </td>
@@ -441,7 +441,7 @@ const UserManagement = () => {
                           onClick={() => {
                           setShowDetail(true)
                           setSelectedOrg(org)
-                          setSearchParams({ id: org.id});
+                          setSearchParams({ id: org._id});
                           if (fullData) {
                             let detail = null;
                             if (org.Role === 'Director' && org.ExperienceLevel === 'Fresher') {
@@ -464,7 +464,7 @@ const UserManagement = () => {
                         {(org.status === 'pending' || org.status === 'rejected') && (
                           <>
                             <button
-                              onClick={() => AcceptOrg(org.id)}
+                              onClick={() => AcceptOrg(org._id)}
                               title="Approve"
                               className="p-2 rounded-lg hover:bg-green-500/20 text-green-400 transition"
                             >
@@ -481,7 +481,7 @@ const UserManagement = () => {
                           </>
                         )}
                         <button
-                          onClick={() => openDeleteModal(org.id)}
+                          onClick={() => openDeleteModal(org._id)}
                           title="Delete"
                           className="p-2 rounded-lg hover:bg-red-500/20 text-red-400/70 hover:text-red-400 transition"
                         >

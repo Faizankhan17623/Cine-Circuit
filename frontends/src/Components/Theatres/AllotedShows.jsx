@@ -112,7 +112,7 @@ const AllotedShows = () => {
               <div
                 key={show._id}
                 className="bg-richblack-800 rounded-2xl border border-richblack-700 overflow-hidden hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300 group cursor-pointer flex flex-col"
-                onClick={() => navigate(`/movies/${show._id}`)}
+                onClick={() => navigate(`/Movie/${show._id}`)}
               >
                 {/* Poster */}
                 <div className="relative h-52 overflow-hidden">

@@ -23,7 +23,6 @@ import TheatreFullDetails from './Components/Theatres/TheatreFullDetails'
 import Purchase from './Components/Movies/Purchase'
 import Profile from './Components/Dashboard/Profile'
 import { useDispatch, useSelector } from 'react-redux'
-// import Error from './Components/extra/Extra'
 import {ACCOUNT_TYPE} from './utils/constants'
 import Purchased from './Components/Dashboard/PurchasedTickets'
 import Wishlist from './Components/Dashboard/Wishlist'
@@ -50,8 +49,16 @@ import CreateTicket from './Components/Dashboard/Tickets/CreateTicketes'
 import TicketAllotment from './Components/Dashboard/Tickets/TicketAllotment'
 import AllTickets from './Components/Dashboard/Tickets/GetAllTicket'
 import Chat from './Components/Dashboard/Chating/Chat'
+import TheatreDetailsDash from './Components/Dashboard/TheatreDetails'
+import TotalSales from './Components/Dashboard/TotalSales'
+import AllotedShowsDash from './Components/Dashboard/AllotedShows'
+import TheatreAllTickets from './Components/Dashboard/TheatreAllTickets'
+import DistributeTickets from './Components/Dashboard/DistributeTickets'
+import UpdateTicketTime from './Components/Dashboard/UpdateTicketTime'
 import ReviewPopup from './Components/Movies/ReviewPopup'
+import MovieCategory from './Components/Home/MovieCategory'
 import { MdDesktopMac } from 'react-icons/md'
+import AIAgent from './Components/extra/AIAgent'
 
 const MobileBlocker = () => (
   <div className="fixed inset-0 z-[9999] bg-richblack-900 flex flex-col items-center justify-center px-8 text-center">
@@ -77,6 +84,7 @@ const Homelayout = ({Notify}) =>{
       <Finder />
     </div>
       <Listing/>
+
       <CookieConsent
   location="bottom"
   buttonText="Sure man!!"
@@ -87,7 +95,6 @@ const Homelayout = ({Notify}) =>{
 >
    We use cookies to improve your experience. By continuing, you agree to our cookie policy.
 </CookieConsent>
-     
   </div>
   )
 }
@@ -122,10 +129,14 @@ useEffect(() => {
     <div className={`bg-richblack-800 min-h-screen`}>
       {isMobile && <MobileBlocker />}
       <ReviewPopup />
+      <AIAgent />
 
       <Routes>
 
         <Route path='/' element={<Homelayout  Notify={notify}/>}/>
+        <Route path='/top-rated' element={<MovieCategory type="top-rated" />} />
+        <Route path='/most-liked' element={<MovieCategory type="most-liked" />} />
+        <Route path='/recently-released' element={<MovieCategory type="recently-released" />} />
         <Route path='/About' element={<About/>}/>
         <Route path='/Contact' element={<Contact/>}/>
         <Route path='/SignUp' element={<Join/> }/>
@@ -192,6 +203,19 @@ useEffect(() => {
       <Route path="/Dashboard/Tickets/All" element={<AllTickets/>} />
       <Route path="/Dashboard/Chats" element={<Chat/>} />
 
+    </>
+  )}
+
+  {/* Theatre specific */}
+  {user?.usertype === ACCOUNT_TYPE.THEATER && (
+    <>
+      <Route path="/Dashboard/Theatre-Details" element={<TheatreDetailsDash />} />
+      <Route path="/Dashboard/Total-Sales" element={<TotalSales />} />
+      <Route path="/Dashboard/Alloted-Shows" element={<AllotedShowsDash />} />
+      <Route path="/Dashboard/All-Tickets" element={<TheatreAllTickets />} />
+      <Route path="/Dashboard/Distribute-Tickets" element={<DistributeTickets />} />
+      <Route path="/Dashboard/Update-Ticket-Time" element={<UpdateTicketTime />} />
+      <Route path="/Dashboard/Chats" element={<Chat />} />
     </>
   )}
 

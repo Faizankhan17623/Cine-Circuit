@@ -15,7 +15,6 @@ const User = () => {
 
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [mail, setMail] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const [names, setNames] = useState("");
@@ -27,7 +26,7 @@ const User = () => {
   const [emails, setEmails] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [numbers, setNumbers] = useState('');
-  const [Loading,setloading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [otp,setOTP] = useState('')
   const [Data,setData] = useState(null)
 
@@ -123,7 +122,7 @@ const User = () => {
 
       const toastId = toast.loading('Loading... ')
       try {
-        setloading(true)
+        setLoading(true)
         const Response = await dispatch(sendOtp(email))
         if (Response?.success) {
           toast.success('OTP sent successfully');
@@ -136,7 +135,7 @@ const User = () => {
         console.error("Error sending OTP:", error);
         toast.error('Something went wrong');;
       } finally {
-        setloading(false)
+        setLoading(false)
         toast.dismiss(toastId);
       }
     }
@@ -181,7 +180,7 @@ setShowOtp(false)
       }
   };
 
-  if(Loading){
+  if(loading){
     return (
       <div className='w-full h-full  flex flex-col'>
         <div className='flex-1 flex justify-center items-center '>
@@ -383,13 +382,13 @@ setShowOtp(false)
       <button
         type="submit"
         className={`w-full py-3 rounded-lg text-base font-bold tracking-wide transition-all duration-200 shadow-lg flex justify-center items-center mt-2 ${
-          Loading || names === "taken" || emails === "taken" || numbers === "taken"
+          loading || names === "taken" || emails === "taken" || numbers === "taken"
             ? 'bg-richblack-600 text-richblack-400 cursor-not-allowed'
             : 'bg-gradient-to-r from-yellow-200 to-yellow-50 text-richblack-900 hover:shadow-yellow-200/20 hover:shadow-xl active:scale-[0.98]'
         }`}
-        disabled={Loading || names === "taken" || emails === "taken" || numbers === "taken"}
+        disabled={loading || names === "taken" || emails === "taken" || numbers === "taken"}
       >
-        {Loading ? (
+        {loading ? (
           <>
             <Loader />
             <span className="ml-2">Processing...</span>

@@ -43,15 +43,8 @@ import {
   const [expandedCard, setExpandedCard] = useState(null)
   const [filterStatus, setFilterStatus] = useState('all') // For "All Shows" tab filtering
 
-  console.log(confirmAction)
+  // console.log(confirmAction)
 
-  // const keys =Object.keys(confirmAction);
-  // const val = Object.values(confirmAction)
-  // const all = Object.entries(confirmAction)
-  // console.log("This is the date in the keys",keys)
-  // console.log("This is the date in the values",val)
-  // console.log("This is the whole date ",all)
-  // Fetch shows based on active tab
   const fetchShows = async () => {
     if (!token) return
 

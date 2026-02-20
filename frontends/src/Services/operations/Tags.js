@@ -84,7 +84,7 @@ export function CreateHashtag(token, tagname, navigate) {
         dispatch(setTagsLoading(true))
 
         try {
-            const response = await apiConnector("POST", CreateHashtagAPI, { tagname }, {
+            const response = await apiConnector("POST", CreateTags, { name: tagname }, {
                 Authorization: `Bearer ${token}`
             })
 

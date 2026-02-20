@@ -91,16 +91,15 @@ export function OrgainezerLogin(email,password,navigate){
                       localStorage.setItem('userImage', userimage)
 
 
-            navigate('/Dashboard/My-Profile')
+            if(!response.data.success){
+                toast.error(response.data.message)
+                return
+            }
 
-                         if(!response.data.success){
-                                    toast.error(response.response.data.message)   
-                                }
+            navigate('/Dashboard/My-Profile')
         }catch(error){
-           toast.error(error.response.data.message)
-                      console.log(error.response.data.message)
-                      console.log("There is an error in the login process",error)
-                      console.log("unable to log in")
+           toast.error(error?.response?.data?.message || "There is an error in the login process")
+           console.log("There is an error in the login process",error)
         }
         finally {
             dispatch(setLoading(false));

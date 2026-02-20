@@ -15,6 +15,9 @@ import { MdReviews } from 'react-icons/md';
 import { FaLock, FaHashtag, FaUserFriends, FaFilm, FaUpload, FaList } from 'react-icons/fa';
 import {UserDetails} from '../../Services/operations/Auth'
 import {GetMyOrgDetails} from '../../Services/operations/orgainezer'
+import { FaTheaterMasks } from 'react-icons/fa'
+import { MdAttachMoney, MdLocalMovies, MdAccessTime } from 'react-icons/md'
+import { FaTicketSimple } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 
 const LeftSide = ({direction}) => {
@@ -124,6 +127,17 @@ const LeftSide = ({direction}) => {
     { icon: CiChat1, label: 'Chat', path: '/Dashboard/Chats', id: 8 },
   ];
 
+  const theatreNav = [
+    { icon: LuUserRound, label: 'My Profile', path: '/Dashboard/My-Profile', id: 1 },
+    { icon: FaTheaterMasks, label: 'Theatre Details', path: '/Dashboard/Theatre-Details', id: 2 },
+    { icon: MdAttachMoney, label: 'Total Sales', path: '/Dashboard/Total-Sales', id: 3 },
+    { icon: MdLocalMovies, label: 'Alloted Shows', path: '/Dashboard/Alloted-Shows', id: 4 },
+    { icon: IoTicketSharp, label: 'All Tickets', path: '/Dashboard/All-Tickets', id: 5 },
+    { icon: FaTicketSimple, label: 'Distribute Tickets', path: '/Dashboard/Distribute-Tickets', id: 6 },
+    { icon: MdAccessTime, label: 'Update Ticket Time', path: '/Dashboard/Update-Ticket-Time', id: 7 },
+    { icon: CiChat1, label: 'Chat', path: '/Dashboard/Chats', id: 8 },
+  ];
+
 // disabled: isVerificationDisabled
 
   useEffect(() => {
@@ -141,6 +155,7 @@ const LeftSide = ({direction}) => {
     [ACCOUNT_TYPE.USER]: viewerNav,
     [ACCOUNT_TYPE.ORGANIZER]: organizerNav,
     [ACCOUNT_TYPE.ADMIN]: adminNav,
+    [ACCOUNT_TYPE.THEATER]: theatreNav,
   };
 
   const navigationItems = navMap[user?.usertype] || [];
@@ -187,7 +202,6 @@ const LeftSide = ({direction}) => {
 
 
 
-  const isVerificatioasdefnSubmitted = localStorage.getItem("user");
   const Verification = localStorage.getItem("Verified")
 
   if (!user) {

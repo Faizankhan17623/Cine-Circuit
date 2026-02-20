@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
 import { MovieDetailsFinding } from "../../Services/operations/User"
-import { createRating, getAverageRating, bannerLike, bannerDislike } from "../../Services/operations/Auth"
+import { createRating, getAverageRating, bannerLike, bannerDislike, createComment, getAllComments, deleteComment } from "../../Services/operations/Auth"
 import { PurcahsedTickets } from "../../Services/operations/User"
 import { FaArrowLeft } from "react-icons/fa"
 import {
@@ -35,6 +36,12 @@ const Movie = () => {
   const [dislikeCount, setDislikeCount] = useState(0)
   const [hasPurchased, setHasPurchased] = useState(false)
 
+  // Comments state
+  const [comments, setComments] = useState([])
+  const [commentText, setCommentText] = useState("")
+  const [submittingComment, setSubmittingComment] = useState(false)
+  const [showAllComments, setShowAllComments] = useState(false)
+
   const { token, isLoggedIn } = useSelector((state) => state.auth)
   const { user } = useSelector((state) => state.profile)
   const navigate = useNavigate()
@@ -49,16 +56,23 @@ const previousTag = location.state?.tag
         const response = await dispatch(MovieDetailsFinding(id))
         if (response?.success) {
           const movieData = response.data.data
+          console.log("Movie data:", movieData)
           setMovie(movieData)
           setLikeCount(movieData.BannerLiked || 0)
           setDislikeCount(movieData.BannerDisLiked || 0)
+          // Check if movie already has comments in different possible fields
+          const movieComments = movieData.comments || movieData.Comments || movieData.commentsArray || []
+          if (movieComments.length > 0) {
+            setComments(movieComments)
+            // console.log("Comments from movie data:", movieComments)
+          }
         }
         const ratingRes = await dispatch(getAverageRating(id))
         if (ratingRes?.success) {
           setAverageRating(ratingRes.averageRating)
         }
-        // Check if user has purchased tickets for this movie
-        if (token) {
+        // Check if user has purchased tickets for this movie (Viewers only)
+        if (token && user?.usertype === "Viewer") {
           const ticketRes = await dispatch(PurcahsedTickets(token, navigate))
           if (ticketRes?.success) {
             const purchased = ticketRes.data.data?.some(
@@ -66,6 +80,15 @@ const previousTag = location.state?.tag
             )
             setHasPurchased(!!purchased)
           }
+        }
+        // Fetch comments
+        const commentRes = await dispatch(getAllComments(id, token))
+        console.log("Comment result:", commentRes)
+        if (commentRes?.success && commentRes.data?.length > 0) {
+          setComments(commentRes.data)
+          console.log("Comments set:", commentRes.data)
+        } else {
+          console.log("No comments found or error")
         }
       } catch (error) {
         console.log("Movie fetch error:", error)
@@ -99,7 +122,7 @@ const previousTag = location.state?.tag
   }
 
   const handleLike = async () => {
-    if (!isLoggedIn || !token) return
+    if (!isLoggedIn || !token || user?.usertype !== "Viewer") return
     const res = await dispatch(bannerLike(id, token))
     if (res?.success) {
       if (res.likes !== undefined) {
@@ -112,7 +135,7 @@ const previousTag = location.state?.tag
   }
 
   const handleDislike = async () => {
-    if (!isLoggedIn || !token) return
+    if (!isLoggedIn || !token || user?.usertype !== "Viewer") return
     const res = await dispatch(bannerDislike(id, token))
     if (res?.success) {
       if (res.likes !== undefined) {
@@ -121,6 +144,41 @@ const previousTag = location.state?.tag
       } else {
         setDislikeCount((prev) => prev + 1)
       }
+    }
+  }
+
+  const handleSubmitComment = async () => {
+    if (!isLoggedIn || !commentText.trim()) return
+    setSubmittingComment(true)
+    try {
+      const res = await dispatch(createComment(id, commentText.trim(), token))
+      if (res?.success) {
+        setCommentText("")
+        // Refresh comments
+        const commentRes = await dispatch(getAllComments(id, token))
+        if (commentRes?.success) {
+          setComments(commentRes.data || [])
+        }
+      }
+    } catch (error) {
+      console.log("Comment submit error:", error)
+    } finally {
+      setSubmittingComment(false)
+    }
+  }
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const res = await dispatch(deleteComment(id, commentId, token))
+      if (res?.success) {
+        // Refresh comments
+        const commentRes = await dispatch(getAllComments(id, token))
+        if (commentRes?.success) {
+          setComments(commentRes.data || [])
+        }
+      }
+    } catch (error) {
+      console.log("Comment delete error:", error)
     }
   }
 
@@ -206,7 +264,7 @@ const previousTag = location.state?.tag
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleLike}
-                  disabled={!isLoggedIn}
+                  disabled={!isLoggedIn || user?.usertype !== "Viewer"}
                   className="flex items-center gap-2 px-4 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white hover:bg-green-500/20 hover:border-green-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <FaThumbsUp className="text-green-400" />
@@ -214,7 +272,7 @@ const previousTag = location.state?.tag
                 </button>
                 <button
                   onClick={handleDislike}
-                  disabled={!isLoggedIn}
+                  disabled={!isLoggedIn || user?.usertype !== "Viewer"}
                   className="flex items-center gap-2 px-4 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white hover:bg-red-500/20 hover:border-red-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <FaThumbsDown className="text-red-400" />
@@ -338,7 +396,7 @@ const previousTag = location.state?.tag
 
           {/* Rating & Review Section */}
           <div>
-            <h2 className="text-xl font-semibold mb-6">Ratings & Reviews</h2>
+            <h2 className="text-xl font-semibold mb-6">Ratings</h2>
 
             {/* Average Rating Card */}
             <div className="flex items-center gap-6 bg-richblack-800 rounded-2xl p-6 border border-richblack-700 mb-6">
@@ -359,7 +417,7 @@ const previousTag = location.state?.tag
                   ))}
                 </div>
                 <p className="text-xs text-richblack-400 mt-1">
-                  {movie.ratingAndReviews?.length || 0} reviews
+                  {movie.ratingAndReviews?.length || 0} ratings
                 </p>
               </div>
 
@@ -389,37 +447,6 @@ const previousTag = location.state?.tag
                 })}
               </div>
             </div>
-
-            {/* Existing Reviews */}
-            {movie.ratingAndReviews?.length > 0 && (
-              <div className="space-y-3 mb-6 max-h-80 overflow-y-auto pr-2">
-                {movie.ratingAndReviews.map((review, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-richblack-800 rounded-xl p-4 border border-richblack-700"
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex items-center gap-0.5">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <FaStar
-                            key={star}
-                            className={`text-xs ${
-                              star <= review.rating
-                                ? "text-yellow-400"
-                                : "text-richblack-600"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs text-richblack-400">
-                        {review.rating}/5
-                      </span>
-                    </div>
-                    <p className="text-sm text-richblack-200">{review.review}</p>
-                  </div>
-                ))}
-              </div>
-            )}
 
             {/* Write Review Form */}
             {isLoggedIn && user?.usertype === "Viewer" && hasPurchased && !reviewSubmitted ? (
@@ -499,18 +526,115 @@ const previousTag = location.state?.tag
             ) : null}
           </div>
 
-<button className="w-full bg-yellow-400
-hover:bg-yellow-300
-text-black font-bold py-3 rounded-xl
-border border-yellow-300
-transition-all duration-200
-shadow-md shadow-yellow-500/20
-hover:shadow-yellow-500/40
-active:scale-95" onClick={()=>{
-   navigate(`/Purchase/${movie._id}`)
-}}>
-  Purchase Tickets
-</button>
+          {/* Comments Section */}
+          <div className="mt-10">
+            <h2 className="text-xl font-semibold mb-6">Comments</h2>
+
+            {/* Add Comment Form */}
+            {isLoggedIn && user?.usertype === "Viewer" ? (
+              <div className="bg-richblack-800 rounded-2xl p-6 border border-richblack-700 mb-6">
+                <h3 className="text-sm font-semibold mb-4 text-richblack-200">Add a Comment</h3>
+                <textarea
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Write your comment about this movie..."
+                  rows={3}
+                  className="w-full bg-richblack-700 border border-richblack-600 rounded-xl px-4 py-3 text-sm text-white placeholder-richblack-400 focus:outline-none focus:border-yellow-400/50 resize-none mb-4"
+                />
+                <button
+                  onClick={handleSubmitComment}
+                  disabled={!commentText.trim() || submittingComment}
+                  className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                    !commentText.trim() || submittingComment
+                      ? "bg-richblack-700 text-richblack-500 cursor-not-allowed"
+                      : "bg-yellow-400 hover:bg-yellow-300 text-black"
+                  }`}
+                >
+                  {submittingComment ? "Posting..." : "Post Comment"}
+                </button>
+              </div>
+            ) : !isLoggedIn ? (
+              <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 text-center mb-6">
+                <p className="text-orange-400 text-sm">
+                  Please login to post a comment
+                </p>
+              </div>
+            ) : (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-center mb-6">
+                <p className="text-red-400 text-sm">
+                  Only viewers can post comments
+                </p>
+              </div>
+            )}
+
+            {/* Comments List */}
+            {comments.length > 0 ? (
+              <div className="space-y-4">
+                {comments.map((comment, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-richblack-800 rounded-xl p-4 border border-richblack-700"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center text-black font-bold text-sm">
+                          {comment.userName?.charAt(0).toUpperCase() || "U"}
+                        </div>
+                        <span className="text-sm font-medium text-white">
+                          {comment.userName || "User"}
+                        </span>
+                        <span className="text-xs text-richblack-400">
+                          {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString() : ""}
+                        </span>
+                      </div>
+                      {comment.userId === user?._id && (
+                        <button
+                          onClick={() => handleDeleteComment(comment._id)}
+                          className="text-red-400 hover:text-red-300 text-xs"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-sm text-richblack-200 pl-10">{comment.comment}</p>
+                  </div>
+                ))}
+                {comments.length > 3 && (
+                  <button
+                    onClick={() => setShowAllComments(!showAllComments)}
+                    className="text-yellow-400 hover:text-yellow-300 text-sm font-medium"
+                  >
+                    {showAllComments ? "Show Less" : `Show All Comments (${comments.length})`}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-richblack-400">No comments yet. Be the first to comment!</p>
+              </div>
+            )}
+          </div>
+
+{(!isLoggedIn || user?.usertype === "Viewer") ? (
+  <button className={`w-full font-bold py-3 rounded-xl border transition-all duration-200 active:scale-95 ${
+    isLoggedIn
+      ? "bg-yellow-400 hover:bg-yellow-300 text-black border-yellow-300 shadow-md shadow-yellow-500/20 hover:shadow-yellow-500/40"
+      : "bg-richblack-700 text-richblack-400 border-richblack-600 cursor-not-allowed"
+  }`} onClick={()=>{
+    if (!isLoggedIn) {
+      toast.error("Please login to purchase tickets")
+      navigate("/Login")
+      return
+    }
+    navigate(`/Purchase/${movie._id}`)
+  }}>
+    Purchase Tickets
+  </button>
+) : (
+  <div className="w-full text-center py-3 rounded-xl bg-richblack-800 border border-richblack-700 text-richblack-400 text-sm">
+    Only viewers can purchase tickets
+  </div>
+)}
 
         </div>
       </div>

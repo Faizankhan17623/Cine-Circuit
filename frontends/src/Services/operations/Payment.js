@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast'
-import {apiConnector} from '../apiConnector'
+import {apiConnector, axiosinstance} from '../apiConnector'
 import {CreatePayment,paymentVerification,TicketDetails} from '../Apis/PaymentApi'
 import {setUser,setLoading} from '../../Slices/PaymentSlice'
 
@@ -86,7 +86,7 @@ export function MakePayment(
         description: "Ticket Purchase",
 
         handler: async function (razorpayResponse) {
-          dispatch(
+          await dispatch(
             PaymentVerify(
               razorpayResponse.razorpay_order_id,
               razorpayResponse.razorpay_payment_id,
@@ -180,15 +180,12 @@ export function PaymentVerify(
 export function MakePdf(ticketId, token) {
   return async () => {
     try {
-      const response = await apiConnector(
-        "GET",
-        `${downloadticketdata}/${ticketId}`,
-        null,
-        {
-          Authorization: `Bearer ${token}`,
-        },
-        "blob"   // important for PDF
-      );
+      const response = await axiosinstance({
+        method: "GET",
+        url: `${downloadticketdata}/${ticketId}`,
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: "blob"
+      });
 
       const url = window.URL.createObjectURL(
         new Blob([response.data])

@@ -199,7 +199,7 @@ const Slider = () => {
                     )}
                     {movie.movieStatus !== "Upcoming" && movie.movieStatus !== "Coming Soon" && movie.movieStatus !== "Expired" && (
                       <button
-                        onClick={() => navigate(`/movies/${movie._id}`)}
+                        onClick={() => navigate(`/Movie/${movie._id}`)}
                         className='px-6 py-3 bg-yellow-400 hover:bg-yellow-300 text-black text-sm font-bold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-400/20'
                       >
                         Book Tickets

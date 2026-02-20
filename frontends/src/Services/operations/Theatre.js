@@ -1,10 +1,10 @@
-import {CreateTheatrere,Theatreinfo,AllTheatres,TheatreCreationRequest,DistributeTickets,UpdateTicketTime,TicketsCreated,TheatreDetails,totalsale,GetShowAllotedDetails,GetAllTicketsDetails,GetSingleShowDetails} from '../Apis/TheatreApi'
+import {CreateTheatrere,theatreinfos,AllTheatres,TheatreCreationRequest,DistributeTickets,UpdateTicketTime,TicketsCreated,TheatreDetails,totalsale,GetShowAllotedDetailss,GetAllTicketsDetails,GetSingleShowDetailss} from '../Apis/TheatreApi'
 import {setTheatre,setLoading,setImage,setUser} from '../../Slices/TheatreSlice'
 import { toast } from 'react-hot-toast'
 import {apiConnector} from '../apiConnector'
 
 const {CreateTheatre} = CreateTheatrere
-const {tt} = Theatreinfo
+const {tt} = theatreinfos
 const {Alltheatres} = AllTheatres
 const {theatrecreationrequest} = TheatreCreationRequest
 
@@ -13,12 +13,12 @@ const {updatetickettime} = UpdateTicketTime
 const {ticketscreated} = TicketsCreated
 const {theatredetails} = TheatreDetails
 const {TotalSale} = totalsale
-const {getshowalloteddetails} = GetShowAllotedDetails
+const {getshowalloteddetails} = GetShowAllotedDetailss
 const {getallticketsdetails} = GetAllTicketsDetails
-const {getsingleshowdetails} = GetSingleShowDetails
+const {getsingleshowdetails} = GetSingleShowDetailss
 // const {TheatreInfo} = 
 
-export function CreateTheatree(name,email,pasword,number){
+export function CreateTheatree(name,email,password,number){
     return async(dispatch)=>{
         const toastId = toast.loading("Creating Theatre")
         dispatch(setLoading(true))
@@ -26,7 +26,7 @@ export function CreateTheatree(name,email,pasword,number){
             const response = await apiConnector("POST", CreateTheatre, {
                 userName:name,
                 email:email,
-                password:pasword,
+                password:password,
                 number:number
             })
 
@@ -54,7 +54,7 @@ export function theatreinfo(email,name,locationname,locationurl,typesofseats,Scr
         const toastId = toast.loading("Getting Theatre Info")
         dispatch(setLoading(true))
         try {
-            const response = await apiConnector("POST", TheatreInfo, {
+            const response = await apiConnector("POST", tt, {
                 email:email,
                 username:name,
                 locationName:locationname,
@@ -86,12 +86,14 @@ export function theatreinfo(email,name,locationname,locationurl,typesofseats,Scr
 }
 
 
-export function AllTheatresInfo(){
+export function AllTheatresInfo(token){
     return async(dispatch)=>{
         const toastId = toast.loading("Getting All Theatre Info")
         dispatch(setLoading(true))
         try {
-            const response = await apiConnector("GET", Alltheatres)
+            const response = await apiConnector("GET", Alltheatres, null, {
+                Authorization: `Bearer ${token}`
+            })
 
             console.log("All Theatre info fetched successfully", response)
 
@@ -113,12 +115,14 @@ export function AllTheatresInfo(){
 }
 
 
-export function TheatreCreationRequestInfo(){
+export function TheatreCreationRequestInfo(token){
     return async(dispatch)=>{
         const toastId = toast.loading("Getting Theatre Creation Request Info")
         dispatch(setLoading(true))
         try {
-            const response = await apiConnector("GET", theatrecreationrequest)
+            const response = await apiConnector("GET", theatrecreationrequest, null, {
+                Authorization: `Bearer ${token}`
+            })
 
             console.log("Theatre Creation Request info fetched successfully", response)
 
@@ -142,222 +146,225 @@ export function TheatreCreationRequestInfo(){
 
 // query main show id and body main see user id
 
-export function DistributeTicketsInfo(ticketCreation,releasedate,showid){
+export function DistributeTicketsInfo(ticketCreation, ReleaseDate, showId, token){
     return async(dispatch)=>{
-        const toastId = toast.loading("Distributing Tickets")
-        dispatch(setLoading(true))
         try {
-            const response = await apiConnector("POST", distributetickets, {
-                showId:showid,
-               Date:releasedate,
-               ticketsCategory:ticketCreation
+            const response = await apiConnector("POST", distributetickets+`?ShowId=${showId}`, {
+                ticketsCreation: ticketCreation,
+                ReleaseDate: ReleaseDate
+            },{
+                Authorization: `Bearer ${token}`
             })
 
             console.log("Tickets distributed successfully", response)
 
             if(!response.data.success){
-                toast.error("The Tickets are not distributed")
-                return
+                return { success: false, message: response.data.message }
             }
-            dispatch(setUser(response.data.theatre))
-            
-            toast.success("The Tickets are distributed")
+
+            return { success: true, data: response.data }
         } catch (error) {
             console.log(error)
-            toast.error("Error in distributing tickets")
-            console.log("error whle distributing the tickets")
+            return { success: false, message: error?.response?.data?.message }
         }
-        dispatch(setLoading(false))
-        toast.dismiss(toastId)
     }
 }
 
 
-export function updateticketTime(theatreid,showid,tickeetid,time){
+export function UpdateTicketTimeData(theatreId, showId, ticketId, time, token){
     return async (dispatch)=>{
-        const toastId = toast.loading('...loading')
+        const toastId = toast.loading('Updating ticket time...')
         dispatch(setLoading(true))
         try{
-            const response = await apiConnector('PUT',updatetickettime,{
-                showId:showid,
-                theatreId:theatreid,
-                _id:tickeetid,
-                timings:time
+            const response = await apiConnector('PUT', updatetickettime+`?theatreId=${theatreId}&ShowId=${showId}`, {
+                Ticketid: ticketId,
+                time: time
+            },{
+                Authorization: `Bearer ${token}`
             })
 
-             console.log("Tickets time updated succesfully", response)
+            console.log("Tickets time updated successfully", response)
 
             if(!response.data.success){
-                toast.error("The time is not updated")
-                return
+                toast.error(response.data.message || "The time is not updated")
+                return { success: false, message: response.data.message }
             }
-            dispatch(setUser(response.data.id))
-            
-            toast.success("Ticket time is been updated")
+
+            toast.success("Ticket time has been updated")
+            return { success: true, data: response.data }
         }catch(error){
             console.log(error)
-            console.log("there is an error in the update tickeet time code")
+            toast.error(error?.response?.data?.message || "Error in updating ticket time")
+            return { success: false, message: error?.response?.data?.message }
+        }finally{
+            toast.dismiss(toastId)
+            dispatch(setLoading(false))
         }
-
-        toast.dismiss(toastId)
-        dispatch(setLoading(false))
     }
 }
 
 
-export function GetTicketsCreatedData(){
+export function GetTicketsCreatedData(token){
     return async(dispatch)=>{
         const toastId = toast.loading('...loading')
         dispatch(setLoading(true))
         try{
+            const response = await apiConnector("GET",ticketscreated,null,{
+                Authorization: `Bearer ${token}`
+            })
 
-            const response = await apiConnector("GET",ticketscreated)
-            
             if(!response.data.success){
                 toast.error("There is an error in fetching all tickeets created data")
-                return
+                return { success: false }
             }
 
-            dispatch(setUser(response.data.id))
             toast.success("the data is been reterived")
+            return { success: true, data: response.data }
         }catch(error){
             console.log(error)
-            console.log("There is an error in the reteriving all he tickets data")
-            toast.error("There is an error in the reteriving all he tickets data")
+            toast.error(error?.response?.data?.message || "There is an error in the reteriving all the tickets data")
+            return { success: false }
+        }finally{
+            toast.dismiss(toastId)
+            dispatch(setLoading(false))
         }
-        toast.dismiss(toastId)
-        dispatch(setLoading(false))
     }
 }
 
 
 
 // This is the function that will fetch all the data of our own theatre
-export function GetTheatreDetails(){
+export function GetTheatreDetails(token){
     return async(dispatch)=>{
         const toastId = toast.loading('...loading')
         dispatch(setLoading(true))
         try{
+            const response = await apiConnector("GET",theatredetails,null,{
+                Authorization: `Bearer ${token}`
+            })
 
-            const response = await apiConnector("GET",theatredetails)
-            
             if(!response.data.success){
                 toast.error("error in fetching the data of the theatre")
-                return
+                return { success: false }
             }
-            dispatch(setUser(response.data.id))
             toast.success("Theatre details fetched succesfully")
+            return { success: true, data: response.data }
         }catch(error){
             console.log(error)
-            console.log("There is an error in fetching the theatre details")
-            toast.error("There is an error in fetching the theatre details")
+            toast.error(error?.response?.data?.message || "There is an error in fetching the theatre details")
+            return { success: false }
+        }finally{
+            toast.dismiss(toastId)
+            dispatch(setLoading(false))
         }
-        toast.dismiss(toastId)
-        dispatch(setLoading(false))
     }
 }
 
 
-export function CalculatTotalSale(){
+export function CalculateTotalSale(token){
     return async(dispatch)=>{
         const toastId = toast.loading('...loading')
         dispatch(setLoading(true))
         try{
+            const response = await apiConnector("GET",TotalSale,null,{
+                Authorization: `Bearer ${token}`
+            })
 
-            const response = await apiConnector("GET",TotalSale)
-            console.log("This is the total sale response",response)
             if(!response.data.success){
-                toast.error("Therre is an error while fetching the total sale")
-                return
+                toast.error("There is an error while fetching the total sale")
+                return { success: false }
             }
-            dispatch(setUser(response.data.id))
             toast.success("The total sale data is been reterived")
+            return { success: true, data: response.data }
         }catch(error){
             console.log(error)
-            console.log("There is an error while fetching the total sale")
-            toast.error("There is an error while fetching the total sale")
+            toast.error(error?.response?.data?.message || "There is an error while fetching the total sale")
+            return { success: false }
+        }finally{
+            toast.dismiss(toastId)
+            dispatch(setLoading(false))
         }
-        toast.dismiss(toastId)
-        dispatch(setLoading(false))
     }
 }
 
-export function GetShowAllotdDetailes(){
+export function GetShowAllotedDetails(token){
     return async(dispatch)=>{
         const toastId = toast.loading('...loading')
         dispatch(setLoading(true))
         try{
+            const response = await apiConnector("GET",getshowalloteddetails,null,{
+                Authorization: `Bearer ${token}`
+            })
 
-            const response = await apiConnector("GET",getshowalloteddetails)
-            
             if(!response.data.success){
                 toast.error("There is an error while reteriving all the show details")
-                return
+                return { success: false }
             }
-            dispatch(setUser(response.data.id))
             toast.success("The show details are been succesfully fetched")
+            return { success: true, data: response.data }
         }catch(error){
             console.log(error)
-            console.log("There is an error while reteriving all the show details")
-            toast.error("There is an error while reteriving all the show details")
+            toast.error(error?.response?.data?.message || "There is an error while reteriving all the show details")
+            return { success: false }
+        }finally{
+            toast.dismiss(toastId)
+            dispatch(setLoading(false))
         }
-        toast.dismiss(toastId)
-        dispatch(setLoading(false))
     }
 }
 
-export function FetchAllTicketsDetails(){
+export function FetchAllTicketsDetails(token){
     return async(dispatch)=>{
         const toastId = toast.loading('...loading')
         dispatch(setLoading(true))
         try{
-
-            const response = await apiConnector("GET",getallticketsdetails)
-            console.log("data Fetched Succesfully",response)
+            const response = await apiConnector("GET",getallticketsdetails,null,{
+                Authorization: `Bearer ${token}`
+            })
 
             if(!response.data.success){
                 toast.error("There is an error while fetching all the ticket details")
-                return
+                return { success: false }
             }
-
-            dispatch(setUser(response.data.id))
             toast.success("Ticket Details fetched succesfully")
+            return { success: true, data: response.data }
         }catch(error){
             console.log(error)
-            console.log("There is an error while fetching all the ticket details")
-            toast.error("There is an error while fetching all the ticket details")
+            toast.error(error?.response?.data?.message || "There is an error while fetching all the ticket details")
+            return { success: false }
+        }finally{
+            toast.dismiss(toastId)
+            dispatch(setLoading(false))
         }
-        toast.dismiss(toastId)
-        dispatch(setLoading(false))
     }
 }
 
 
-export function GetSingleShowDetailss(showid){
+export function GetSingleShowDetails(showid, token){
     return async(dispatch)=>{
         const toastId = toast.loading('...loading')
         dispatch(setLoading(true))
         try{
-
-            const response = await apiConnector("",getsingleshowdetails,{
+            const response = await apiConnector("GET",getsingleshowdetails,null,{
+                Authorization: `Bearer ${token}`
+            },{
                 showAlloted:showid
             })
-            console.log("Single Show Detils Fetched Sucesfully",response)
 
             if(!response.data.success){
                 toast.error("There is an error while fetching the detils of single show")
-                return
+                return { success: false }
             }
-            dispatch(setUser(response.data.id))
-
             toast.success("Single Show Details Fetched Sucesfully")
+            return { success: true, data: response.data }
         }catch(error){
             console.log(error)
-            console.log("There is an error while fetching the detils of single show")
-            toast.error("There is an error while fetching the detils of single show")
+            toast.error(error?.response?.data?.message || "There is an error while fetching the detils of single show")
+            return { success: false }
+        }finally{
+            toast.dismiss(toastId)
+            dispatch(setLoading(false))
         }
-        toast.dismiss(toastId)
-        dispatch(setLoading(false))
     }
 }
 
@@ -407,7 +414,7 @@ fd.append('parking', JSON.stringify(data.parking || []))
 
 // console.log("🚀 Sending request to:", TheatreInfo)
                 
-                        const Response = await apiConnector("POST","http://localhost:4000/api/v1/Theatre/Theatre-info",fd)
+                        const Response = await apiConnector("POST",tt,fd)
             
                    console.log("✅ Response received:", Response)
             // console.log("Response data:", Response.data)

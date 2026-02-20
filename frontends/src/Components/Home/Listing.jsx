@@ -16,8 +16,11 @@
 
   const PLACEHOLDER_IMG = 'https://res.cloudinary.com/dit2bnxnd/image/upload/v1767976754/2_phppq2.png';
 
-  const MovieCard = ({ slide, badgeColor }) => (
-    <div className="group relative w-full h-[280px] sm:h-[300px] rounded-xl overflow-hidden cursor-pointer">
+  const MovieCard = ({ slide, badgeColor, onClick }) => (
+    <div
+      className="group relative w-full h-[280px] sm:h-[300px] rounded-xl overflow-hidden cursor-pointer"
+      onClick={onClick}
+    >
       <img
         src={slide.Posterurl || PLACEHOLDER_IMG}
         alt={slide.title}
@@ -56,7 +59,7 @@
     </div>
   );
 
-  const MovieSection = ({ title, highlight, icon, iconColor, badgeColor, data }) => (
+  const MovieSection = ({ title, highlight, icon, iconColor, badgeColor, data, onCardClick, onViewAllClick }) => (
     <div className="w-full max-w-[92%] mx-auto py-6">
       {/* Section Header */}
       <div className="flex items-center justify-between mb-6">
@@ -71,7 +74,10 @@
             <div className={`mt-1 w-12 h-[2px] bg-gradient-to-r ${iconColor} rounded-full`} />
           </div>
         </div>
-        <button className="text-richblack-300 hover:text-white text-sm flex items-center gap-1 transition-colors group">
+        <button
+          onClick={onViewAllClick}
+          className="text-richblack-300 hover:text-white text-sm flex items-center gap-1 transition-colors group"
+        >
           View All
           <FaChevronRight className="text-[10px] group-hover:translate-x-0.5 transition-transform" />
         </button>
@@ -98,9 +104,9 @@
         modules={[FreeMode, Pagination, Mousewheel, Keyboard, Autoplay, Navigation]}
         className="listing-swiper !pb-10"
       >
-        {data.map((slide) => (
-          <SwiperSlide key={slide._id}>
-            <MovieCard slide={slide} badgeColor={badgeColor} />
+        {data.map((slide, index) => (
+          <SwiperSlide key={slide._id || index}>
+            <MovieCard slide={slide} badgeColor={badgeColor} onClick={() => onCardClick(slide)} />
           </SwiperSlide>
         ))}
       </Swiper>
@@ -123,7 +129,18 @@
 
         const highlyRated = await dispatch(getHighlyRatedMovies())
         if (highlyRated?.success) {
-          setHighlyRatedData(highlyRated.data)
+          const sorted = [...highlyRated.data].sort((a, b) => {
+            const aRating = a.averageRating || 0
+            const bRating = b.averageRating || 0
+            const aReviews = a.reviewCount || 0
+            const bReviews = b.reviewCount || 0
+            if (aReviews === 0 && bReviews === 0) return (b.BannerLiked || 0) - (a.BannerLiked || 0)
+            if (aReviews === 0) return 1
+            if (bReviews === 0) return -1
+            if (bRating !== aRating) return bRating - aRating
+            return bReviews - aReviews
+          })
+          setHighlyRatedData(sorted)
         }
 
         const recentlyReleased = await dispatch(getRecentlyReleasedMovies())
@@ -142,6 +159,7 @@
         iconColor: "from-yellow-400 to-amber-500",
         badgeColor: "from-yellow-400 to-amber-500",
         data: highlyRatedData,
+        route: "top-rated",
       },
       {
         title: "Most Liked",
@@ -150,6 +168,7 @@
         iconColor: "from-pink-400 to-rose-500",
         badgeColor: "from-pink-400 to-rose-500",
         data: mostLikedData,
+        route: "most-liked",
       },
       {
         title: "Recently Released",
@@ -158,6 +177,7 @@
         iconColor: "from-orange-400 to-red-500",
         badgeColor: "from-orange-400 to-red-500",
         data: recentlyReleasedData,
+        route: "recently-released",
       },
     ];
 
@@ -182,6 +202,8 @@
               iconColor={section.iconColor}
               badgeColor={section.badgeColor}
               data={section.data}
+              onCardClick={(movie) => navigate(`/Movie/${movie._id}`)}
+              onViewAllClick={() => navigate(`/${section.route}`)}
             />
           )
         ))}
