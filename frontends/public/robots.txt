@@ -1,0 +1,15 @@
+# Cine Circuit — robots.txt
+# Tells Google which pages to crawl and index
+
+User-agent: *
+Allow: /
+
+# Block dashboard pages from being indexed (private user pages)
+Disallow: /Dashboard/
+Disallow: /OTP
+Disallow: /Reset-Password/
+Disallow: /Forgot-Password
+
+# Sitemap location
+# REPLACE YOUR_VERCEL_URL below with your actual Vercel URL
+Sitemap: https://mw-mocha.vercel.app/sitemap.xml
