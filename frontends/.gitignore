@@ -36,9 +36,9 @@ functionadding.ts
 DEPLOYMENT_URL_CHANGES.md
 
 # Environment variables (contains secrets)
-.env
-.env.local
-.env.*.local
+# .env
+# .env.local
+# .env.*.local
 
 # Test files (if any)
 *.test.js
