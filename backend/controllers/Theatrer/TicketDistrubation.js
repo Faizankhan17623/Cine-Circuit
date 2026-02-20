@@ -66,8 +66,8 @@ exports.TicketDistributionSystem = async (req, res) => {
         }
 
         const index = TheatreFinding.showAlloted.findIndex(id => id.toString() === ShowId.toString());
-        const TicketPrice = TheatreFinding.priceoftheTicket[index];
-        const TicketReceived = TheatreFinding.ticketsReceived[index];
+        const TicketPrice = Number(TheatreFinding.priceoftheTicket[index]);
+        const TicketReceived = Number(TheatreFinding.ticketsReceived[index]);
         const TicketReceivedTime = TheatreFinding.ticketsReceivedTime[index];
 
         const Dates = new Date()
@@ -82,10 +82,10 @@ exports.TicketDistributionSystem = async (req, res) => {
             })
         }
         
-        let totalTicketsCreated = 0 
+        let totalTicketsCreated = 0
 
         for(const tickets of ticketsCreation){
-            if(tickets.price < TicketPrice){
+            if(Number(tickets.price) < TicketPrice){
                 return res.status(400).json({
                     message:`The price cannot be lower then the price that is been given by the orgainzer ${TicketPrice}`,
                     success:false
@@ -96,18 +96,32 @@ exports.TicketDistributionSystem = async (req, res) => {
                     throw new Error("All ticket details (category, numberOftickets, price) are required");
                 }
 
-                 totalTicketsCreated += tickets.numberOftickets
+                 totalTicketsCreated += Number(tickets.numberOftickets)
         }
 
 
 
         // console.log("This is the index",index,"This is the ticket price",TicketPrice,"This are the total tickets received,",TicketReceived)
         const ExistingTickets = await Theatrestickets.find({ showId: ShowId, theatreId: UserFinding.theatresCreated }).sort({ Date: -1 }).limit(1);
-        let Remaining = ExistingTickets.length > 0 ? ExistingTickets[0].TicketsRemaining - totalTicketsCreated : TicketReceived - totalTicketsCreated;
 
-        if (Remaining < 0) {
+        // Calculate remaining tickets from organizer
+        let totalTicketsFromOrganizer = Number(TicketReceived);
+        let alreadyDistributed = 0;
+
+        // If there are existing tickets, calculate how many were already distributed
+        if (ExistingTickets.length > 0) {
+            const allTicketsForShow = await Theatrestickets.find({ showId: ShowId, theatreId: UserFinding.theatresCreated });
+            alreadyDistributed = allTicketsForShow.reduce((sum, ticket) => {
+                const categorySum = ticket.ticketsCategory.reduce((catSum, cat) => catSum + Number(cat.ticketsCreated || 0), 0);
+                return sum + categorySum;
+            }, 0);
+        }
+
+        const remainingTickets = totalTicketsFromOrganizer - alreadyDistributed;
+
+        if (totalTicketsCreated > remainingTickets) {
             return res.status(400).json({
-                message: "Not enough tickets available",
+                message: `Not enough tickets available. Organizer gave ${totalTicketsFromOrganizer} tickets, ${alreadyDistributed} already distributed. Remaining: ${remainingTickets}. You are trying to create ${totalTicketsCreated} tickets.`,
                 success: false
             });
         }
@@ -164,17 +178,17 @@ if (parsedReleaseDate.getTime() === formattedNow.getTime()) {
             Date: ReleaseDate,
             pricefromtheorg: TicketPrice,
             totalticketfromorg: TicketReceived,
-            
+
             ticketsCategory: ticketsCreation.map(data => ({
                 category: data.category,
                 price: data.price,
                 ticketsCreated: data.numberOftickets,
-                ticketsPurchaseafterRemaining:data.numberOftickets
+                ticketsPurchaseafterRemaining: data.numberOftickets
             })),
-            
+
             ticketsReceivingTime: TicketReceivedTime,
             Status: "Upcoming",
-            TicketsRemaining: Remaining
+            TicketsRemaining: remainingTickets - totalTicketsCreated
         });
 
   TheatreFinding.ticketCreation.push(TicketCreations._id);

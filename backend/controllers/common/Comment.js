@@ -1,4 +1,4 @@
-const comment = require('../../models/Comment')
+const Comment = require('../../models/Comment')
 const CreateShow = require('../../models/CreateShow')
 const USER = require('../../models/user')
 const date = require('date-and-time')
@@ -6,12 +6,15 @@ const Theatres = require('../../models/Theatres')
 
 // Done
 // tHIS IS THE FUNCTION THAT WILL HELP US SO THAT THE ROUTE IS THE USE ROUTE AND IT IS PRESENTED ON LINIE NO 46
-exports.Comment = async(req,res)=>{
+exports.UserComments = async(req,res)=>{
     try {
         const userId = req.USER.id
         // console.log(`${userId}`.bgBlue)
-        const Showid = req.query.Showid
-        const {coment} = req.body
+        // Accept both query param and body param
+        const Showid = req.query.Showid 
+        const {coment, comment} = req.body
+        const commentText = coment || comment  // Handle both spelling variants
+
         if(!Showid){
             return res.status(500).json({
                 message:"The input Fields are been required",
@@ -28,11 +31,15 @@ exports.Comment = async(req,res)=>{
         const now = new Date();
                     const pattern = date.compile('DD/MM/YYYY HH:mm:ss');
                     let ComemntTime = date.format(now, pattern);
-        const Creation = await comment.create({
+
+        const Creation = new Comment({
             Showid:Showid,
-            data:coment,
+            userId:userId,
+            data:commentText,
             CreatedAt:ComemntTime
         })
+            await Creation.save()
+
         await USER.updateOne({_id:userId},{$push:{comment:Creation._id}})
         await CreateShow.updateOne({_id:Showid},{$push:{Comment:Creation._id}})
 
@@ -54,7 +61,7 @@ exports.Comment = async(req,res)=>{
 
 exports.getAllComment = async (req,res)=>{
     try{
-        const Showid = req.query.Showid
+        const Showid = req.query.Showid || req.query.movie_id
         if(!Showid){
             return res.status(500).json({
                 message:"The input Fields are been required",
@@ -69,15 +76,39 @@ exports.getAllComment = async (req,res)=>{
             })
         }
 
+        // console.log("Finding.Comment:", Finding.Comment)
 
-        let AllComments = Finding.Comment.map(async(data)=>{
-            let allComm = await comment.findOne({_id:data})
-            console.log(allComm)
-            return allComm
-        })
+        if (!Finding.Comment || Finding.Comment.length === 0) {
+            return res.status(200).json({
+                message:"These are all the comments",
+                success:true,
+                data:[]
+            })
+        }
 
+        let AllComments = await Promise.all(Finding.Comment.map(async(data)=>{
+          // console.log("dat from all comments",data)
+            let allComm = await Comment.findById(data)
+            // console.log("allComm:", allComm)
+            if(allComm){
+                const userName = await USER.findById(allComm.userId)
+                // console.log(userName)
+                return {
+                    _id:allComm._id,
+                    comment:allComm.data,
+                    userId:allComm.userId ? allComm.userId._id : null,
+                    userName: userName.userName,
+                    createdAt:allComm.CreatedAt,
+                    updatedAt:allComm.updatedAt
+                }
+            }
+            return null
+        }))
 
-        console.log(AllComments)
+        // Filter out null values
+        AllComments = AllComments.filter(c => c !== null)
+
+        console.log("AllComments:", AllComments)
 
         return res.status(200).json({
             message:"These are all the comments",
@@ -85,7 +116,7 @@ exports.getAllComment = async (req,res)=>{
             data:AllComments
         })
 
-        
+
     }catch(error){
         console.log(error)
         console.log(error.message)
@@ -98,8 +129,9 @@ exports.getAllComment = async (req,res)=>{
 
 exports.deleteComment = async (req,res)=>{
     try{
-        const Showid = req.query.Showid
-        if(!Showid){
+        const Showid = req.query.Showid || req.query.movie_id
+        const commentId = req.query.commentId || req.body.commentId
+        if(!Showid || !commentId){
             return res.status(500).json({
                 message:"The input Fields are been required",
                 success:false
@@ -113,7 +145,15 @@ exports.deleteComment = async (req,res)=>{
             })
         }
 
-        const Deletion = await comment.findByIdAndDelete(Showid,{new:true})
+        const Deletion = await Comment.findByIdAndDelete(commentId)
+
+        // Also remove from CreateShow's Comment array
+        if(Deletion){
+            await CreateShow.updateOne(
+                {_id:Showid},
+                {$pull: {Comment: commentId}}
+            )
+        }
 
         return res.status(200).json({
             message:"These comment is been deleted",

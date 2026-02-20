@@ -16,38 +16,40 @@ exports.TicketPurchased = async(req,res)=>{
         const userId = req.USER.id;
 
         if(!userId){
-            return res.status(400).json({message:"User ID not found"});
+            return res.status(400).json({message:"User ID not found", success: false});
         }
 
         const user = await USER.findOne({_id:userId}).populate('Casttaken')
 
         if(!user){
-            return res.status(404).json({message:"User not found"});
+            return res.status(404).json({message:"User not found", success: false});
+        }
+
+        if(!user.PaymentId || user.PaymentId.length === 0){
+            return res.status(200).json({
+                success: true,
+                message:"No tickets purchased yet",
+                count: 0,
+                data: []
+            });
         }
 
         const paymentId = await Promise.all(
             user.PaymentId.map(async (payment) => {
                     const datas = await Payment.findOne({ _id: payment });
-                    
-                    if(!datas){
-                        return res.status(404).json({message:"Payment not found"});
-                    }
-    
+                    if(!datas) return null;
                     return datas
                 })
         )
 
-            if(!paymentId){
-                return res.status(404).json({message:"Payment not found"});
-            }
-            
-
             const validTickets = paymentId.filter(ticket => ticket !== null);
 
         if(validTickets.length === 0){
-            return res.status(404).json({
-                success: false,
-                message:"No ticket details found"
+            return res.status(200).json({
+                success: true,
+                message:"No ticket details found",
+                count: 0,
+                data: []
             });
         }
 
@@ -82,6 +84,15 @@ exports.TicketPurchasedFullDetails = async(req,res)=>{
             return res.status(404).json({
                 success: false,
                 message:"User not found"
+            });
+        }
+
+        if(!user.PaymentId || user.PaymentId.length === 0){
+            return res.status(200).json({
+                success: true,
+                message: "No tickets purchased yet",
+                count: 0,
+                data: []
             });
         }
 
@@ -126,9 +137,11 @@ exports.TicketPurchasedFullDetails = async(req,res)=>{
         const validTickets = ticketDetails.filter(ticket => ticket !== null);
 
         if(validTickets.length === 0){
-            return res.status(404).json({
-                success: false,
-                message:"No ticket details found"
+            return res.status(200).json({
+                success: true,
+                message:"No ticket details found",
+                count: 0,
+                data: []
             });
         }
 
@@ -401,31 +414,18 @@ exports.PurcahsingData = async (req, res) => {
     }
 
     // ✅ Get all theatres properly
-    const Theatres = await Theatre.find({
-      _id: { $in: Finding.AllotedToTheNumberOfTheatres }
-    });
-
-    if (!Theatres || Theatres.length === 0) {
-      return res.status(404).json({
-        message: "No theatre found",
-        success: false
-      });
-    }
+    const theatreIds = Finding.AllotedToTheNumberOfTheatres || [];
+    const Theatres = theatreIds.length > 0
+      ? await Theatre.find({ _id: { $in: theatreIds } })
+      : [];
 
     // ✅ Extract all ticket IDs from all theatres
-    const allTicketIds = Theatres.flatMap(theatre => theatre.ticketCreation);
+    const allTicketIds = Theatres.flatMap(theatre => theatre.ticketCreation || []);
 
-    if (!allTicketIds || allTicketIds.length === 0) {
-      return res.status(404).json({
-        message: "No tickets created",
-        success: false
-      });
-    }
-
-    // ✅ Get all tickets
-    const TicketData = await Theatrestickets.find({
-      _id: { $in: allTicketIds }
-    });
+    // ✅ Get all tickets (empty array if none)
+    const TicketData = allTicketIds.length > 0
+      ? await Theatrestickets.find({ _id: { $in: allTicketIds } })
+      : [];
 
     return res.status(200).json({
       message: "This is the data",
@@ -452,14 +452,19 @@ exports.PurcahsingData = async (req, res) => {
 
 exports.MostLikedMovies = async (req,res)=>{
     try{
+        const page  = parseInt(req.query.page)  || 1
+        const limit = parseInt(req.query.limit) || 10
+        const skip  = (page - 1) * limit
+
         const AllMovies = await CreateShow.find({ uploaded: true, VerifiedByTheAdmin: true })
             .populate("genre")
             .populate("ratingAndReviews")
 
         if(!AllMovies || AllMovies.length === 0){
-            return res.status(404).json({
+            return res.status(200).json({
                 message:"No movies found",
-                success:false
+                success:true,
+                data:[]
             })
         }
 
@@ -467,10 +472,21 @@ exports.MostLikedMovies = async (req,res)=>{
             return (b.BannerLiked || 0) - (a.BannerLiked || 0)
         })
 
+        const totalCount = MostLiked.length
+        const paginated  = MostLiked.slice(skip, skip + limit)
+
         return res.status(200).json({
             message:"Most liked movies fetched successfully",
             success:true,
-            data:MostLiked
+            data:paginated,
+            pagination:{
+                totalCount,
+                totalPages: Math.ceil(totalCount / limit),
+                currentPage: page,
+                limit,
+                hasNextPage: page < Math.ceil(totalCount / limit),
+                hasPrevPage: page > 1
+            }
         })
 
     }catch(error){
@@ -486,14 +502,19 @@ exports.MostLikedMovies = async (req,res)=>{
 
 exports.HighlyRatedMovies = async (req,res)=>{
     try{
+        const page  = parseInt(req.query.page)  || 1
+        const limit = parseInt(req.query.limit) || 10
+        const skip  = (page - 1) * limit
+
         const AllMovies = await CreateShow.find({ uploaded: true, VerifiedByTheAdmin: true })
             .populate("ratingAndReviews")
             .populate("genre")
 
         if(!AllMovies || AllMovies.length === 0){
-            return res.status(404).json({
+            return res.status(200).json({
                 message:"No movies found",
-                success:false
+                success:true,
+                data:[]
             })
         }
 
@@ -505,18 +526,37 @@ exports.HighlyRatedMovies = async (req,res)=>{
             }
             return {
                 ...movie.toObject(),
-                averageRating
+                averageRating,
+                reviewCount: movie.ratingAndReviews?.length || 0
             }
         })
 
         const HighlyRated = Rated.sort((a,b)=>{
-            return (b.averageRating || 0) - (a.averageRating || 0)
+            if (a.reviewCount === 0 && b.reviewCount === 0) {
+                return (b.BannerLiked || 0) - (a.BannerLiked || 0)
+            }
+            if (a.reviewCount === 0) return 1
+            if (b.reviewCount === 0) return -1
+            const ratingDiff = (b.averageRating || 0) - (a.averageRating || 0)
+            if (ratingDiff !== 0) return ratingDiff
+            return b.reviewCount - a.reviewCount
         })
+
+        const totalCount = HighlyRated.length
+        const paginated  = HighlyRated.slice(skip, skip + limit)
 
         return res.status(200).json({
             message:"Highly rated movies fetched successfully",
             success:true,
-            data:HighlyRated
+            data:paginated,
+            pagination:{
+                totalCount,
+                totalPages: Math.ceil(totalCount / limit),
+                currentPage: page,
+                limit,
+                hasNextPage: page < Math.ceil(totalCount / limit),
+                hasPrevPage: page > 1
+            }
         })
 
     }catch(error){
@@ -532,25 +572,43 @@ exports.HighlyRatedMovies = async (req,res)=>{
 
 exports.RecentlyReleased = async (req,res)=>{
     try{
+        const page  = parseInt(req.query.page)  || 1
+        const limit = parseInt(req.query.limit) || 10
+        const skip  = (page - 1) * limit
+
         const AllMovies = await CreateShow.find({ uploaded: true, VerifiedByTheAdmin: true, movieStatus: "Released" })
             .populate("genre")
             .populate("ratingAndReviews")
 
         if(!AllMovies || AllMovies.length === 0){
-            return res.status(404).json({
+            return res.status(200).json({
                 message:"No movies found",
-                success:false
+                success:true,
+                data:[]
             })
         }
 
         const Recent = [...AllMovies].sort((a,b)=>{
-            return new Date(b.createdAt) - new Date(a.createdAt)
+            const dateA = a.VerificationTime ? new Date(a.VerificationTime) : new Date(0)
+            const dateB = b.VerificationTime ? new Date(b.VerificationTime) : new Date(0)
+            return dateB - dateA
         })
+
+        const totalCount = Recent.length
+        const paginated  = Recent.slice(skip, skip + limit)
 
         return res.status(200).json({
             message:"Recently released movies fetched successfully",
             success:true,
-            data:Recent
+            data:paginated,
+            pagination:{
+                totalCount,
+                totalPages: Math.ceil(totalCount / limit),
+                currentPage: page,
+                limit,
+                hasNextPage: page < Math.ceil(totalCount / limit),
+                hasPrevPage: page > 1
+            }
         })
 
     }catch(error){
@@ -563,3 +621,65 @@ exports.RecentlyReleased = async (req,res)=>{
         })
     }
 }
+
+exports.ContentBasedAlgorithm = async(req,res) => {
+    try {
+
+ const userId = req.USER.id;
+
+//  console.log(userId)
+
+        const user = await USER.findById(userId)
+            .populate("UserBannerliked")
+            .populate("UserBannerhated");
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                success: false
+            });
+        }
+
+        // console.log("User Data:", user);
+
+       const GenreFinding = await Promise.all(
+            user.UserBannerliked.map(async (data) => {
+                return await genre.findById(data.genre);
+            })
+        );
+        // console.log(GenreFinding)
+
+if (GenreFinding.length === 0 || !GenreFinding) {
+    return res.status(400).json({
+        message: "No genre details",
+        success: false
+    });
+}
+
+
+        // const Genres = []
+        // for(let i=0;i<GenreFinding.length;i++){
+        //     if(GenreFinding.genreName !== GenreFinding.genreName -1  ){
+        //         Genres.push(GenreFinding.genreName)
+        //     }
+        // }
+
+        
+const uniqueGenres = [
+    ...new Set(GenreFinding.map(g => g.genreName))
+];
+
+        return res.status(200).json({
+            message: "This is the user data",
+            success: true,
+            data: uniqueGenres
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Internal Server Error",
+            success: false
+        });
+    }
+};

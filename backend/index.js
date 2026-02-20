@@ -7,7 +7,10 @@ const fileUpload = require('express-fileupload')
 const colors = require('colors')
 var morgan = require('morgan')
 const VisitorCounter = require('express-visitor-counter')
+const rateLimit  = require('express-rate-limit')
 const formData = require('express-form-data') // DISABLED: conflicts with express-fileupload (uses multiparty internally) and can consume the request stream twice, causing "BadRequestError: stream ended unexpectedly"
+const swaggerUi = require('swagger-ui-express')
+const swaggerSpec = require('./config/swagger')
 require('./Background_Process/Shows/movieStatusCronjobs')
 require('./Background_Process/Tickets/Tickets')
 require('./Background_Process/ReturnnsoldTickets')
@@ -35,7 +38,27 @@ app.use(cors({
     credentials: true
 }));
 
+// General limiter — applied to all routes (200 requests per 15 min)
+const generalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 200,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    ipv6Subnet: 56,
+})
 
+// Strict limiter — login & OTP only (5 attempts per 15 min)
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { success: false, message: 'Too many attempts. Please try again after 15 minutes.' }
+})
+
+app.use(generalLimiter)
+app.use('/api/v1/createAccount/Login', authLimiter)
+app.use('/api/v1/createAccount/Create-OTP', authLimiter)
 // app.use(cors())
 
 app.use(express.json())
@@ -43,22 +66,16 @@ app.use(cookieParser ())
 app.use(morgan("dev"));
 
 app.use(VisitorCounter(Visitor))
-<<<<<<< HEAD
-=======
-
-
-
->>>>>>> 9d71308 (Bugs Fixed)
 
 app.use(fileUpload({
     useTempFiles : true,
     tempFileDir : require('os').tmpdir(),
-    limits: { fileSize: 100 * 1024 * 1024 },
+    limits: { fileSize: 50 * 1024 * 1024 },
 }))
 
 
-app.use(express.json({ limit: "100mb" }));
-app.use(express.urlencoded({ extended: true, limit: "100mb" }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 
 app.use('/api/v1/createAccount',auth)
@@ -67,6 +84,12 @@ app.use('/api/v1/Org',Orgainezer)
 app.use('/api/v1/Show',Show)
 app.use('/api/v1/Theatre',Theatre)
 app.use('/api/v1/Payment',payment)
+
+// Swagger API Docs — http://localhost:4003/api/docs
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customSiteTitle: 'Cine Circuit API Docs',
+    customCss: '.swagger-ui .topbar { background: linear-gradient(to right, #7c3aed, #db2777); }',
+}))
 
 // app.use(formData.parse()) // DISABLED: express-form-data (multiparty) conflicts with express-fileupload. Using both can end the stream unexpectedly. Use express-fileupload for handling file uploads globally or apply middleware per-route if needed.
 

@@ -8,3 +8,10 @@ node_modules
 npm-debug.log*
 
 package-lock.json
+
+# Private planning files
+../BUGS_AND_ISSUES.md
+../FEATURES_TO_ADD.md
+../AI_FEATURES_TO_ADD.md
+../CURRENT_PROJECT_ENHANCEMENTS.md
+../PROJECT_RECOMMENDATIONS.md

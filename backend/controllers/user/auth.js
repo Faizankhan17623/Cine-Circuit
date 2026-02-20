@@ -17,14 +17,7 @@ exports.login = async (req, res) => {
         }
 
         const user = await USER.findOne({ email: email.toLowerCase() })
-            .populate('resetPasswordExpires')
-            .populate({path:'showsCreated',model:'Show'})
-            .populate({path:'UserBannerliked',model:'Show'})
-            .populate({path:'UserBannerhated',model:'Show'})
-            .populate({path:'messageReceived',model:'Message'})
-            .populate({path:'comment',model:'Comment'})
-            .exec()
-
+        
         if (!user) {
             return res.status(404).json({
                 message: "Email not found.",
@@ -57,7 +50,7 @@ exports.login = async (req, res) => {
         // Restrict access for "organizer" and "administrator"
             // Allow only "viewer" role to proceed
         await USER.findByIdAndUpdate(_id, { verified: true }, { new: true });
-        await USER.findByIdAndUpdate(_id, { $push: { lastlogin: lastLoginTime } }, { new: true });
+        await USER.findByIdAndUpdate(_id, { $push: { lastlogin: lastLoginTime } } , { new: true });
 
         const expiry = "7d";  // string is clearer
 
@@ -69,6 +62,7 @@ exports.login = async (req, res) => {
 
         user.token = jwtCreation;
         user.password = undefined
+        user.id = _id
 
         // console.log(jwtCreation)
         const options = {

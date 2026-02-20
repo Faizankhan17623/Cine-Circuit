@@ -9,41 +9,45 @@ exports.CalculateTotalSale = async(req,res)=>{
     try{
         const userId = req.USER.id;
         if(!userId) {
-            return res.status(400).json({ message: "User ID is required" });
+            return res.status(400).json({ message: "User ID is required", success: false });
         }
         const user = await USER.findOne({_id:userId});
         if(!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found", success: false });
         }
 
+        if(!user.theatresCreated) {
+            return res.status(200).json({ message: "No theatre created yet", success: true, totalAmount: 0 });
+        }
 
-        const Finding = await Theatres.findOne({_id:user.theatreCreated});
+        const Finding = await Theatres.findOne({_id:user.theatresCreated});
 
         if(!Finding) {
-            return res.status(404).json({ message: "Theatre not found" });
+            return res.status(200).json({ message: "Theatre not found", success: true, totalAmount: 0 });
         }
 
+        if(!Finding.ticketCreation || Finding.ticketCreation.length === 0) {
+            return res.status(200).json({ message: "No tickets created yet", success: true, totalAmount: 0 });
+        }
 
         const TheatreTicket = await Theatrestickets.findOne({_id:Finding.ticketCreation});
-        if(!TheatreTicket) {
-            return res.status(404).json({ message: "Theatre ticket not found" });
+        if(!TheatreTicket || !TheatreTicket.ticketsPurchased || TheatreTicket.ticketsPurchased.length === 0) {
+            return res.status(200).json({ message: "No tickets purchased yet", success: true, totalAmount: 0 });
         }
 
         let totalAmount = 0
-        const calcuatetotal = await Promise.all(
+        await Promise.all(
             TheatreTicket.ticketsPurchased.map(async(item) => {
             const data = await Payment.findOne({_id:item})
-            totalAmount += data.amount
+            if(data) totalAmount += data.amount
             return totalAmount
         }))
-
-        // console.log(totalAmount)
 
         return res.status(200).json({message:"Total Sale Amount",success:true,totalAmount:totalAmount})
     }catch(error){
         console.log(error)
         console.log("Error in CalculateTotalSale controller",error.message)
-        res.status(500).json({message:"Internal Server Error"});        
+        res.status(500).json({message:"Internal Server Error", success: false});
     }
 }
 
@@ -52,31 +56,31 @@ exports.SingleTheatreDetails = async(req,res)=>{
     try{
         const userId = req.USER.id;
         if(!userId) {
-            return res.status(400).json({ message: "User ID is required" });
+            return res.status(400).json({ message: "User ID is required", success: false });
         }
         const user = await USER.findOne({_id:userId});
         if(!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found", success: false });
         }
 
-
-        const Finding = await Theatres.findOne({_id:user.theatreCreated});
-
+        if(!user.theatresCreated) {
+            return res.status(200).json({ message: "No theatre created yet", success: true, TheatreDetails: null, TheatreTicketDetails: null });
+        }
+// console.log(user.theatresCreated)
+        const Finding = await Theatres.findOne({_id:user.theatresCreated});
         if(!Finding) {
-            return res.status(404).json({ message: "Theatre not found" });
+            return res.status(200).json({ message: "Theatre not found", success: true, TheatreDetails: null, TheatreTicketDetails: null });
         }
 
-
-        const TheatreTicket = await Theatrestickets.findOne({_id:Finding.ticketCreation});
-        if(!TheatreTicket) {
-            return res.status(404).json({ message: "Theatre ticket not found" });
-        }
+        const TheatreTicket = Finding.ticketCreation
+            ? await Theatrestickets.findOne({_id:Finding.ticketCreation})
+            : null;
 
         return res.status(200).json({message:"Theatre Details",success:true,TheatreDetails:Finding,TheatreTicketDetails:TheatreTicket})
     }catch(error){
         console.log(error)
         console.log("Error in GetTheatreDetails controller",error.message)
-        res.status(500).json({message:"Internal Server Error"});        
+        res.status(500).json({message:"Internal Server Error", success: false});
     }
 }
 
@@ -84,23 +88,38 @@ exports.GetShowAllotedDetails = async(req,res)=>{
     try{
         const userId = req.USER.id;
         if(!userId) {
-            return res.status(400).json({ message: "User ID is required" });
+            return res.status(400).json({ message: "User ID is required", success: false });
         }
         const user = await USER.findOne({_id:userId});
         if(!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found", success: false });
         }
 
+        if(!user.theatresCreated) {
+            return res.status(200).json({ message: "No theatre created yet", success: true, show: [] });
+        }
 
-        const Finding = await Theatres.findOne({_id:user.theatreCreated});
+        const Finding = await Theatres.findOne({_id:user.theatresCreated});
         if(!Finding) {
-            return res.status(404).json({ message: "Theatre not found" });
+            return res.status(200).json({ message: "Theatre not found", success: true, show: [] });
+        }
+
+        if(!Finding.showAlloted || Finding.showAlloted.length === 0) {
+            return res.status(200).json({ message: "No shows alloted yet", success: true, show: [] });
         }
 
         const ShowData = await Promise.all(
             Finding.showAlloted.map(async(item,index)=>{
                 const data = await CreateShow.findOne({_id:item})
-                return {data,index}
+                return {
+                    data,
+                    index,
+                    ticketAllocation: {
+                        ticketsReceived: Finding.ticketsReceived?.[index] || 0,
+                        ticketPrice: Finding.priceoftheTicket?.[index] || 0,
+                        ticketsReceivedTime: Finding.ticketsReceivedTime?.[index] || null
+                    }
+                }
             })
         )
 
@@ -113,40 +132,55 @@ exports.GetShowAllotedDetails = async(req,res)=>{
 
     }catch(error){
         console.log(error)
-        console.log("Error in GetTheatreDetails controller",error.message)
-        res.status(500).json({message:"Internal Server Error"});        
+        console.log("Error in GetShowAllotedDetails controller",error.message)
+        res.status(500).json({message:"Internal Server Error", success: false});
     }
 }
 
 exports.getAllticketsDetails = async(req,res)=>{
     try{
-        
+
         const userId = req.USER.id;
 
         if(!userId) {
-            return res.status(400).json({ message: "User ID is required" });
+            return res.status(400).json({ message: "User ID is required", success: false });
         }
 
         const user = await USER.findOne({_id:userId});
         if(!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found", success: false });
         }
 
+        if(!user.theatresCreated) {
+            return res.status(200).json({ message: "No theatre created yet", success: true, data: { theatre: null, shows: [], totalShows: 0, totalTicketsReceived: 0 } });
+        }
 
-        const Finding = await Theatres.findOne({_id:user.theatreCreated});
+        const Finding = await Theatres.findOne({_id:user.theatresCreated});
         if(!Finding) {
-            return res.status(404).json({ message: "Theatre not found" });
+            return res.status(200).json({ message: "Theatre not found", success: true, data: { theatre: null, shows: [], totalShows: 0, totalTicketsReceived: 0 } });
+        }
+
+        if(!Finding.showAlloted || Finding.showAlloted.length === 0) {
+            return res.status(200).json({
+                message: "No shows alloted yet",
+                success: true,
+                data: {
+                    theatre: { name: Finding.Theatrename, location: Finding.locationname },
+                    shows: [],
+                    totalShows: 0,
+                    totalTicketsReceived: 0
+                }
+            });
         }
 
         const ShowData = await Promise.all(
             Finding.showAlloted.map(async(item, index) => {
                 const showDetails = await CreateShow.findOne({_id:item});
-                
-                // Get corresponding ticket details for this show using index
+
                 const ticketInfo = {
-                    ticketsReceived: Finding.ticketsReceived[index] ? Number(Finding.ticketsReceived[index]) : 0,
-                    receivedTime: Finding.ticketsReceivedTime[index] || null,
-                    ticketPrice: Finding.priceoftheTicket[index] ? Number(Finding.priceoftheTicket[index]) : 0
+                    ticketsReceived: Finding.ticketsReceived?.[index] ? Number(Finding.ticketsReceived[index]) : 0,
+                    receivedTime: Finding.ticketsReceivedTime?.[index] || null,
+                    ticketPrice: Finding.priceoftheTicket?.[index] ? Number(Finding.priceoftheTicket[index]) : 0
                 };
 
                 return {
@@ -156,7 +190,7 @@ exports.getAllticketsDetails = async(req,res)=>{
                 };
             })
         );
-       
+
         return res.status(200).json({
             message: "Theatre Details Retrieved Successfully",
             success: true,
@@ -167,14 +201,14 @@ exports.getAllticketsDetails = async(req,res)=>{
                 },
                 shows: ShowData,
                 totalShows: ShowData.length,
-                totalTicketsReceived: Finding.ticketsReceived.reduce((sum, tickets) => sum + Number(tickets), 0)
+                totalTicketsReceived: (Finding.ticketsReceived || []).reduce((sum, tickets) => sum + Number(tickets), 0)
             }
         });
 
     }catch(error){
         console.log(error)
         console.log("Error in GetAllTheatreDetails controller",error.message)
-        res.status(500).json({message:"Internal Server Error"});        
+        res.status(500).json({message:"Internal Server Error", success: false});
     }
 }
 
@@ -193,7 +227,7 @@ exports.getSingleShowDetails = async(req,res)=>{
         }
 
 
-        const Finding = await Theatres.findOne({_id:user.theatreCreated,showAlloted:showId});
+        const Finding = await Theatres.findOne({_id:user.theatresCreated,showAlloted:showId});
 
         if(!Finding) {
             return res.status(404).json({ message: "THis show is not alloted to you",success:false });

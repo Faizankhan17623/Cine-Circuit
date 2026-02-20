@@ -23,13 +23,43 @@ exports.MakePayment = async(req,res) => {
         const ShowId = req.body.ShowId
         const Theatreid = req.body.Theatreid
         const Ticketid = req.body.Ticketid
-        const userId = req.body.userId
+        const userId = req.USER?.id
         const{Categories,totalTickets,time} = req.body
 
-        // console.log(Categories)
+        // Debug: Log what's received
+        console.log("Payment request received:", { ShowId, Theatreid, Ticketid, userId, Categories, totalTickets, time })
+
         if(!userId){
             return res.status(400).json({
-                message:"You are not logged in please log in",
+                message:"You are not logged in. Please log in first.",
+                success:false
+            })
+        }
+
+        if(!ShowId){
+            return res.status(400).json({
+                message:"Show ID is missing",
+                success:false
+            })
+        }
+
+        if(!Theatreid){
+            return res.status(400).json({
+                message:"Theatre ID is missing",
+                success:false
+            })
+        }
+
+        if(!Ticketid){
+            return res.status(400).json({
+                message:"Ticket ID is missing",
+                success:false
+            })
+        }
+
+        if(!time){
+            return res.status(400).json({
+                message:"Time is missing",
                 success:false
             })
         }
@@ -47,22 +77,36 @@ exports.MakePayment = async(req,res) => {
             USER.findOne({_id:userId}),
             CreateShow.findOne({_id:ShowId}),
             Theatre.findOne({_id:Theatreid}),
-            Theatrestickets.findOne({_id:Ticketid,showId:ShowId})
+            Theatrestickets.findOne({_id:Ticketid})
         ]);
 
-        if(!UserFinders || !Showearching || !Theatrearching || !TheatreTicketsrearching){
+        // Check each one individually for better error message
+        if(!UserFinders){
             return res.status(404).json({
-                message:"Required data not found",
+                message:"User not found. Please login again.",
+                success:false
+            })
+        }
+        if(!Showearching){
+            return res.status(404).json({
+                message:"Show not found",
+                success:false
+            })
+        }
+        if(!Theatrearching){
+            return res.status(404).json({
+                message:"Theatre not found",
+                success:false
+            })
+        }
+        if(!TheatreTicketsrearching){
+            return res.status(404).json({
+                message:"Ticket not found for this show",
                 success:false
             })
         }
 
-        const Theatreticketsdata  = await Theatrestickets.findOne({_id:Ticketid,showId:ShowId})
-        if(!Theatreticketsdata){
-            return res.status(404).json({
-                message:"The tickets are not found",
-                success:false
-            })}
+        const Theatreticketsdata = TheatreTicketsrearching
 
         // console.log("Theatreticketsdata",Theatreticketsdata)
         // Validate time and status
@@ -177,6 +221,7 @@ exports.MakePayment = async(req,res) => {
             userid: userId,
             Showdate:Theatreticketsdata.Date,
             theatreid: Theatreid,
+            ticketid: Ticketid,
             purchaseDate: ps,
             razorpay_order_id: order.id,
             totalTicketpurchased: totalTickets.reduce((a, b) => parseInt(a) + parseInt(b), 0),
@@ -197,10 +242,10 @@ exports.MakePayment = async(req,res) => {
 
         // console.log(UserFinders)
         
-        setTimeout(async () => {
+        // setTimeout(async () => {
             const mailes = await mailSender(UserFinders.email,"Your Booking is Confirmed - Cine Circuit",TicketTemplate(PaymentStatus));
             console.log("Email sent successfully:");
-        },twominutes)
+        // },twominutes)
 
         return res.status(200).json({
             message: "Order created successfully",
@@ -277,8 +322,7 @@ exports.Verifypayment = async(req,res) => {
 
                 // Update tickets
                 const createTicket = await Theatrestickets.findOne({
-                    showId: PaymentVerifier.showid,
-                    theatreId: PaymentVerifier.theatreid
+                    _id: PaymentVerifier.ticketid
                 }).session(session);
 
                 if (!createTicket) {

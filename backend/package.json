@@ -34,6 +34,7 @@
     "express": "^4.21.2",
     "express-fileupload": "^1.5.1",
     "express-form-data": "^3.0.1",
+    "express-rate-limit": "^8.2.1",
     "express-session": "^1.18.1",
     "express-visitor-counter": "^1.5.1",
     "html-pdf": "^3.0.1",
@@ -54,6 +55,8 @@
     "razorpay": "^2.9.6",
     "render": "^0.1.4",
     "set-value": "^4.1.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "update": "^0.4.2"
   }
 }

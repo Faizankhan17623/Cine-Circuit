@@ -134,8 +134,20 @@ exports.CreateOtp = async(req,res)=>{
                 data:email
             })
         }
-        // now we will generate the otp 
 
+        // Cooldown check — if OTP still exists in DB it means 2 minutes haven't passed yet
+        const existingOtp = await OTP.findOne({email}).sort({createdAt: -1})
+        if(existingOtp){
+            const secondsPassed = Math.floor((Date.now() - new Date(existingOtp.createdAt)) / 1000)
+            const secondsRemaining = 120 - secondsPassed
+            return res.status(429).json({
+                message:`An OTP was already sent. Please wait ${secondsRemaining} second(s) before requesting a new one.`,
+                success:false,
+                retryAfter: secondsRemaining
+            })
+        }
+
+        // now we will generate the otp
         const generate = otpGenerator.generate(6,{
             lowerCaseAlphabets:false,
             digits:true,
@@ -143,10 +155,8 @@ exports.CreateOtp = async(req,res)=>{
             specialChars:false
         })
 
-        // console.log("This is the generated otp",generate)
-
         const saving = await OTP.create({otp:generate,email:email})
-        // console.log("The otp is been saved in the databse",saving)
+        // console.log("The otp is been saved in the database",saving)
 
         return res.status(200).json({
             message:`The otp is been send on the email address ${email}`,

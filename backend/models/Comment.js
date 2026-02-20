@@ -1,13 +1,18 @@
 const mongoose = require('mongoose')
 const CreateComment = new mongoose.Schema({
-    Showid:[{
+    Showid:{
         type:String,
         required:true
-    }],
+    },
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'user',
+        required:true
+    },
     data:{
         type:String,
         required:true,
-        maxlength:150,
+        maxlength:500,
     },
     CreatedAt:{
         type:String,
