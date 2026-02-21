@@ -91,3 +91,7 @@ export const NavbarData = {
     TheatreData:BASE_URL+"/Theatre-data",
     MovieData:BASE_URL+"/Movie-data"
 }
+
+export const SearchApi = {
+    search: BASE_URL + "/Search"
+}

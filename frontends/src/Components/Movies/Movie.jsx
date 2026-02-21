@@ -570,7 +570,7 @@ const previousTag = location.state?.tag
             {/* Comments List */}
             {comments.length > 0 ? (
               <div className="space-y-4">
-                {comments.map((comment, idx) => (
+                {(showAllComments ? comments : comments.slice(0, 3)).map((comment, idx) => (
                   <div
                     key={idx}
                     className="bg-richblack-800 rounded-xl p-4 border border-richblack-700"
@@ -584,7 +584,7 @@ const previousTag = location.state?.tag
                           {comment.userName || "User"}
                         </span>
                         <span className="text-xs text-richblack-400">
-                          {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString() : ""}
+                          {comment.createdAt || ""}
                         </span>
                       </div>
                       {comment.userId === user?._id && (

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from "react-router-dom"
 import { UserLogout, getNavbarMovieData, getNavbarTheatreData } from '../../Services/operations/Auth'
 import { toast } from 'react-hot-toast'
+import SearchPopup from '../extra/SearchPopup'
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
@@ -28,6 +29,7 @@ const Navbar = () => {
 
   const [path, setPath] = useState('/')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const [movieTags, setMovieTags] = useState(FALLBACK_MOVIE_TAGS)
   const [theatreTypes, setTheatreTypes] = useState(FALLBACK_THEATRE_TYPES)
 
@@ -137,7 +139,10 @@ const Navbar = () => {
 
       {/* Right Side Actions */}
       <div className='flex items-center gap-3'>
-        <button className='w-9 h-9 flex items-center justify-center rounded-lg hover:bg-richblack-700 transition-colors'>
+        <button
+          onClick={() => setSearchOpen(true)}
+          className='w-9 h-9 flex items-center justify-center rounded-lg hover:bg-richblack-700 transition-colors'
+        >
           <IoIosSearch className='text-xl text-richblack-100' />
         </button>
         <button className='w-9 h-9 flex items-center justify-center rounded-lg hover:bg-richblack-700 transition-colors'>
@@ -200,6 +205,8 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      <SearchPopup open={searchOpen} onClose={() => setSearchOpen(false)} />
     </nav>
   )
 }

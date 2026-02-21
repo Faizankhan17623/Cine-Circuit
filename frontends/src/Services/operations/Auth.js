@@ -558,9 +558,8 @@ export function createComment(movieId, commentText, token) {
         try {
             console.log("Creating comment with:", { commentText, movieId })
 
-            const response = await apiConnector("POST", Comments, {
-                comment: commentText,
-                movie_id: movieId  // Backend expects movie_id not movieId
+            const response = await apiConnector("POST", `${Comments}?Showid=${movieId}`, {
+                comment: commentText
             }, {
                 Authorization: `Bearer ${token}`
             })
@@ -591,14 +590,7 @@ export function getAllComments(movieId, token) {
         try {
             console.log("Fetching comments for movieId:", movieId)
 
-            if (!token) {
-                return { success: false, data: [] }
-            }
-
-            // API requires authentication - use movie_id as parameter
-            const response = await apiConnector("GET", `${GetAllComment}?movie_id=${movieId}`, null, {
-                Authorization: `Bearer ${token}`
-            })
+            const response = await apiConnector("GET", `${GetAllComment}?Showid=${movieId}`)
             console.log("API Response:", response)
 
             if (response?.data) {
@@ -916,7 +908,7 @@ export function getMostLikedMovies(){
         dispatch(setlaoding(true))
         try {
             const response = await apiConnector("GET",MostLiked)
-            console.log("This is the responsee data",response)
+            // console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
@@ -962,7 +954,7 @@ export function getRecentlyReleasedMovies(){
         dispatch(setlaoding(true))
         try {
             const response = await apiConnector("GET",RecentlyReleased)
-            console.log("This is the responsee data",response)
+            // console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
