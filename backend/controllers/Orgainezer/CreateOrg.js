@@ -1005,7 +1005,6 @@ await USER.findByIdAndUpdate(ID,{orgainezerdata:Uploading._id})
   return res.status(400).json({
     message:"There is an error in uploading the data",
     success:false,
-    error:error.message
   })
 }
 
@@ -1098,7 +1097,6 @@ const {Role , ExperienceLevel} = Finding
       return res.status(500).json({
         message:"There is an error while creating the data",
         success:false,
-        error:error.message
       })
     }
 
@@ -1343,7 +1341,6 @@ exports.DirectorExperience = async (req, res) => {
       return res.status(400).json({
         message: "There is an error while uploading the director experience data",
         success: false,
-        error: error.message || error
       });
     }
 
@@ -1352,7 +1349,6 @@ exports.DirectorExperience = async (req, res) => {
     return res.status(400).json({
       message: "There is something wrong in the DirectorExperienced code",
       success: false,
-      error: error.message || error
     });
   }
 };
@@ -1613,7 +1609,6 @@ exports.ProducerFresher = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Something went wrong in producerfresher",
-      error: error.message,
     });
   }
 };
@@ -1856,7 +1851,6 @@ if (Funding.length === 0) {
     return res.status(400).json({
       message: "There is an something wrong in the ProducerFresher code",
       success: false,
-      error: error.message,
     });
   }
 };
@@ -1954,7 +1948,6 @@ exports.GetMyOrgData = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error fetching organizer data",
-      error: error.message
     });
   }
 };
@@ -2048,7 +2041,6 @@ exports.GetOrganizerOwnData = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error fetching organizer data",
-      error: error.message
     });
   }
 };

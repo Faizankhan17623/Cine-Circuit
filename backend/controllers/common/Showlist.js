@@ -1,4 +1,5 @@
 const CreateShow = require('../../models/CreateShow')
+const Theatre = require('../../models/Theatres')
 
 // THis is the function that is been created on the route of orgainezer on line no 15
 // it is also preseent in the user route 
@@ -122,6 +123,33 @@ exports.VerifiedButnotUploaded = async(req,res)=>{
     }
 }
 
+
+exports.SearchAll = async (req, res) => {
+    try {
+        const { q } = req.query
+        if (!q || q.trim().length < 2) {
+            return res.status(400).json({ success: false, message: "Query must be at least 2 characters" })
+        }
+        const regex = new RegExp(q.trim(), 'i')
+
+        const [movies, theatres] = await Promise.all([
+            CreateShow.find({ title: regex, uploaded: true, VerifiedByTheAdmin: true })
+                .select('_id title image')
+                .limit(6),
+            Theatre.find({ Theatrename: regex, status: 'Approved', Verified: true })
+                .select('_id Theatrename locationname')
+                .limit(6)
+        ])
+
+        return res.status(200).json({
+            success: true,
+            data: { movies, theatres }
+        })
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({ success: false, message: "Internal server error" })
+    }
+}
 
 exports.FindAllExpiredShows = async(req,res)=>{
     try{

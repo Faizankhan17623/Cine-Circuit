@@ -591,7 +591,6 @@ exports.TheatreCreationRequest = async(req,res)=>{
         return res.status(500).json({
             message: "There is an error in the TheatreCreationRequestPassing code",
             success: false,
-            error: error.message
         });
     }
 };
@@ -750,7 +749,7 @@ exports.VerifyTheatrer = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Server error during theatre verification: " + error.message,
+      message: "Server error during theatre verification",
     });
   }
 };
@@ -816,7 +815,7 @@ exports.GetTheatreDetails = async (req, res) => {
         console.error("Error in getting theatre details:", error);
         return res.status(500).json({
             success: false,
-            message: error.message,
+            message: "Internal server error",
         });
     }
 }

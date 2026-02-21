@@ -257,7 +257,7 @@ exports.MakePayment = async(req,res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({
-            message: error.message || "Internal server error",
+            message: "Internal server error",
             success: false
         });
     }
@@ -320,52 +320,38 @@ exports.Verifypayment = async(req,res) => {
                     { new: true, session }
                 );
 
-                // Update tickets
-                const createTicket = await Theatrestickets.findOne({
-                    _id: PaymentVerifier.ticketid
-                }).session(session);
-
-                if (!createTicket) {
-                    throw new Error("Ticket document not found");
-                }
-
-                // Update ticket quantities atomically
+                // Update ticket quantities atomically — single DB op per category
+                // BUG-3 FIX: findOneAndUpdate with $elemMatch + $gte condition is atomic,
+                // so two concurrent payments can never both pass the availability check.
                 for (const category of PaymentVerifier.ticketCategorey) {
-                    const categoryIndex = createTicket.ticketsCategory.findIndex(
-                        cat => cat.category === category.categoryName
-                    );
-                
-                    if (categoryIndex === -1) {
-                        throw new Error(`Category ${category.categoryName} not found`);
-                    }
-                
-                    const currentCategory = createTicket.ticketsCategory[categoryIndex];
                     const requestedTickets = parseInt(category.ticketsPurchased);
-                    const availableTickets = currentCategory.ticketsPurchaseafterRemaining;
-                
-                    // Enhanced validation with detailed error message
-                    if (availableTickets < requestedTickets) {
-                        throw new Error(
-                            `Cannot complete purchase for ${category.categoryName}. ` +
-                            `Requested: ${requestedTickets} tickets, ` +
-                            `Available: ${availableTickets} tickets. ` +
-                            `Please try again with a smaller quantity.`
-                        );
-                    }
-                
-                    currentCategory.ticketsPurchaseafterRemaining -= requestedTickets;
-                
-                    // Additional validation after update
-                    if (currentCategory.ticketsPurchaseafterRemaining < 0) {
-                        throw new Error(
-                            `System error: Negative ticket count for ${category.categoryName}. ` +
-                            `Please contact support.`
-                        );
+
+                    const updated = await Theatrestickets.findOneAndUpdate(
+                        {
+                            _id: PaymentVerifier.ticketid,
+                            ticketsCategory: {
+                                $elemMatch: {
+                                    category: category.categoryName,
+                                    ticketsPurchaseafterRemaining: { $gte: requestedTickets }
+                                }
+                            }
+                        },
+                        {
+                            $inc: { 'ticketsCategory.$.ticketsPurchaseafterRemaining': -requestedTickets }
+                        },
+                        { new: true, session }
+                    );
+
+                    if (!updated) {
+                        throw new Error(`Tickets sold out for ${category.categoryName}. Please try again.`);
                     }
                 }
 
-                createTicket.ticketsPurchased.push(paymentId);
-                await createTicket.save({ session });
+                await Theatrestickets.findOneAndUpdate(
+                    { _id: PaymentVerifier.ticketid },
+                    { $push: { ticketsPurchased: paymentId } },
+                    { session }
+                );
                 // console.log(updatedPayment)
                 // console.log(createTicket)
                 // Update user's payment record
@@ -457,7 +443,7 @@ exports.Verifypayment = async(req,res) => {
         }
 
         return res.status(500).json({
-            message: error.message || "Payment verification failed",
+            message: "Payment verification failed",
             success: false,
             status: "failure"
         });
@@ -529,10 +515,9 @@ exports.MakePdf = async(req,res)=>{
     .send(pdfBuffer);
     }catch(error){
         console.error('PDF generation error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Error generating PDF',
-            error: error.message 
+        res.status(500).json({
+            success: false,
+            message: 'Error generating PDF'
         });
     }
 }

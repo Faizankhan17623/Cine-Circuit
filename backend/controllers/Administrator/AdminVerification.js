@@ -228,7 +228,7 @@ exports.VerifyOrgainezer = async (req, res) => {
     console.error("VerifyOrganizer Error:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Internal server error",
     });
   }
 };

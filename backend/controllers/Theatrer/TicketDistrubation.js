@@ -206,7 +206,6 @@ await TheatreFinding.save();
         return res.status(500).json({
             message: "Internal Server Error",
             success: false,
-            error: error.message
         });
     }
 };

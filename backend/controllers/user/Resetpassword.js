@@ -43,7 +43,6 @@ exports.LinkSend = async(req,res)=>{
               })
     } catch (error) {
         return res.json({
-            error: error.message,
             success: false,
             message: `Some Error in Sending the Reset Message`,
           })
@@ -95,9 +94,8 @@ exports.ResetPassword = async(req,res)=>{
         
     } catch (error) {
         return res.json({
-            error: error.message,
             success: false,
             message: `Some Error in Updating the Password`,
-        })        
+        })
     }
 }

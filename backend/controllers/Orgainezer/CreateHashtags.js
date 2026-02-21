@@ -46,7 +46,7 @@ exports.Createtags = async(req, res) => {
         // Handle mongoose validation errors
         if (error.name === 'ValidationError') {
             return res.status(400).json({
-                message: error.message,
+                message: "Invalid tag data",
                 success: false
             });
         }
@@ -62,7 +62,6 @@ exports.Createtags = async(req, res) => {
         return res.status(500).json({
             message: "Error creating hashtag",
             success: false,
-            error: error.message
         });
     }
 };

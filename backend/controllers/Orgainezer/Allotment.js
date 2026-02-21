@@ -150,7 +150,6 @@ exports.AllotTheatre = async (req, res) => {
         return res.status(500).json({
             message: "An error occurred while allotting tickets to the theatre",
             success: false,
-            error: error.message
         });
     }
 };

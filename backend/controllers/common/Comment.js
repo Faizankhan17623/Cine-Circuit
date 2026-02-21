@@ -108,7 +108,7 @@ exports.getAllComment = async (req,res)=>{
         // Filter out null values
         AllComments = AllComments.filter(c => c !== null)
 
-        console.log("AllComments:", AllComments)
+        // console.log("AllComments:", AllComments)
 
         return res.status(200).json({
             message:"These are all the comments",

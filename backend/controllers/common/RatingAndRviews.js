@@ -70,7 +70,6 @@ exports.createRating = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     })
   }
 }
@@ -109,7 +108,6 @@ exports.getAverageRating = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to retrieve the rating for the course",
-      error: error.message,
     })
   }
 }
@@ -136,7 +134,6 @@ exports.getAllRatingReview = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to retrieve the rating and review for the course",
-      error: error.message,
     })
   }
 }
