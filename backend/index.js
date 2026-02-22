@@ -34,7 +34,7 @@ const Visitor = require('./models/Visitor')
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://mw-mocha.vercel.app/"
+        "https://mw-mocha.vercel.app"
     ],
     credentials: true
 }));

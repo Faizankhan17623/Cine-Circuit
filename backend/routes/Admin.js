@@ -1,5 +1,6 @@
 const express = require('express')
 const route = express.Router()
+const { body, validationResult } = require('express-validator')
 const {auth,IsAdmin,IsOrganizer} = require('../middlewares/verification')
 const {Creategenre,Updategenre,deletegenre,deleteAllgenre,getAllGenres} = require('../controllers/Administrator/CreateGenre')
 const {GetAllTheatres,TheatreCreationRequest,CreateTheatres,VerifyTheatrer,GetTheatreDetails} = require('../controllers/Administrator/CreateTheatres')
@@ -11,11 +12,20 @@ const{CreateLanguage,updateLanguage,deleteLanguage,Getalllanguage,deleteallangua
 const {OrgainesersVerifylength,Theatrelength,GetAllUsersDetailsVerified,GetAllUsersDetailsVerifiedfalse,GetAllOrganizerDetailsVerified,GetAllOrganizerDetailsVerifiedfalse,GetAllTheatrerDetailsVerified,GetAllTheatrerDetailsVerifiedfalse} = require('../controllers/Dashboard/AdminDashboard')
 
 const {notUploadedShows,VerifiedButnotUploaded} = require("../controllers/common/Showlist")
+const {SetMaintenance} = require('../controllers/Administrator/Maintenance')
 
+// Returns first validation error as a 400 response
+const validate = (req, res, next) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, message: errors.array()[0].msg })
+    }
+    next()
+}
 
 // This is the extra route that is been added so that the admin can delete all the comments
 
-// This one will work for all the orgaineser 
+// This one will work for all the orgaineser
 // DONE
 route.put("/Org-Verification",auth,IsAdmin,VerifyOrgainezer)
 route.delete("/delete-Org",auth,IsAdmin,deleteOrgainezer)
@@ -26,11 +36,18 @@ route.get("/Orgainezer-Details",auth,IsAdmin,OrgDetails)
 
 // DONE all the four are rpresetnt in the admin foldeer in the admin verification file
 
-// This is the one that will work to create the genre 
+// This is the one that will work to create the genre
 // DONE
 
-route.post("/Create-Genre",auth,IsAdmin,Creategenre)
-route.put("/Update-Genre",auth,IsAdmin,Updategenre)
+route.post("/Create-Genre", auth, IsAdmin, [
+    body('genrename').trim().notEmpty().withMessage('Genre name is required'),
+], validate, Creategenre)
+
+route.put("/Update-Genre", auth, IsAdmin, [
+    body('newName').trim().notEmpty().withMessage('New genre name is required'),
+    body('id').isMongoId().withMessage('Valid genre ID is required'),
+], validate, Updategenre)
+
 route.delete("/delete-Genre",auth,IsAdmin,deletegenre)
 route.delete("/remove-AllGenre",auth,IsAdmin,deleteAllgenre)
 route.get("/Get-AllGenre",auth,IsAdmin,getAllGenres)
@@ -41,8 +58,16 @@ route.get("/Get-AllGenre",auth,IsAdmin,getAllGenres)
 // This are the route that are going to create all the sub genre
 // DONE
 
-route.post("/Create-SubGenre",auth,IsAdmin,CreateSubgenre)
-route.put("/Update-SubGenre",auth,IsAdmin,UpdateSubGenre)
+route.post("/Create-SubGenre", auth, IsAdmin, [
+    body('id').isMongoId().withMessage('Valid genre ID is required'),
+    body('subgenrename').trim().notEmpty().withMessage('Sub-genre name is required'),
+], validate, CreateSubgenre)
+
+route.put("/Update-SubGenre", auth, IsAdmin, [
+    body('id').isMongoId().withMessage('Valid sub-genre ID is required'),
+    body('newName').trim().notEmpty().withMessage('New sub-genre name is required'),
+], validate, UpdateSubGenre)
+
 route.delete("/delete-SubGenre",auth,IsAdmin,deletesubgenre)
 route.delete("/remove-All-SubGenre",auth,IsAdmin,deleteAllsubGenres)
 route.get("/Get-AllSubGenre",auth,IsAdmin,getAllgenre)
@@ -50,17 +75,17 @@ route.get("/Get-AllSubGenre",auth,IsAdmin,getAllgenre)
 
 
 
-// DONE 
+// DONE
 // This is the route that is going to create the theatres
 route.get("/Theatre-Request",auth,IsAdmin,TheatreCreationRequest)
-// ya wo route hain jo ke saare thatre ka data show karena 
+// ya wo route hain jo ke saare thatre ka data show karena
 // route.get("/Get-AllTheatres",auth,IsAdmin,GetAllTheatres)
 // 3 This is the third step for creating the theatre and the fianl step for creating the theatre
 route.post("/Theatre-FormData",auth,IsAdmin,CreateTheatres)
-// This is the route using which you can forcefully delete a theatre  ... Thinking of it as of now 
+// This is the route using which you can forcefully delete a theatre  ... Thinking of it as of now
 // DONE This are all the routes that are present in the create theatres file in the admin folder
 
-// DOne 
+// DOne
 // This is the route that is gonng to verify the show
 route.put("/Verify-Show",auth,IsAdmin,VerifyShow)
 route.get("/Unverified-Shows",auth,IsAdmin,AllShows)
@@ -74,8 +99,15 @@ route.get("/verified-not-uploaded",auth,IsAdmin,VerifiedButnotUploaded)
 
 // DONE
 // This are going to be the routes that are been going  to be used for creating the languages
-route.post("/Create-Language",auth,IsAdmin,CreateLanguage)
-route.put("/Update-Language",auth,IsAdmin,updateLanguage)
+route.post("/Create-Language", auth, IsAdmin, [
+    body('langname').trim().notEmpty().withMessage('Language name is required'),
+], validate, CreateLanguage)
+
+route.put("/Update-Language", auth, IsAdmin, [
+    body('newname').trim().notEmpty().withMessage('New language name is required'),
+    body('id').isMongoId().withMessage('Valid language ID is required'),
+], validate, updateLanguage)
+
 route.delete("/delete-Language",auth,IsAdmin,deleteLanguage)
 route.get("/All-Languages",auth,IsAdmin,Getalllanguage)
 route.delete("/delete-AllLanguage",auth,IsAdmin,deleteallanguage)
@@ -97,5 +129,10 @@ route.get("/Unverified-Orgainesers",auth,IsAdmin,GetAllOrganizerDetailsVerifiedf
 route.put("/Verify-Theatres",auth,IsAdmin,VerifyTheatrer)
 route.get("/Unverified-Theatres",auth,IsAdmin,GetAllTheatrerDetailsVerifiedfalse)
 // DONE this are all the routes that are present in the admin dashboard file in the dashboard folder
+
+// Maintenance mode
+route.put("/Set-Maintenance", auth, IsAdmin, [
+    body('isActive').isBoolean().withMessage('isActive must be true or false'),
+], validate, SetMaintenance)
 
 module.exports = route

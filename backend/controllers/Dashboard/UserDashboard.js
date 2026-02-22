@@ -624,10 +624,7 @@ exports.RecentlyReleased = async (req,res)=>{
 
 exports.ContentBasedAlgorithm = async(req,res) => {
     try {
-
- const userId = req.USER.id;
-
-//  console.log(userId)
+        const userId = req.USER.id;
 
         const user = await USER.findById(userId)
             .populate("UserBannerliked")
@@ -640,39 +637,47 @@ exports.ContentBasedAlgorithm = async(req,res) => {
             });
         }
 
-        // console.log("User Data:", user);
-
-       const GenreFinding = await Promise.all(
+        // Step 1: Get genres from movies the user has liked
+        const GenreFinding = await Promise.all(
             user.UserBannerliked.map(async (data) => {
                 return await genre.findById(data.genre);
             })
         );
-        // console.log(GenreFinding)
 
-if (GenreFinding.length === 0 || !GenreFinding) {
-    return res.status(400).json({
-        message: "No genre details",
-        success: false
-    });
-}
+        if (GenreFinding.length === 0 || !GenreFinding) {
+            return res.status(400).json({
+                message: "No genre details",
+                success: false
+            });
+        }
 
+        // Step 2: Get unique genre IDs from liked movies
+        const uniqueGenreIds = [
+            ...new Set(
+                GenreFinding
+                    .filter(g => g !== null)
+                    .map(g => g._id.toString())
+            )
+        ];
 
-        // const Genres = []
-        // for(let i=0;i<GenreFinding.length;i++){
-        //     if(GenreFinding.genreName !== GenreFinding.genreName -1  ){
-        //         Genres.push(GenreFinding.genreName)
-        //     }
-        // }
+        // Step 3: Get IDs of movies user already liked — exclude them from results
+        // NOTE: Remove this exclusion filter once the database has more data
+        // so users can rediscover movies they liked. Tracked in today_work.md
+        const alreadyLikedIds = user.UserBannerliked.map(m => m._id.toString());
 
-        
-const uniqueGenres = [
-    ...new Set(GenreFinding.map(g => g.genreName))
-];
+        // Step 4: Fetch movies matching those genres, excluding already liked ones
+        const recommendedMovies = await CreateShow.find({
+            genre: { $in: uniqueGenreIds },
+            _id: { $nin: alreadyLikedIds }
+        })
+        .select('title Posterurl genre SUbGenre likes _id')
+        .sort({ likes: -1 })
+        .limit(10);
 
         return res.status(200).json({
-            message: "This is the user data",
+            message: "Recommended movies based on your taste",
             success: true,
-            data: uniqueGenres
+            data: recommendedMovies
         });
 
     } catch (error) {

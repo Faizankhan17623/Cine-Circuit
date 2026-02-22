@@ -18,12 +18,14 @@ const {UserComments,getAllComment,deleteComment} = require('../controllers/commo
 const {PosterLike,BannerDisliked} = require('../controllers/Orgainezer/CreateTheatreShow')
 const {LinkSend,ResetPassword} = require('../controllers/user/Resetpassword')
 const {AllShows,usingtitle,SearchAll} = require('../controllers/common/Showlist')
+const {GetMaintenance} = require('../controllers/Administrator/Maintenance')
+const {PublicGenres, RecommendMovies} = require('../controllers/common/Recommend')
 const {createRating,getAverageRating,getAllRatingReview} = require("../controllers/common/RatingAndRviews")
 const {TicketPurchased,TicketPurchasedFullDetails} = require("../controllers/Dashboard/UserDashboard")
 const {GetAlluserDetails,FindUserNames,FindLoginEmail,FindNumber,FindCreationEmail} = require('../controllers/user/User')
 const {BannerMovies,FIndusingMOvieTags,FindWholeMoviesData,FindMovieById,PurcahsingData,MostLikedMovies,HighlyRatedMovies,RecentlyReleased,ContentBasedAlgorithm} = require('../controllers/Dashboard/UserDashboard')
 const {GetSingleTheatreDetails,getTheatreDetails, GetShowsDetails} = require('../controllers/Dashboard/TheatrereDashboard')
-// DONE 
+// DONE
 const {TheatreNavbar,MovieNavbar}  = require('../controllers/common/Comment')
 // This is the first route that will be used to create the user and all the things that the user will do releated to his personal info
 route.post("/Create-User", [
@@ -43,10 +45,21 @@ route.post("/Find-creation-Email",FindCreationEmail)
 route.post("/Find-Number",FindNumber)
 route.get("/Personal",auth, ContentBasedAlgorithm)
 
-route.put("/Update-userName",auth,updateUserName)
-route.put("/Update-Password",auth,updatePassword) 
-route.put("/Update-Image",auth,UpdateImage) 
-route.put("/Update-Number",auth,updateNUmber) 
+route.put("/Update-userName", auth, [
+    body('newName').trim().notEmpty().withMessage('New username is required'),
+], validate, updateUserName)
+
+route.put("/Update-Password", auth, [
+    body('oldPassword').notEmpty().withMessage('Current password is required'),
+    body('newPassword').isLength({ min: 8 }).withMessage('New password must be at least 8 characters'),
+], validate, updatePassword)
+
+route.put("/Update-Image",auth,UpdateImage)
+
+route.put("/Update-Number", auth, [
+    body('number').notEmpty().withMessage('Phone number is required'),
+], validate, updateNUmber)
+
 route.get("/Current-UserDetails",auth,CurrentLoginUser)
 
 route.get("/Theatre-data", TheatreNavbar)
@@ -63,9 +76,16 @@ route.post("/Login", [
 
 // This are the route that are going to be used to reseet thee password
 // 1 Before resetting the password you neeed to send the link of the password via the email
-route.post("/Send-Link",LinkSend) 
+route.post("/Send-Link", [
+    body('email').isEmail().withMessage('Valid email is required'),
+], validate, LinkSend)
+
 // 2 The second step is the reset the password once the link is been send
-route.put("/Change-Password",ResetPassword) 
+route.put("/Change-Password", [
+    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+    body('ConfirmPassword').notEmpty().withMessage('Confirm password is required'),
+    body('token').notEmpty().withMessage('Reset token is required'),
+], validate, ResetPassword)
 
 // This is the route that will help us to see all the shows that are going on
 route.get("/Shows",AllShows)
@@ -74,8 +94,8 @@ route.get("/Search", SearchAll)
 route.get("/Specific-Show",auth,IsUSER,usingtitle)
 
 // This are the route that are going to be used to like and dislike the banner
-route.put("/Like-Banner",auth, IsUSER,PosterLike) 
-route.put("/Dislike-Banner",auth, IsUSER,BannerDisliked) 
+route.put("/Like-Banner",auth, IsUSER,PosterLike)
+route.put("/Dislike-Banner",auth, IsUSER,BannerDisliked)
 
 route.get('/Banner',BannerMovies)
 route.post('/Movie-Tags',FIndusingMOvieTags)
@@ -97,8 +117,16 @@ route.post("/Comment-Banner", auth, IsUSER, [
 route.get("/Get-Comment",getAllComment)
 route.delete("/delte-Comment",auth,IsUSER,deleteComment)
 
-route.post("/Send-Message",auth, IsUSER,SendMessage) 
-route.put("/Update-Message",auth, IsUSER,Updatemessage)
+route.post("/Send-Message", auth, IsUSER, [
+    body('to').trim().notEmpty().withMessage('Recipient username is required'),
+    body('message').trim().notEmpty().withMessage('Message text is required'),
+    body('type').isIn(['Chat', 'enquiry', 'Personal']).withMessage('Type must be Chat, enquiry, or Personal'),
+], validate, SendMessage)
+
+route.put("/Update-Message", auth, IsUSER, [
+    body('message').trim().notEmpty().withMessage('Message text is required'),
+], validate, Updatemessage)
+
 route.get("/Get-AllMessages",auth, IsUSER,getAllMessage)
 // This is the route that will be used to create the user dashboard and this is going to be used in the dashboard
 
@@ -120,5 +148,15 @@ route.get('/Highly-Rated',HighlyRatedMovies)
 route.get('/Recently-Released',RecentlyReleased)
 route.get('/Theatre-Shows', GetShowsDetails)
 route.get('/Single-Theatre', GetSingleTheatreDetails)
-module.exports = route      
+
+// Public maintenance status — no auth required
+route.get('/Maintenance-Status', GetMaintenance)
+
+// Movie recommendation — public
+route.get('/Public-Genres', PublicGenres)
+route.post('/Recommend-Movies', [
+    body('genreId').isMongoId().withMessage('Valid genre ID is required'),
+], validate, RecommendMovies)
+
+module.exports = route
 // memphis
