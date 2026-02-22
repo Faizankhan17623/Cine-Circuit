@@ -9,6 +9,7 @@ import orgainezerReducer from '../Slices/orgainezerSlice'
 import paymentReducer from '../Slices/PaymentSlice'
 import tagsReducer from '../Slices/TagsSlice'
 import castReducer from '../Slices/CastSlice'
+import maintenanceReducer from '../Slices/maintenanceSlice'
 
 const rootReduers = combineReducers({
     auth:authReducer,
@@ -20,7 +21,8 @@ const rootReduers = combineReducers({
     orgainezer:orgainezerReducer,
     tags:tagsReducer,
     cast:castReducer,
-    payment:paymentReducer
+    payment:paymentReducer,
+    maintenance:maintenanceReducer
 })
 
 

@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { MovieDetailsFinding } from "../../Services/operations/User"
 import { createRating, getAverageRating, bannerLike, bannerDislike, createComment, getAllComments, deleteComment } from "../../Services/operations/Auth"
 import { PurcahsedTickets } from "../../Services/operations/User"
+import { addFavourite, removeFavourite } from "../../Slices/AddtoFavouritslistSlice"
 import { FaArrowLeft } from "react-icons/fa"
 import {
   FaPlay,
@@ -15,7 +16,9 @@ import {
   FaStar,
   FaRegStar,
   FaThumbsUp,
-  FaThumbsDown
+  FaThumbsDown,
+  FaBookmark,
+  FaRegBookmark
 } from "react-icons/fa"
 import Loader from "../extra/Loading"
 import Navbar from "../Home/Navbar"
@@ -44,6 +47,8 @@ const Movie = () => {
 
   const { token, isLoggedIn } = useSelector((state) => state.auth)
   const { user } = useSelector((state) => state.profile)
+  const wishlist = useSelector((state) => state.addtofavourite.Add)
+  const isWishlisted = wishlist?.some((item) => item._id === id)
   const navigate = useNavigate()
   
 const previousTag = location.state?.tag
@@ -184,9 +189,34 @@ const previousTag = location.state?.tag
 
   if (loading || !movie) {
     return (
-        <div className="flex-1 flex justify-center items-center">
-          <Loader />
+      <div className="min-h-screen bg-richblack-900 text-white flex flex-col">
+        <Navbar />
+        {/* Hero skeleton */}
+        <div className="pt-20">
+          <div className="relative w-full h-[520px] bg-richblack-700 animate-pulse" />
+          <div className="max-w-6xl mx-auto px-6 py-14 space-y-10">
+            {/* Genre pills skeleton */}
+            <div className="flex gap-3">
+              <div className="h-8 w-24 bg-richblack-700 rounded-full animate-pulse" />
+              <div className="h-8 w-20 bg-richblack-700 rounded-full animate-pulse" />
+            </div>
+            {/* Languages skeleton */}
+            <div className="flex gap-3">
+              <div className="h-8 w-16 bg-richblack-700 rounded-full animate-pulse" />
+              <div className="h-8 w-20 bg-richblack-700 rounded-full animate-pulse" />
+            </div>
+            {/* Cast skeleton */}
+            <div className="grid grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-richblack-800 p-5 rounded-2xl text-center animate-pulse">
+                  <div className="w-24 h-24 mx-auto rounded-full bg-richblack-600 mb-4" />
+                  <div className="h-4 bg-richblack-600 rounded w-3/4 mx-auto" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+      </div>
     )
   }
 
@@ -278,6 +308,30 @@ const previousTag = location.state?.tag
                   <FaThumbsDown className="text-red-400" />
                   <span className="text-sm font-semibold">{dislikeCount}</span>
                 </button>
+
+                {/* Wishlist Bookmark */}
+                {isLoggedIn && user?.usertype === "Viewer" && (
+                  <button
+                    onClick={() => {
+                      if (isWishlisted) {
+                        dispatch(removeFavourite({ _id: id }))
+                      } else {
+                        dispatch(addFavourite({ _id: id, title: movie.title, Posterurl: movie.Posterurl, genre: movie.genre }))
+                      }
+                    }}
+                    className={`flex items-center gap-2 px-4 py-3 backdrop-blur-md border rounded-xl text-white transition-all ${
+                      isWishlisted
+                        ? "bg-yellow-400/20 border-yellow-400/50 hover:bg-yellow-400/10"
+                        : "bg-white/10 border-white/20 hover:bg-yellow-400/20 hover:border-yellow-400/40"
+                    }`}
+                    title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+                  >
+                    {isWishlisted
+                      ? <FaBookmark className="text-yellow-400" />
+                      : <FaRegBookmark className="text-yellow-300" />
+                    }
+                  </button>
+                )}
               </div>
             </div>
           </div>

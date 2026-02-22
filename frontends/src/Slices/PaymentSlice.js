@@ -21,4 +21,4 @@ const PaymentSlice = createSlice({
 
 
 export const {setUser,setLoading} = PaymentSlice.actions
-export default  PaymentSlice.reducers
+export default  PaymentSlice.reducer

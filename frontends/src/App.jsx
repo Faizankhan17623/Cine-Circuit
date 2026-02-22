@@ -59,6 +59,10 @@ import ReviewPopup from './Components/Movies/ReviewPopup'
 import MovieCategory from './Components/Home/MovieCategory'
 import { MdDesktopMac } from 'react-icons/md'
 import AIAgent from './Components/extra/AIAgent'
+import MaintenanceBanner from './Components/extra/MaintenanceBanner'
+import MaintenancePopup from './Components/extra/MaintenancePopup'
+import MaintenanceMode from './Components/Dashboard/MaintenanceMode'
+import { fetchMaintenanceStatus } from './Services/operations/Maintenance'
 
 const MobileBlocker = () => (
   <div className="fixed inset-0 z-[9999] bg-richblack-900 flex flex-col items-center justify-center px-8 text-center">
@@ -115,6 +119,10 @@ useEffect(() => {
   return () => window.removeEventListener('resize', check)
 }, [])
 
+useEffect(() => {
+  dispatch(fetchMaintenanceStatus())
+}, [])
+
 
  if (user === null) {
     const storedUser = localStorage.getItem("userType");
@@ -128,6 +136,8 @@ useEffect(() => {
   return (
     <div className={`bg-richblack-800 min-h-screen`}>
       {isMobile && <MobileBlocker />}
+      <MaintenanceBanner />
+      <MaintenancePopup />
       <ReviewPopup />
       <AIAgent />
 
@@ -229,6 +239,7 @@ useEffect(() => {
       <Route path="/Dashboard/VerifyTheatre" element={<VerifyTheatrer/>} />
       <Route path="/Dashboard/users" element={<Users/>} />
       <Route path="/Dashboard/Chats" element={<Chat/>} />
+      <Route path="/Dashboard/Maintenance" element={<MaintenanceMode/>} />
     </>
   )}
 

@@ -94,3 +94,7 @@ export const DeleteComment={
 export const TheatreVerification = {
     Verify_Theatres:BASE_URL+"/Verify-Theatres"
 }
+
+export const MaintenanceApi = {
+    SetMaintenance: BASE_URL + "/Set-Maintenance"
+}

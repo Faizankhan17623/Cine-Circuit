@@ -113,15 +113,44 @@
     </div>
   );
 
+  // Skeleton card — shown while section data is loading
+  const SkeletonCard = () => (
+    <div className="w-full h-[280px] sm:h-[300px] rounded-xl overflow-hidden bg-richblack-700 animate-pulse">
+      <div className="w-full h-full bg-gradient-to-br from-richblack-700 to-richblack-600" />
+    </div>
+  )
+
+  const SkeletonSection = ({ iconColor }) => (
+    <div className="w-full max-w-[92%] mx-auto py-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 bg-gradient-to-br ${iconColor} rounded-xl opacity-30 animate-pulse`} />
+          <div>
+            <div className="h-6 w-48 bg-richblack-600 rounded-lg animate-pulse mb-2" />
+            <div className="h-0.5 w-12 bg-richblack-600 rounded-full animate-pulse" />
+          </div>
+        </div>
+        <div className="h-4 w-16 bg-richblack-700 rounded animate-pulse" />
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    </div>
+  )
+
   const Listing = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const [mostLikedData, setMostLikedData] = useState([])
     const [highlyRatedData, setHighlyRatedData] = useState([])
     const [recentlyReleasedData, setRecentlyReleasedData] = useState([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
       const fetchData = async () => {
+        setLoading(true)
         const mostLiked = await dispatch(getMostLikedMovies())
         if (mostLiked?.success) {
           setMostLikedData(mostLiked.data)
@@ -147,6 +176,7 @@
         if (recentlyReleased?.success) {
           setRecentlyReleasedData(recentlyReleased.data)
         }
+        setLoading(false)
       }
       fetchData()
     }, [dispatch])
@@ -192,21 +222,29 @@
            onClick={() => navigate("/SignUp")}
         />
 
-        {sectionConfig.map((section, index) => (
-          section.data.length > 0 && (
-            <MovieSection
-              key={index}
-              title={section.title}
-              highlight={section.highlight}
-              icon={section.icon}
-              iconColor={section.iconColor}
-              badgeColor={section.badgeColor}
-              data={section.data}
-              onCardClick={(movie) => navigate(`/Movie/${movie._id}`)}
-              onViewAllClick={() => navigate(`/${section.route}`)}
-            />
-          )
-        ))}
+        {loading ? (
+          <>
+            <SkeletonSection iconColor="from-yellow-400 to-amber-500" />
+            <SkeletonSection iconColor="from-pink-400 to-rose-500" />
+            <SkeletonSection iconColor="from-orange-400 to-red-500" />
+          </>
+        ) : (
+          sectionConfig.map((section, index) => (
+            section.data.length > 0 && (
+              <MovieSection
+                key={index}
+                title={section.title}
+                highlight={section.highlight}
+                icon={section.icon}
+                iconColor={section.iconColor}
+                badgeColor={section.badgeColor}
+                data={section.data}
+                onCardClick={(movie) => navigate(`/Movie/${movie._id}`)}
+                onViewAllClick={() => navigate(`/${section.route}`)}
+              />
+            )
+          ))
+        )}
 
         <JoinCard
           title="Register your Theatre with Us"

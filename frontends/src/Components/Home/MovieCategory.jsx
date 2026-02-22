@@ -299,8 +299,23 @@ const MovieCategory = ({ type: propType }) => {
       {/* Content */}
       <div className="max-w-[1440px] mx-auto px-4 py-8 -mt-4">
         {loading ? (
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex bg-richblack-800 rounded-2xl border border-richblack-700 overflow-hidden animate-pulse">
+                <div className="w-48 h-48 bg-richblack-600 flex-shrink-0" />
+                <div className="flex-1 p-5 flex flex-col gap-3">
+                  <div className="h-6 bg-richblack-600 rounded-lg w-3/4" />
+                  <div className="h-4 bg-richblack-700 rounded w-1/2" />
+                  <div className="flex gap-2 mt-1">
+                    <div className="h-7 w-20 bg-richblack-700 rounded-lg" />
+                    <div className="h-7 w-24 bg-richblack-700 rounded-lg" />
+                    <div className="h-7 w-16 bg-richblack-700 rounded-lg" />
+                  </div>
+                  <div className="h-4 bg-richblack-700 rounded w-full mt-2" />
+                  <div className="h-4 bg-richblack-700 rounded w-5/6" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : movies.length === 0 ? (
           <div className="text-center py-20 bg-richblack-800 rounded-2xl border border-richblack-700">

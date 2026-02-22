@@ -95,3 +95,12 @@ export const NavbarData = {
 export const SearchApi = {
     search: BASE_URL + "/Search"
 }
+
+export const MaintenanceStatus = {
+    status: BASE_URL + "/Maintenance-Status"
+}
+
+export const Recommendation = {
+    PublicGenres: BASE_URL + "/Public-Genres",
+    RecommendMovies: BASE_URL + "/Recommend-Movies"
+}

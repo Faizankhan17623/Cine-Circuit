@@ -4,6 +4,20 @@
 
 export const agentTasks = [
   {
+    id: "recommend",
+    category: "Movie Recommendations",
+    icon: "🎬",
+    roles: ["all"],
+    tasks: [
+      {
+        id: "rec-1",
+        query: "Recommend me a movie 🎬",
+        type: "recommendation",
+        answer: "",
+      },
+    ],
+  },
+  {
     id: "onboarding",
     category: "Getting Started",
     icon: "🚀",
