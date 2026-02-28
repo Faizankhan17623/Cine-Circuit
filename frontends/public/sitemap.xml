@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Cine Circuit Sitemap
-  REPLACE ALL "YOUR_VERCEL_URL" below with your actual Vercel URL
-  Example: https://mw-mocha.vercel.app
+  Cine Circuit — Static Sitemap
+  Covers all known static routes.
+  Dynamic movie pages are served by the backend sitemap:
+  https://mw-9z0s.onrender.com/sitemap.xml
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Home Page — highest priority -->
+  <!-- Home Page -->
   <url>
     <loc>https://mw-mocha.vercel.app</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <lastmod>2026-02-24</lastmod>
   </url>
 
   <!-- Movie Listing Pages -->
@@ -18,18 +20,21 @@
     <loc>https://mw-mocha.vercel.app/top-rated</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <lastmod>2026-02-24</lastmod>
   </url>
 
   <url>
     <loc>https://mw-mocha.vercel.app/most-liked</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <lastmod>2026-02-24</lastmod>
   </url>
 
   <url>
     <loc>https://mw-mocha.vercel.app/recently-released</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <lastmod>2026-02-24</lastmod>
   </url>
 
   <!-- Static Pages -->
@@ -37,12 +42,14 @@
     <loc>https://mw-mocha.vercel.app/About</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <lastmod>2026-02-24</lastmod>
   </url>
 
   <url>
     <loc>https://mw-mocha.vercel.app/Contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+    <lastmod>2026-02-24</lastmod>
   </url>
 
   <!-- Auth Pages -->

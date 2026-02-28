@@ -98,3 +98,8 @@ export const TheatreVerification = {
 export const MaintenanceApi = {
     SetMaintenance: BASE_URL + "/Set-Maintenance"
 }
+
+export const BugReportAdminApi = {
+    GetAllBugReports: BASE_URL + "/Bug-Reports",
+    UpdateBugStatus: BASE_URL + "/Update-Bug-Status"
+}

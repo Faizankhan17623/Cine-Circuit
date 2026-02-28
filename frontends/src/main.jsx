@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { configureStore } from '@reduxjs/toolkit'
 import rootReduers from './reducer/index.js'
 import { Provider } from 'react-redux'
+import { HelmetProvider } from 'react-helmet-async'
 
 
 const store = configureStore({
@@ -15,11 +16,12 @@ const store = configureStore({
 
 
 createRoot(document.getElementById('root')).render(
-    <Provider store={store}>
-      <BrowserRouter>
-        <App/>
-        <Toaster position="top-right" reverseOrder={true}/>
-      </BrowserRouter>
-    </Provider>
-
+    <HelmetProvider>
+      <Provider store={store}>
+        <BrowserRouter>
+          <App/>
+          <Toaster position="top-right" reverseOrder={true}/>
+        </BrowserRouter>
+      </Provider>
+    </HelmetProvider>
 )

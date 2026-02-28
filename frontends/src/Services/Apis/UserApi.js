@@ -104,3 +104,12 @@ export const Recommendation = {
     PublicGenres: BASE_URL + "/Public-Genres",
     RecommendMovies: BASE_URL + "/Recommend-Movies"
 }
+
+export const BugReportApi = {
+    ReportBug: BASE_URL + "/Report-Bug",
+    MyBugReports: BASE_URL + "/My-Bug-Reports"
+}
+
+export const FeedbackApi = {
+    SubmitFeedback: BASE_URL + "/Submit-Feedback"
+}

@@ -1,68 +1,78 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import Navbar from './Components/Home/Navbar'
 import toast from 'react-hot-toast';
 import Slider from './Components/Home/Slider'
 import Finder from './Components/Home/Finder'
 import Listing from './Components/Home/Listing';
 import {  Routes, Route, Navigate} from "react-router-dom";
-import About from './Components/Home/AboutUs'
-import Contact from './Components/Home/contact'
-import Join from './Components/UserCreation/Join'
-import OPT from './Components/UserCreation/OTP'
-import Login from './Components/Login/join'
-import Forgot from './Components/Login/Forgot'
-import Reset from './Components/Login/Reset'
 import OpenRoute from './Hooks/OpenRoute'
 import PrivateRoute from './Hooks/PrivateRoute';
-import Dasboard from './Components/Dashboard/Connector'
-import Movies from './Components/Movies/Heading'
-import Movie from './Components/Movies/Movie'
-import Theatres from './Components/Theatres/Heading'
-import AllotedShows from './Components/Theatres/AllotedShows'
-import TheatreFullDetails from './Components/Theatres/TheatreFullDetails'
-import Purchase from './Components/Movies/Purchase'
-import Profile from './Components/Dashboard/Profile'
 import { useDispatch, useSelector } from 'react-redux'
 import {ACCOUNT_TYPE} from './utils/constants'
-import Purchased from './Components/Dashboard/PurchasedTickets'
-import Wishlist from './Components/Dashboard/Wishlist'
-import History from './Components/Dashboard/PurchasedHistory'
-import Tickets from './Components/Dashboard/Tickets'
-import Settings from './Components/Dashboard/Settings'
-import Right from './Components/Dashboard/RightSide'
-import UserManage from './Components/Dashboard/UserManagement'
-import Site from './Components/Dashboard/SiteSettings'
-import Genre from './Components/Dashboard/Genres'
-import Language from './Components/Dashboard/Language'
-import Users from './Components/Dashboard/Users'
-import Error from './Components/extra/Extra'
-import OrganizerVerificationForm from './Components/Dashboard/OrganizerVerificationForm'
-import Tags from './Components/Dashboard/Tags'
-import Cast from './Components/Dashboard/Cast'
-import ShowsManager from './Components/Dashboard/ShowsManager'
-import UploadShow from './Components/Dashboard/UploadShow'
-import AllShows from './Components/Dashboard/AllShows'
-import  VerifyShow from './Components/Dashboard/VerifyShows'
-import CookieConsent, { Cookies } from "react-cookie-consent";
-import  VerifyTheatrer from './Components/Dashboard/VerifyTheatrer'
-import CreateTicket from './Components/Dashboard/Tickets/CreateTicketes'
-import TicketAllotment from './Components/Dashboard/Tickets/TicketAllotment'
-import AllTickets from './Components/Dashboard/Tickets/GetAllTicket'
-import Chat from './Components/Dashboard/Chating/Chat'
-import TheatreDetailsDash from './Components/Dashboard/TheatreDetails'
-import TotalSales from './Components/Dashboard/TotalSales'
-import AllotedShowsDash from './Components/Dashboard/AllotedShows'
-import TheatreAllTickets from './Components/Dashboard/TheatreAllTickets'
-import DistributeTickets from './Components/Dashboard/DistributeTickets'
-import UpdateTicketTime from './Components/Dashboard/UpdateTicketTime'
-import ReviewPopup from './Components/Movies/ReviewPopup'
-import MovieCategory from './Components/Home/MovieCategory'
+import CookieConsent from "react-cookie-consent";
 import { MdDesktopMac } from 'react-icons/md'
 import AIAgent from './Components/extra/AIAgent'
 import MaintenanceBanner from './Components/extra/MaintenanceBanner'
 import MaintenancePopup from './Components/extra/MaintenancePopup'
-import MaintenanceMode from './Components/Dashboard/MaintenanceMode'
 import { fetchMaintenanceStatus } from './Services/operations/Maintenance'
+import ReviewPopup from './Components/Movies/ReviewPopup'
+import Error from './Components/extra/Extra'
+import { Helmet } from 'react-helmet-async'
+
+// Lazy-loaded route components — split into separate chunks for faster initial load
+const About = lazy(() => import('./Components/Home/AboutUs'))
+const Contact = lazy(() => import('./Components/Home/contact'))
+const Join = lazy(() => import('./Components/UserCreation/Join'))
+const OPT = lazy(() => import('./Components/UserCreation/OTP'))
+const Login = lazy(() => import('./Components/Login/join'))
+const Forgot = lazy(() => import('./Components/Login/Forgot'))
+const Reset = lazy(() => import('./Components/Login/Reset'))
+const Dasboard = lazy(() => import('./Components/Dashboard/Connector'))
+const Movies = lazy(() => import('./Components/Movies/Heading'))
+const Movie = lazy(() => import('./Components/Movies/Movie'))
+const Theatres = lazy(() => import('./Components/Theatres/Heading'))
+const AllotedShows = lazy(() => import('./Components/Theatres/AllotedShows'))
+const TheatreFullDetails = lazy(() => import('./Components/Theatres/TheatreFullDetails'))
+const Purchase = lazy(() => import('./Components/Movies/Purchase'))
+const Profile = lazy(() => import('./Components/Dashboard/Profile'))
+const Purchased = lazy(() => import('./Components/Dashboard/PurchasedTickets'))
+const Wishlist = lazy(() => import('./Components/Dashboard/Wishlist'))
+const History = lazy(() => import('./Components/Dashboard/PurchasedHistory'))
+const Tickets = lazy(() => import('./Components/Dashboard/Tickets'))
+const Settings = lazy(() => import('./Components/Dashboard/Settings'))
+const Right = lazy(() => import('./Components/Dashboard/RightSide'))
+const UserManage = lazy(() => import('./Components/Dashboard/UserManagement'))
+const Site = lazy(() => import('./Components/Dashboard/SiteSettings'))
+const Genre = lazy(() => import('./Components/Dashboard/Genres'))
+const Language = lazy(() => import('./Components/Dashboard/Language'))
+const Users = lazy(() => import('./Components/Dashboard/Users'))
+const OrganizerVerificationForm = lazy(() => import('./Components/Dashboard/OrganizerVerificationForm'))
+const Tags = lazy(() => import('./Components/Dashboard/Tags'))
+const Cast = lazy(() => import('./Components/Dashboard/Cast'))
+const ShowsManager = lazy(() => import('./Components/Dashboard/ShowsManager'))
+const UploadShow = lazy(() => import('./Components/Dashboard/UploadShow'))
+const AllShows = lazy(() => import('./Components/Dashboard/AllShows'))
+const VerifyShow = lazy(() => import('./Components/Dashboard/VerifyShows'))
+const VerifyTheatrer = lazy(() => import('./Components/Dashboard/VerifyTheatrer'))
+const CreateTicket = lazy(() => import('./Components/Dashboard/Tickets/CreateTicketes'))
+const TicketAllotment = lazy(() => import('./Components/Dashboard/Tickets/TicketAllotment'))
+const AllTickets = lazy(() => import('./Components/Dashboard/Tickets/GetAllTicket'))
+const Chat = lazy(() => import('./Components/Dashboard/Chating/Chat'))
+const TheatreDetailsDash = lazy(() => import('./Components/Dashboard/TheatreDetails'))
+const TotalSales = lazy(() => import('./Components/Dashboard/TotalSales'))
+const AllotedShowsDash = lazy(() => import('./Components/Dashboard/AllotedShows'))
+const TheatreAllTickets = lazy(() => import('./Components/Dashboard/TheatreAllTickets'))
+const DistributeTickets = lazy(() => import('./Components/Dashboard/DistributeTickets'))
+const UpdateTicketTime = lazy(() => import('./Components/Dashboard/UpdateTicketTime'))
+const MovieCategory = lazy(() => import('./Components/Home/MovieCategory'))
+const MaintenanceMode = lazy(() => import('./Components/Dashboard/MaintenanceMode'))
+const BugReports = lazy(() => import('./Components/Dashboard/BugReports'))
+
+const PageLoader = () => (
+  <div className="min-h-screen bg-richblack-900 flex items-center justify-center">
+    <div className="w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+  </div>
+)
 
 const MobileBlocker = () => (
   <div className="fixed inset-0 z-[9999] bg-richblack-900 flex flex-col items-center justify-center px-8 text-center">
@@ -141,14 +151,55 @@ useEffect(() => {
       <ReviewPopup />
       <AIAgent />
 
+      <Suspense fallback={<PageLoader />}>
       <Routes>
 
         <Route path='/' element={<Homelayout  Notify={notify}/>}/>
-        <Route path='/top-rated' element={<MovieCategory type="top-rated" />} />
-        <Route path='/most-liked' element={<MovieCategory type="most-liked" />} />
-        <Route path='/recently-released' element={<MovieCategory type="recently-released" />} />
-        <Route path='/About' element={<About/>}/>
-        <Route path='/Contact' element={<Contact/>}/>
+        <Route path='/top-rated' element={
+          <>
+            <Helmet>
+              <title>Top Rated Movies — Cine Circuit</title>
+              <meta name="description" content="Browse the highest-rated movies on Cine Circuit. Critics and audiences agree — these are the best films showing now." />
+            </Helmet>
+            <MovieCategory type="top-rated" />
+          </>
+        } />
+        <Route path='/most-liked' element={
+          <>
+            <Helmet>
+              <title>Most Liked Movies — Cine Circuit</title>
+              <meta name="description" content="Discover the most liked movies by Cine Circuit audiences. Book tickets for the films everyone is talking about." />
+            </Helmet>
+            <MovieCategory type="most-liked" />
+          </>
+        } />
+        <Route path='/recently-released' element={
+          <>
+            <Helmet>
+              <title>Recently Released Movies — Cine Circuit</title>
+              <meta name="description" content="Watch the latest movies just released in theatres. Book your tickets for brand new releases on Cine Circuit." />
+            </Helmet>
+            <MovieCategory type="recently-released" />
+          </>
+        } />
+        <Route path='/About' element={
+          <>
+            <Helmet>
+              <title>About Cine Circuit — Our Story</title>
+              <meta name="description" content="Learn about Cine Circuit — the platform built to bring movies and audiences together. Our mission, team, and values." />
+            </Helmet>
+            <About/>
+          </>
+        }/>
+        <Route path='/Contact' element={
+          <>
+            <Helmet>
+              <title>Contact Us — Cine Circuit</title>
+              <meta name="description" content="Get in touch with the Cine Circuit team. We're here to help with bookings, partnerships, and feedback." />
+            </Helmet>
+            <Contact/>
+          </>
+        }/>
         <Route path='/SignUp' element={<Join/> }/>
         <Route path='/Login' element={ <Login/>}/>
         <Route path='/OTP' element={<OPT/>}/>
@@ -240,6 +291,7 @@ useEffect(() => {
       <Route path="/Dashboard/users" element={<Users/>} />
       <Route path="/Dashboard/Chats" element={<Chat/>} />
       <Route path="/Dashboard/Maintenance" element={<MaintenanceMode/>} />
+      <Route path="/Dashboard/Bug-Reports" element={<BugReports/>} />
     </>
   )}
 
@@ -248,6 +300,7 @@ useEffect(() => {
 
 <Route path='*' element={<Error/>}/>
     </Routes>
+    </Suspense>
     </div>
   )
 }

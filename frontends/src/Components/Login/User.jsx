@@ -114,6 +114,7 @@ const onsubmit = async (data) => {
         </label>
         <input
           type="email"
+          id='Email'
           {...register("Email", { required: "Email is required" })}
           onChange={(e) => setusername(e.target.value)}
           className={`w-full px-4 py-2.5 bg-richblack-700 border rounded-lg text-white text-sm placeholder:text-richblack-300 outline-none transition-all duration-200 focus:ring-2 focus:ring-yellow-200/50 focus:border-yellow-200/50 ${errors.Email ? "border-red-500" : "border-richblack-600"}`}
@@ -131,6 +132,7 @@ const onsubmit = async (data) => {
         <div className="relative">
           <input
             type={showPass ? "text" : "password"}
+            id='Password'
             {...register("Password", {
               required: "Password is required",
               minLength: { value: 2, message: "At least 2 characters" },
@@ -142,6 +144,7 @@ const onsubmit = async (data) => {
           />
           <button
             type="button"
+            id='submit-btn'
             className="absolute right-3 top-1/2 -translate-y-1/2 text-xl text-richblack-300 hover:text-white transition-colors"
             tabIndex={-1}
             onClick={() => setShowPass(s => !s)}

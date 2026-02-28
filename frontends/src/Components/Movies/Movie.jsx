@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { Helmet } from "react-helmet-async"
 import toast from "react-hot-toast"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
@@ -220,8 +221,39 @@ const previousTag = location.state?.tag
     )
   }
 
+  const siteUrl = "https://mw-mocha.vercel.app"
+  const movieSchema = {
+    "@context": "https://schema.org",
+    "@type": "Movie",
+    "name": movie.title,
+    "description": movie.tagline || `Watch ${movie.title} on Cine Circuit`,
+    "image": movie.Posterurl,
+    "genre": movie.genre?.genreName,
+    "datePublished": movie.releasedate,
+    "duration": movie.movieDuration ? `PT${movie.movieDuration}M` : undefined,
+    "director": movie.directorname?.map(d => ({ "@type": "Person", "name": d })),
+    "actor": movie.castName?.map(c => ({ "@type": "Person", "name": c.name })),
+    "url": `${siteUrl}/Movie/${movie._id}`,
+  }
+
   return (
     <div className="min-h-screen bg-richblack-900 text-white flex flex-col">
+      <Helmet>
+        <title>{movie.title} — Book Tickets | Cine Circuit</title>
+        <meta name="description" content={`${movie.title} (${movie.releasedate}) — ${movie.genre?.genreName}. ${movie.movieDuration} mins. ${movie.tagline || ""}. Book tickets on Cine Circuit.`} />
+        <meta name="keywords" content={`${movie.title}, ${movie.genre?.genreName}, book tickets, ${movie.hashtags?.map(h => h.name).join(", ")}, cine circuit`} />
+        <link rel="canonical" href={`${siteUrl}/Movie/${movie._id}`} />
+        <meta property="og:type" content="video.movie" />
+        <meta property="og:title" content={`${movie.title} | Cine Circuit`} />
+        <meta property="og:description" content={movie.tagline || `Watch ${movie.title} on Cine Circuit. Book tickets online.`} />
+        <meta property="og:image" content={movie.Posterurl} />
+        <meta property="og:url" content={`${siteUrl}/Movie/${movie._id}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${movie.title} | Cine Circuit`} />
+        <meta name="twitter:description" content={movie.tagline || `Watch ${movie.title} on Cine Circuit.`} />
+        <meta name="twitter:image" content={movie.Posterurl} />
+        <script type="application/ld+json">{JSON.stringify(movieSchema)}</script>
+      </Helmet>
       <Navbar />
 <div className=" pt-2 ">
   <button

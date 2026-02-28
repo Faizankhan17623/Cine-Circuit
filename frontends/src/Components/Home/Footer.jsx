@@ -1,7 +1,11 @@
+import { useState } from 'react'
 import InputBox from '../extra/InputBox'
 import { FaGooglePlay, FaAppStore, FaLinkedin, FaInstagram, FaTwitter, FaGithub, FaRegCopyright, FaHeart, FaFilm } from "react-icons/fa"
+import BugReportModal from '../extra/BugReportModal'
 
 const Footer = () => {
+  const [bugOpen, setBugOpen] = useState(false)
+
   return (
     <div className='w-full'>
       <InputBox />
@@ -59,7 +63,7 @@ const Footer = () => {
                 <a href="/" className='text-richblack-300 text-sm hover:text-yellow-400 transition-colors'>Become a Theatre Partner</a>
                 <a href="/" className='text-richblack-300 text-sm hover:text-yellow-400 transition-colors'>Complaints</a>
                 <a href="/" className='text-richblack-300 text-sm hover:text-yellow-400 transition-colors'>Careers</a>
-                <a href="mailto:Faizankhan901152@gmail.com" className='text-richblack-300 text-sm hover:text-yellow-400 transition-colors'>Report a Bug</a>
+                <button onClick={() => setBugOpen(true)} className='text-richblack-300 text-sm hover:text-yellow-400 transition-colors text-left'>Report a Bug</button>
               </div>
             </div>
 
@@ -107,6 +111,8 @@ const Footer = () => {
           </div>
         </div>
       </footer>
+
+      <BugReportModal open={bugOpen} onClose={() => setBugOpen(false)} />
     </div>
   )
 }
