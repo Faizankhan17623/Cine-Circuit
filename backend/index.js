@@ -94,6 +94,10 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 
 // app.use(formData.parse()) // DISABLED: express-form-data (multiparty) conflicts with express-fileupload. Using both can end the stream unexpectedly. Use express-fileupload for handling file uploads globally or apply middleware per-route if needed.
 
+// Dynamic sitemap — includes all verified movies for Google indexing
+const { GenerateSitemap } = require('./controllers/common/Sitemap')
+app.get('/sitemap.xml', GenerateSitemap)
+
 app.use('/',(req,res)=>{
     res.status(200).json({
         message:`This is the default route for the backend`,

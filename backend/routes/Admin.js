@@ -13,6 +13,7 @@ const {OrgainesersVerifylength,Theatrelength,GetAllUsersDetailsVerified,GetAllUs
 
 const {notUploadedShows,VerifiedButnotUploaded} = require("../controllers/common/Showlist")
 const {SetMaintenance} = require('../controllers/Administrator/Maintenance')
+const {GetAllBugReports, UpdateBugStatus} = require('../controllers/Administrator/BugReportAdmin')
 
 // Returns first validation error as a 400 response
 const validate = (req, res, next) => {
@@ -134,5 +135,12 @@ route.get("/Unverified-Theatres",auth,IsAdmin,GetAllTheatrerDetailsVerifiedfalse
 route.put("/Set-Maintenance", auth, IsAdmin, [
     body('isActive').isBoolean().withMessage('isActive must be true or false'),
 ], validate, SetMaintenance)
+
+// Bug Reports — admin only
+route.get("/Bug-Reports", auth, IsAdmin, GetAllBugReports)
+route.put("/Update-Bug-Status", auth, IsAdmin, [
+    body('bugReportId').isMongoId().withMessage('Valid bug report ID is required'),
+    body('status').isIn(['open', 'in-progress', 'resolved']).withMessage('Status must be open, in-progress, or resolved'),
+], validate, UpdateBugStatus)
 
 module.exports = route

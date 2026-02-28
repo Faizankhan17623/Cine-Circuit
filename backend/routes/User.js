@@ -20,6 +20,8 @@ const {LinkSend,ResetPassword} = require('../controllers/user/Resetpassword')
 const {AllShows,usingtitle,SearchAll} = require('../controllers/common/Showlist')
 const {GetMaintenance} = require('../controllers/Administrator/Maintenance')
 const {PublicGenres, RecommendMovies} = require('../controllers/common/Recommend')
+const {ReportBug, GetMyBugReports} = require('../controllers/common/BugReport')
+const {SubmitFeedback} = require('../controllers/common/Feedback')
 const {createRating,getAverageRating,getAllRatingReview} = require("../controllers/common/RatingAndRviews")
 const {TicketPurchased,TicketPurchasedFullDetails} = require("../controllers/Dashboard/UserDashboard")
 const {GetAlluserDetails,FindUserNames,FindLoginEmail,FindNumber,FindCreationEmail} = require('../controllers/user/User')
@@ -157,6 +159,23 @@ route.get('/Public-Genres', PublicGenres)
 route.post('/Recommend-Movies', [
     body('genreId').isMongoId().withMessage('Valid genre ID is required'),
 ], validate, RecommendMovies)
+
+// Bug Reports — any logged-in user can report or view their own
+route.post('/Report-Bug', auth, [
+    body('title').trim().notEmpty().withMessage('Bug title is required'),
+    body('description').trim().notEmpty().withMessage('Bug description is required'),
+], validate, ReportBug)
+
+route.get('/My-Bug-Reports', auth, GetMyBugReports)
+
+// Feedback form — public, no auth required
+route.post('/Submit-Feedback', [
+    body('firstName').trim().notEmpty().withMessage('First name is required'),
+    body('lastName').trim().notEmpty().withMessage('Last name is required'),
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('number').notEmpty().withMessage('Phone number is required'),
+    body('message').trim().notEmpty().withMessage('Message is required'),
+], validate, SubmitFeedback)
 
 module.exports = route
 // memphis
