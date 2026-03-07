@@ -221,7 +221,7 @@ const previousTag = location.state?.tag
     )
   }
 
-  const siteUrl = "https://mw-mocha.vercel.app"
+  const siteUrl = "https://mw-bay.vercel.app"
   const movieSchema = {
     "@context": "https://schema.org",
     "@type": "Movie",
