@@ -609,7 +609,7 @@ const ticketTemplate = (data) => {
 
                             <!-- Download Button -->
                             <div class="download-section">
-                                <a href="http://localhost:4000/api/v1/Payment/download/${data._id}" class="download-btn">
+                                <a href="https://cine-circuit-backend.onrender.com/api/v1/Payment/download/${data._id}" class="download-btn">
                                     &#11015; &nbsp; Download Tickets
                                 </a>
                                 <p class="download-hint">
