@@ -7,7 +7,7 @@ import 'swiper/css/navigation'
 import 'swiper/css/free-mode'
 import 'swiper/css/pagination'
 import { FreeMode, Pagination, Mousewheel, Autoplay, Keyboard, Navigation } from 'swiper/modules'
-import { FaStar, FaFire, FaHeart, FaPlay, FaChevronRight, FaArrowLeft, FaClock, FaCalendarAlt, FaThumbsUp, FaFilm } from 'react-icons/fa'
+import { FaStar, FaFire, FaHeart, FaPlay, FaChevronRight, FaArrowLeft, FaClock, FaCalendarAlt, FaThumbsUp, FaFilm, FaChevronLeft } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { getMostLikedMovies, getHighlyRatedMovies, getRecentlyReleasedMovies } from '../../Services/operations/Auth'
 import Navbar from './Navbar'
@@ -174,41 +174,39 @@ const MovieCategory = ({ type: propType }) => {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'slider'
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
 
   const config = categoryConfig[type]
+
+  // Reset to page 1 when category changes
+  useEffect(() => {
+    setPage(1)
+  }, [type])
 
   useEffect(() => {
     const fetchMovies = async () => {
       setLoading(true)
       let response
       if (type === 'top-rated') {
-        response = await dispatch(getHighlyRatedMovies())
+        response = await dispatch(getHighlyRatedMovies(page))
       } else if (type === 'most-liked') {
-        response = await dispatch(getMostLikedMovies())
+        response = await dispatch(getMostLikedMovies(page))
       } else if (type === 'recently-released') {
-        response = await dispatch(getRecentlyReleasedMovies())
+        response = await dispatch(getRecentlyReleasedMovies(page))
       }
       if (response?.success) {
-        let data = response.data
-        if (type === 'top-rated') {
-          data = [...data].sort((a, b) => {
-            const aRating = a.averageRating || 0
-            const bRating = b.averageRating || 0
-            const aReviews = a.reviewCount || 0
-            const bReviews = b.reviewCount || 0
-            if (aReviews === 0 && bReviews === 0) return (b.BannerLiked || 0) - (a.BannerLiked || 0)
-            if (aReviews === 0) return 1
-            if (bReviews === 0) return -1
-            if (bRating !== aRating) return bRating - aRating
-            return bReviews - aReviews
-          })
+        setMovies(response.data)
+        if (response.pagination) {
+          setTotalPages(response.pagination.totalPages || 1)
+          setTotalCount(response.pagination.totalCount || response.data.length)
         }
-        setMovies(data)
       }
       setLoading(false)
     }
     fetchMovies()
-  }, [type, dispatch])
+  }, [type, dispatch, page])
 
   if (!config) {
     return (
@@ -260,10 +258,10 @@ const MovieCategory = ({ type: propType }) => {
 
             {/* View Toggle & Stats */}
             <div className="flex items-center gap-4">
-              {movies.length > 0 && (
+              {totalCount > 0 && (
                 <div className="bg-richblack-800 px-4 py-2 rounded-xl border border-richblack-700">
                   <span className="text-richblack-400 text-sm">Total:</span>
-                  <span className="text-white font-bold ml-2">{movies.length}</span>
+                  <span className="text-white font-bold ml-2">{totalCount}</span>
                   <span className="text-richblack-400 text-sm ml-1">movies</span>
                 </div>
               )}
@@ -332,21 +330,58 @@ const MovieCategory = ({ type: propType }) => {
           </div>
         ) : viewMode === 'grid' ? (
           /* Grid View */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-            {movies.map((movie, index) => (
-              <div
-                key={movie._id}
-                className="animate-fadeIn"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <DetailedMovieCard
-                  movie={movie}
-                  badgeColor={config.badgeColor}
-                  onClick={() => navigate(`/Movie/${movie._id}`)}
-                />
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+              {movies.map((movie, index) => (
+                <div
+                  key={movie._id}
+                  className="animate-fadeIn"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <DetailedMovieCard
+                    movie={movie}
+                    badgeColor={config.badgeColor}
+                    onClick={() => navigate(`/Movie/${movie._id}`)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-10">
+                <button
+                  onClick={() => { setPage(p => p - 1); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                  disabled={page === 1}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-richblack-800 border border-richblack-700 text-white disabled:opacity-40 hover:border-yellow-400 transition-colors text-sm"
+                >
+                  <FaChevronLeft className="text-xs" /> Prev
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                  <button
+                    key={p}
+                    onClick={() => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                    className={`w-10 h-10 rounded-xl font-medium transition-all text-sm ${
+                      p === page
+                        ? `bg-gradient-to-r ${config.iconColor} text-white shadow-lg`
+                        : 'bg-richblack-800 border border-richblack-700 text-richblack-300 hover:text-white hover:border-yellow-400'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => { setPage(p => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                  disabled={page === totalPages}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-richblack-800 border border-richblack-700 text-white disabled:opacity-40 hover:border-yellow-400 transition-colors text-sm"
+                >
+                  Next <FaChevronRight className="text-xs" />
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         ) : (
           /* Slider View */
           <Swiper

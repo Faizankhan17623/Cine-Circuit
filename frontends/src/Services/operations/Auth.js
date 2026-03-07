@@ -902,18 +902,18 @@ export function getAllRatingReview(){
     }
 }
 
-export function getMostLikedMovies(){
+export function getMostLikedMovies(page = 1){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setlaoding(true))
         try {
-            const response = await apiConnector("GET",MostLiked)
+            const response = await apiConnector("GET",MostLiked,null,{},{ page, limit: 12 })
             // console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
-            return { success: true, data: response.data.data }
+            return { success: true, data: response.data.data, pagination: response.data.pagination }
         } catch (error) {
             console.log("Error in getting the most liked movies",error)
             console.log("Error in getting the most liked movies")
@@ -925,18 +925,18 @@ export function getMostLikedMovies(){
     }
 }
 
-export function getHighlyRatedMovies(){
+export function getHighlyRatedMovies(page = 1){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setlaoding(true))
         try {
-            const response = await apiConnector("GET",HighlyRated)
+            const response = await apiConnector("GET",HighlyRated,null,{},{ page, limit: 12 })
             // console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
-            return { success: true, data: response.data.data }
+            return { success: true, data: response.data.data, pagination: response.data.pagination }
         } catch (error) {
             console.log("Error in getting the highly rated movies",error)
             console.log("Error in getting the highly rated movies")
@@ -948,18 +948,18 @@ export function getHighlyRatedMovies(){
     }
 }
 
-export function getRecentlyReleasedMovies(){
+export function getRecentlyReleasedMovies(page = 1){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setlaoding(true))
         try {
-            const response = await apiConnector("GET",RecentlyReleased)
+            const response = await apiConnector("GET",RecentlyReleased,null,{},{ page, limit: 12 })
             // console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
-            return { success: true, data: response.data.data }
+            return { success: true, data: response.data.data, pagination: response.data.pagination }
         } catch (error) {
             console.log("Error in getting the recently released movies",error)
             console.log("Error in getting the recently released movies")
