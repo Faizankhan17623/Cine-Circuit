@@ -195,6 +195,24 @@ exports.MakePayment = async(req,res) => {
             }
         }
 
+        // Fresh re-check right before Razorpay order creation
+        // Reduces the race window: if another user just bought the last ticket,
+        // this catches it before we create an order and charge this user
+        const freshTicketDoc = await Theatrestickets.findOne({ _id: Ticketid });
+        if (!freshTicketDoc) {
+            return res.status(404).json({ message: "Ticket not found", success: false });
+        }
+        for (const [i, categoryId] of Categories.entries()) {
+            const freshCat = freshTicketDoc.ticketsCategory.find(t => t._id.toString() === categoryId);
+            const requested = parseInt(totalTickets[i]);
+            if (!freshCat || freshCat.ticketsPurchaseafterRemaining < requested) {
+                return res.status(409).json({
+                    message: `Not enough tickets available${freshCat ? ` for ${freshCat.category}` : ''}. Please try again.`,
+                    success: false
+                });
+            }
+        }
+
         // Calculate total amount
         let totalAmount = results.reduce((sum, category, index) => {
             return sum + (category.price * parseInt(totalTickets[index] || 0));
