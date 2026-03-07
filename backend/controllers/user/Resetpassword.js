@@ -28,7 +28,7 @@ exports.LinkSend = async(req,res)=>{
             },{new:true})
             // console.log("This is the updated details",updateDetails)
 
-            const url = `http://localhost:5173/Reset-Password/${token}`
+            const url = `https://mw-bay.vercel.app/Reset-Password/${token}`
             
             await mailSenders(email,
                 'Reset Your Password - Cine Circuit',
