@@ -1,6 +1,6 @@
 const CreateShow = require('../../models/CreateShow')
 
-const SITE_URL = 'https://mw-mocha.vercel.app'
+const SITE_URL = 'https://mw-bay.vercel.app'
 
 const staticUrls = [
   { loc: SITE_URL,                             changefreq: 'daily',   priority: '1.0' },

@@ -560,7 +560,7 @@ const theatreRejectedTemplate = (theatreName, ownerName, rejectionReason) => {
 
                         <!-- CTA -->
                         <div class="cta-section">
-                            <a href="http://localhost:5173/dashboard" class="cta-btn">
+                            <a href="https://mw-bay.vercel.app/dashboard" class="cta-btn">
                                 &#9998; &nbsp; Edit My Theatre
                             </a>
                         </div>

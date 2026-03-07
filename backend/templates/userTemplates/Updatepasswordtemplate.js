@@ -406,7 +406,7 @@ const updatePasswordTemplate = (email, token) => {
 									<p class="button-label">
 										Click the button below to reset your password and regain access to your account.
 									</p>
-									<a href="http://localhost:5173/Reset-Password/${token}" class="reset-btn">
+									<a href="https://mw-bay.vercel.app/${token}" class="reset-btn">
 										&#128274; &nbsp; Reset Password
 									</a>
 									<p class="button-expire">
@@ -419,7 +419,7 @@ const updatePasswordTemplate = (email, token) => {
 							<div class="link-section">
 								<div class="link-box">
 									<p class="link-label">Button not working? Copy this link</p>
-									<p class="link-url">http://localhost:5173/Reset-Password/${token}</p>
+									<p class="link-url">https://mw-bay.vercel.app/${token}</p>
 								</div>
 							</div>
 

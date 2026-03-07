@@ -34,7 +34,7 @@ Login via \`POST /api/v1/createAccount/Login\` to receive the cookie automatical
         description: 'Local Development Server',
       },
       {
-        url: 'https://mw-mocha.vercel.app',
+        url: 'https://mw-bay.vercel.app',
         description: 'Production Server',
       },
     ],

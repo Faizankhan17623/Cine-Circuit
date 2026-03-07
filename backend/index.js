@@ -34,7 +34,11 @@ const Visitor = require('./models/Visitor')
 app.use(cors({
     origin: [
         "http://localhost:5173",
+<<<<<<< HEAD
         "https://mw-bay.vercel.app"
+=======
+        "https://mw-bay.vercel.app" 
+>>>>>>> 3b61d03 (backend change done)
     ],
     credentials: true
 }));

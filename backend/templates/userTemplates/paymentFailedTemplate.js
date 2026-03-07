@@ -560,7 +560,7 @@ const paymentFailedTemplate = (userName, amount, failureReason) => {
 
                         <!-- CTA -->
                         <div class="cta-section">
-                            <a href="http://localhost:5173/dashboard" class="cta-btn">
+                            <a href="https://mw-bay.vercel.app/dashboard" class="cta-btn">
                                 &#128259; &nbsp; Try Again
                             </a>
                         </div>
