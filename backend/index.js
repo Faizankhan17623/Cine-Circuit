@@ -2,6 +2,7 @@ require('dotenv').config()
 const mongoose = require('mongoose')
 const express = require('express')
 const cors = require('cors')
+const helmet = require('helmet')
 const cookieParser  = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 const colors = require('colors')
@@ -17,6 +18,7 @@ require('./Background_Process/Tickets/Tickets')
 require('./Background_Process/ReturnnsoldTickets')
 
 const app = express()
+app.use(helmet())
 // Taking extra precautions if the first two are blocked then in this case we will use the third one if the user has blocked first two
 const port = process.env.DEFAULT_PORT_NUMBER || process.env.SECOND_NUMBER || 4003
 const DatabaseConnection  = require('./config/database')
@@ -34,11 +36,7 @@ const Visitor = require('./models/Visitor')
 app.use(cors({
     origin: [
         "http://localhost:5173",
-<<<<<<< HEAD
         "https://mw-bay.vercel.app"
-=======
-        "https://mw-bay.vercel.app" 
->>>>>>> 3b61d03 (backend change done)
     ],
     credentials: true
 }));

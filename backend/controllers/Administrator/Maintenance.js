@@ -2,6 +2,7 @@ const MaintenanceModel = require('../../models/Maintenance')
 const User = require('../../models/user')
 const mailSenders = require('../../utils/mailsender')
 const maintenanceTemplate = require('../../templates/userTemplates/maintenanceTemplate')
+const logAudit = require('../../utils/logAudit')
 
 // GET /Maintenance-Status — public, no auth needed
 const GetMaintenance = async (req, res) => {
@@ -56,6 +57,14 @@ const SetMaintenance = async (req, res) => {
             )
             await Promise.all(emailPromises)
         }
+
+        await logAudit(req, {
+            action: 'TOGGLE',
+            resource: 'Maintenance',
+            resourceId: record._id,
+            before: { isActive: !isActive },
+            after:  { isActive: record.isActive, message: record.message, endTime: record.endTime },
+        })
 
         return res.status(200).json({
             success: true,

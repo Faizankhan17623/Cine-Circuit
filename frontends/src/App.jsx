@@ -67,6 +67,7 @@ const UpdateTicketTime = lazy(() => import('./Components/Dashboard/UpdateTicketT
 const MovieCategory = lazy(() => import('./Components/Home/MovieCategory'))
 const MaintenanceMode = lazy(() => import('./Components/Dashboard/MaintenanceMode'))
 const BugReports = lazy(() => import('./Components/Dashboard/BugReports'))
+const AuditLogs = lazy(() => import('./Components/Dashboard/AuditLogs'))
 
 const PageLoader = () => (
   <div className="min-h-screen bg-richblack-900 flex items-center justify-center">
@@ -118,9 +119,19 @@ const App = () => {
 
 // const user = localStorage.getItem('userType')
 const {user} = useSelector((state)=>state.profile)
+const { theme } = useSelector((state) => state.theme)
 const dispatch = useDispatch()
 
 const [isMobile, setIsMobile] = useState(false)
+
+useEffect(() => {
+  const root = document.documentElement
+  if (theme === 'dim') {
+    root.classList.add('dim')
+  } else {
+    root.classList.remove('dim')
+  }
+}, [theme])
 
 useEffect(() => {
   const check = () => setIsMobile(window.innerWidth < 768)
@@ -292,6 +303,7 @@ useEffect(() => {
       <Route path="/Dashboard/Chats" element={<Chat/>} />
       <Route path="/Dashboard/Maintenance" element={<MaintenanceMode/>} />
       <Route path="/Dashboard/Bug-Reports" element={<BugReports/>} />
+      <Route path="/Dashboard/Audit-Logs" element={<AuditLogs/>} />
     </>
   )}
 

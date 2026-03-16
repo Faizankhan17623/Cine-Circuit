@@ -39,7 +39,6 @@ exports.LinkSend = async(req,res)=>{
                 success: true,
                 message:
                   "Email Sent Successfully, Please Check Your Email to Continue Further",
-                  token:token,
               })
     } catch (error) {
         return res.json({
@@ -77,7 +76,7 @@ exports.ResetPassword = async(req,res)=>{
         }
 
         const encryptinPassword = await bcrypt.hash(password,10)
-        const PasswordChanging = await USER.findOneAndUpdate({token:token},{password:encryptinPassword,confirmpass:encryptinPassword,resetPasswordExpires:null},{new:true})
+        const PasswordChanging = await USER.findOneAndUpdate({token:token},{password:encryptinPassword,confirmpass:encryptinPassword,resetPasswordExpires:null,token:null},{new:true})
 
         // Send password change confirmation email
         await mailSenders(

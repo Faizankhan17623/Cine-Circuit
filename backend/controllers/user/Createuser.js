@@ -98,11 +98,13 @@ if (!otpCreation || otpCreation.length === 0) {
             await Creation.save()
             nameChnages.join()
             USER.id = Creation._id
-            // console.log("This is the user that is been created",Creation)
+            const safeUser = Creation.toObject()
+            delete safeUser.password
+            delete safeUser.confirmpass
             return res.status(200).json({
                 message:"The data is been created please log in",
                 success:true,
-                data:Creation
+                data:safeUser
             })
         } catch (error) {
             console.log(error)
@@ -161,7 +163,6 @@ exports.CreateOtp = async(req,res)=>{
         return res.status(200).json({
             message:`The otp is been send on the email address ${email}`,
             success:true,
-            data:generate
         })
 
     } catch (error) {
@@ -474,14 +475,13 @@ exports.CurrentLoginUser = async(req,res)=>{
                 success:false
             })
         }
-        const Finding = await USER.findOne({_id:userId})
+        const Finding = await USER.findOne({_id:userId}).select('-password -confirmpass -token -resetPasswordExpires')
         if(!Finding){
             return res.status(404).json({
                 message:"The user is not been found",
                 success:false
             })
         }
-        console.log(Finding)
 
         return res.status(200).json({
             message:"okay",

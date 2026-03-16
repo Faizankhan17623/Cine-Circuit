@@ -103,3 +103,8 @@ export const BugReportAdminApi = {
     GetAllBugReports: BASE_URL + "/Bug-Reports",
     UpdateBugStatus: BASE_URL + "/Update-Bug-Status"
 }
+
+export const AuditLogApi = {
+    GetAuditLogs:      BASE_URL + "/Audit-Logs",
+    ExportAuditLogCSV: BASE_URL + "/Export-Audit-Log",
+}

@@ -10,6 +10,7 @@ import paymentReducer from '../Slices/PaymentSlice'
 import tagsReducer from '../Slices/TagsSlice'
 import castReducer from '../Slices/CastSlice'
 import maintenanceReducer from '../Slices/maintenanceSlice'
+import themeReducer from '../Slices/themeSlice'
 
 const rootReduers = combineReducers({
     auth:authReducer,
@@ -22,7 +23,8 @@ const rootReduers = combineReducers({
     tags:tagsReducer,
     cast:castReducer,
     payment:paymentReducer,
-    maintenance:maintenanceReducer
+    maintenance:maintenanceReducer,
+    theme:themeReducer
 })
 
 

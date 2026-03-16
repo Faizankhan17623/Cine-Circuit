@@ -21,7 +21,7 @@ const BugReportModal = ({ open, onClose }) => {
     const imageRef = useRef()
     const videoRef = useRef()
 
-    if (!token || !user || !open) return null
+    if (!open) return null
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files)
@@ -108,7 +108,21 @@ const BugReportModal = ({ open, onClose }) => {
 
                         {/* Body */}
                         <div className="px-6 py-5 max-h-[75vh] overflow-y-auto">
-                            {submitted ? (
+                            {(!token || !user) ? (
+                                <div className="text-center py-8">
+                                    <div className="w-16 h-16 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <MdBugReport className="text-red-500 text-3xl" />
+                                    </div>
+                                    <h3 className="text-white font-bold text-lg mb-2">Login Required</h3>
+                                    <p className="text-[#999] text-sm mb-5">You need to be logged in to report a bug.</p>
+                                    <button
+                                        onClick={handleClose}
+                                        className="px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-semibold transition-colors"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            ) : submitted ? (
                                 /* Success State */
                                 <div className="text-center py-6">
                                     <div className="w-16 h-16 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center mx-auto mb-4">

@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 import { FaChevronDown, FaRobot } from "react-icons/fa"
 import { MdOutlineShoppingCart } from "react-icons/md"
 import { IoIosSearch, IoMdMenu, IoMdClose } from "react-icons/io"
+import { BsMoonStarsFill, BsSunFill } from "react-icons/bs"
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from "react-router-dom"
 import { UserLogout, getNavbarMovieData, getNavbarTheatreData } from '../../Services/operations/Auth'
 import { toast } from 'react-hot-toast'
 import SearchPopup from '../extra/SearchPopup'
+import { toggleTheme } from '../../Slices/themeSlice'
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
@@ -26,6 +28,7 @@ const Navbar = () => {
   const navigate = useNavigate()
 
   const { isLoggedIn, image } = useSelector((state) => state.auth)
+  const { theme } = useSelector((state) => state.theme)
 
   const [path, setPath] = useState('/')
   const [menuOpen, setMenuOpen] = useState(false)
@@ -139,6 +142,18 @@ const Navbar = () => {
 
       {/* Right Side Actions */}
       <div className='flex items-center gap-3'>
+        {/* Theme Toggle */}
+        <button
+          onClick={() => dispatch(toggleTheme())}
+          title={theme === 'dark' ? 'Switch to Dim mode' : 'Switch to Dark mode'}
+          className='w-9 h-9 flex items-center justify-center rounded-lg hover:bg-richblack-700 transition-colors'
+        >
+          {theme === 'dark'
+            ? <BsMoonStarsFill className='text-base text-richblack-100' />
+            : <BsSunFill className='text-base text-yellow-50' />
+          }
+        </button>
+
         <button
           onClick={() => setSearchOpen(true)}
           className='w-9 h-9 flex items-center justify-center rounded-lg hover:bg-richblack-700 transition-colors'

@@ -111,7 +111,6 @@ exports.FindNumber = async (req,res)=>{
         return res.status(409).json({
             success:true,
             message:"Number is already taken",
-            data:user
         })
     }catch(error){
         console.log(error)
@@ -144,7 +143,6 @@ exports.FindCreationEmail = async (req,res)=>{
             success:true,
             exists: true,
             message: "Account found",
-            data:user
         })
     }catch(error){
         console.log(error)

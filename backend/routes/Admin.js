@@ -14,6 +14,7 @@ const {OrgainesersVerifylength,Theatrelength,GetAllUsersDetailsVerified,GetAllUs
 const {notUploadedShows,VerifiedButnotUploaded} = require("../controllers/common/Showlist")
 const {SetMaintenance} = require('../controllers/Administrator/Maintenance')
 const {GetAllBugReports, UpdateBugStatus} = require('../controllers/Administrator/BugReportAdmin')
+const {GetAuditLogs, ExportAuditLogCSV} = require('../controllers/Administrator/AuditLog')
 
 // Returns first validation error as a 400 response
 const validate = (req, res, next) => {
@@ -142,5 +143,9 @@ route.put("/Update-Bug-Status", auth, IsAdmin, [
     body('bugReportId').isMongoId().withMessage('Valid bug report ID is required'),
     body('status').isIn(['open', 'in-progress', 'resolved']).withMessage('Status must be open, in-progress, or resolved'),
 ], validate, UpdateBugStatus)
+
+// Audit Logs — admin only
+route.get("/Audit-Logs", auth, IsAdmin, GetAuditLogs)
+route.get("/Export-Audit-Log", auth, IsAdmin, ExportAuditLogCSV)
 
 module.exports = route

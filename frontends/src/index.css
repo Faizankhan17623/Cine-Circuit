@@ -137,6 +137,23 @@
 
 
 
+/* ─── Dim theme — lifts pitch-black to charcoal/slate, like Twitter Dim ──── */
+:root.dim {
+  --color-richblack-900: #2C333F;
+  --color-richblack-800: #374152;
+  --color-richblack-700: #424854;
+  --color-richblack-600: #585D69;
+  --color-richblack-500: #6E727F;
+}
+
+:root.dim * {
+  scrollbar-color: #585D69 #2C333F;
+}
+
+:root.dim *::-webkit-scrollbar-track {
+  background: #2C333F;
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: #424854 #0a0e17;

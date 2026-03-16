@@ -145,6 +145,18 @@ exports.deleteComment = async (req,res)=>{
             })
         }
 
+        // Ownership check — only the comment author or an admin can delete
+        const commentToDelete = await Comment.findById(commentId)
+        if(!commentToDelete){
+            return res.status(404).json({ message:"Comment not found", success:false })
+        }
+        const requestingUser = await USER.findById(req.USER.id).select('usertype')
+        const isOwner = String(commentToDelete.userId) === String(req.USER.id)
+        const isAdmin = requestingUser?.usertype === 'Administrator'
+        if(!isOwner && !isAdmin){
+            return res.status(403).json({ message:"You can only delete your own comments", success:false })
+        }
+
         const Deletion = await Comment.findByIdAndDelete(commentId)
 
         // Also remove from CreateShow's Comment array

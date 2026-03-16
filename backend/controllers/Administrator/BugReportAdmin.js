@@ -2,6 +2,7 @@ const BugReport = require('../../models/BugReport')
 const USER = require('../../models/user')
 const mailSenders = require('../../utils/mailsender')
 const bugResolvedTemplate = require('../../templates/userTemplates/bugResolvedTemplate')
+const logAudit = require('../../utils/logAudit')
 
 // GET /Bug-Reports — admin only
 const GetAllBugReports = async (req, res) => {
@@ -82,6 +83,14 @@ const UpdateBugStatus = async (req, res) => {
                 console.log('Bug resolved email failed:', emailErr.message)
             }
         }
+
+        await logAudit(req, {
+            action: 'UPDATE',
+            resource: 'BugReport',
+            resourceId: bugReportId,
+            before: { status: bugReport.status, adminNote: bugReport.adminNote },
+            after:  { status, adminNote: updateData.adminNote ?? bugReport.adminNote },
+        })
 
         return res.status(200).json({
             success: true,

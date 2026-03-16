@@ -74,10 +74,13 @@ exports.CreateTheatrere = async(req,res)=>{
         // await Theatrestickets.updateOne({_id:userId},{Owner:Creation._id})
         console.log(Theatres.Owner)
         USER.id = Creation._id
+        const safeCreation = Creation.toObject()
+        delete safeCreation.password
+        delete safeCreation.confirmpass
         return res.status(200).json({
             message:"The Theatrer is been created",
             success:true,
-            data:Creation
+            data:safeCreation
         })
     }catch(error){
         console.log(error)
