@@ -397,60 +397,46 @@ exports.UpdateTime = async (req, res) => {
 
 
 
-exports.UpcomigTickets = async (req, res) => {
+exports.UpcomigTickets = async () => {
     try {
         console.log("Running the ticket Released Job");
         const currentDate = new Date();
-        // console.log("This is the current date",currentDate)
         const formattedCurrentDate = date.format(currentDate, "DD/MM/YYYY");
-        // console.log("This is the date format log",formattedCurrentDate)
         const allTickets = await Theatrestickets.find();
-        console.log(allTickets)
-        if (!allTickets) {
-            return res.status(400).json({
-                message: "There are no Tickets present",
-                success: false
-            });
+
+        if (!allTickets || allTickets.length === 0) {
+            console.log("There are no Tickets present");
+            return
         }
 
-        // Filter only tickets that should be released today
-            const ticketsToUpdate = allTickets.filter(ticket => {
-                // console.log("This is the ticket",ticket)
-                let ticketDate;
-                if (typeof ticket.Date === "string") {
-                    ticketDate = ticket.Date.trim(); // If stored as string in "DD/MM/YYYY"
-                } else {
-                    ticketDate = new Date(ticket.Date).toISOString().split("T")[0]; // If stored as ISO Date
-                }
-            
-                // console.log("Formatted Ticket Date:", ticketDate);
-                // console.log("Formatted Current Date:", formattedCurrentDate);
-            
-                return ticketDate === formattedCurrentDate; //
-            });
-            // console.log("This is the tickets to update array",ticketsToUpdate)
+        // Filter only tickets whose date matches today
+        const ticketsToUpdate = allTickets.filter(ticket => {
+            let ticketDate;
+            if (typeof ticket.Date === "string") {
+                ticketDate = ticket.Date.trim()
+            } else {
+                ticketDate = date.format(new Date(ticket.Date), "DD/MM/YYYY")
+            }
+            return ticketDate === formattedCurrentDate
+        });
 
         if (ticketsToUpdate.length > 0) {
             const updatedTickets = await Theatrestickets.updateMany(
-                { _id: { $in: ticketsToUpdate.map(t => t._id) } }, 
+                { _id: { $in: ticketsToUpdate.map(t => t._id) } },
                 { $set: { Status: "Released" } }
             );
-
             console.log("Updated tickets:", updatedTickets);
         } else {
             console.log("No tickets matched today's release date.");
         }
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            message: "There is an error in the update time code",
-            success: false,
-        });
+        console.error("Error in UpcomigTickets cron:", error);
+        throw error
     }
 }
 
-exports.ExpireTickets = async (req, res) => {
+exports.ExpireTickets = async () => {
     try {
 
         const  Yesterday = new Date()
@@ -504,55 +490,44 @@ exports.ExpireTickets = async (req, res) => {
     }
 };
 
-exports.ReturnRemainingTickets = async (req, res) => {
+exports.ReturnRemainingTickets = async () => {
     try {
         const AllTickets = await Theatrestickets.find();
-
         const expiredTickets = AllTickets.filter(data => data.Status === "Expired");
 
-        // console.log('This are all the tickets',AllTickets)
-        // console.log("This is the expired tickets",expiredTickets)
-
-        if (!expiredTickets) {  // Fix: Check if array is empty instead of `!expiredTickets`
-            res.status(400).json({
-                message: "There are no expired tickets available",
-                success: false
-            });
+        if (expiredTickets.length === 0) {
+            console.log("There are no expired tickets available");
+            return
         }
-        
+
         const now = new Date(Date.now())
         const pattern = date.compile('ddd, DD/MM/YYYY HH:mm:ss');
         let ps = date.format(now, pattern);
+
         for (const ticket of expiredTickets) {
             let remainingTickets = 0;
-            console.log("This is the ticket",ticket)
 
-            // Calculate total remaining tickets for this specific ticket
             for (const category of ticket.ticketsCategory) {
                 remainingTickets += category.ticketsPurchaseafterRemaining;
             }
 
-            // Update this specific ticket's document
             const updatedTicket = await Theatrestickets.findByIdAndUpdate(
-                ticket._id, // Use ticket's unique ID to update only that ticket
+                ticket._id,
                 {
                     $set: {
                         unsoldTickets: [{
                             date: ticket.Date,
                             totalTickets: remainingTickets,
-                            time:ps
+                            time: ps
                         }]
                     }
                 },
                 { new: true }
             );
-            console.log("This is the updated ticket",updatedTicket)
-            if(!updatedTicket){
-                return res.status(400).json({
-                    message: "There are no tickets available to return",
-                    success: false
-                });
-                // console.log("there are no tickets availabe to retunr")
+
+            if (!updatedTicket) {
+                console.log(`Ticket ${ticket._id} not found during unsold update`)
+                continue
             }
             console.log(`Updated Ticket ${ticket._id}:`, updatedTicket);
         }
@@ -560,5 +535,6 @@ exports.ReturnRemainingTickets = async (req, res) => {
         console.log("All expired tickets updated successfully.");
     } catch (error) {
         console.error("Error in ReturnRemainingTickets:", error.message);
+        throw error
     }
 };
