@@ -22,6 +22,7 @@ const {GetMaintenance} = require('../controllers/Administrator/Maintenance')
 const {PublicGenres, RecommendMovies} = require('../controllers/common/Recommend')
 const {ReportBug, GetMyBugReports} = require('../controllers/common/BugReport')
 const {SubmitFeedback} = require('../controllers/common/Feedback')
+const {AddToWatchlist, RemoveFromWatchlist, GetMyWatchlist} = require('../controllers/user/Watchlist')
 const {createRating,getAverageRating,getAllRatingReview} = require("../controllers/common/RatingAndRviews")
 const {TicketPurchased,TicketPurchasedFullDetails} = require("../controllers/Dashboard/UserDashboard")
 const {GetAlluserDetails,FindUserNames,FindLoginEmail,FindNumber,FindCreationEmail} = require('../controllers/user/User')
@@ -167,6 +168,17 @@ route.post('/Report-Bug', auth, [
 ], validate, ReportBug)
 
 route.get('/My-Bug-Reports', auth, GetMyBugReports)
+
+// Watchlist — Viewer only
+route.post('/Add-To-Watchlist', auth, IsUSER, [
+    body('movieId').isMongoId().withMessage('Valid movie ID is required'),
+], validate, AddToWatchlist)
+
+route.delete('/Remove-From-Watchlist', auth, IsUSER, [
+    body('movieId').isMongoId().withMessage('Valid movie ID is required'),
+], validate, RemoveFromWatchlist)
+
+route.get('/My-Watchlist', auth, IsUSER, GetMyWatchlist)
 
 // Feedback form — public, no auth required
 route.post('/Submit-Feedback', [
