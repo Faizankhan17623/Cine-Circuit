@@ -113,3 +113,9 @@ export const BugReportApi = {
 export const FeedbackApi = {
     SubmitFeedback: BASE_URL + "/Submit-Feedback"
 }
+
+export const WatchlistApi = {
+    AddToWatchlist: BASE_URL + "/Add-To-Watchlist",
+    RemoveFromWatchlist: BASE_URL + "/Remove-From-Watchlist",
+    MyWatchlist: BASE_URL + "/My-Watchlist",
+}
