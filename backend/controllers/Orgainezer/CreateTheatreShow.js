@@ -612,24 +612,28 @@ exports.updateUpcomingToReleased = async () => {
     try {
         const currentDate = new Date(Date.now());
         currentDate.setHours(0, 0, 0, 0);
-        // console.log('Printing the current date',currentDate)
-        const upcomingMovies = await CreateShow.updateMany(
-            { 
-                movieStatus: "Upcoming", 
-                releasedate: { $lte: currentDate } 
-            },
-            { 
-                $set: { 
-                    movieStatus: "Released", 
-                    lastUpdated: new Date() 
-                } 
-            }
-        );
 
-        console.log(`🎬 Updated ${upcomingMovies.modifiedCount} movies from Upcoming to Released`);
-        return {
-            success: true
-        };
+        // releasedate is stored as a formatted string e.g. "Mon, 05 May 2025"
+        // MongoDB can't compare a string field with a Date using $lte, so we
+        // fetch all Upcoming movies and filter in JS using date-and-time parser
+        const upcomingMovies = await CreateShow.find({ movieStatus: "Upcoming" })
+
+        const toUpdate = upcomingMovies.filter(movie => {
+            const parsed = date.parse(movie.releasedate, 'ddd, DD MMM YYYY')
+            if (!parsed || isNaN(parsed.getTime())) return false
+            parsed.setHours(0, 0, 0, 0)
+            return parsed <= currentDate
+        })
+
+        if (toUpdate.length > 0) {
+            await CreateShow.updateMany(
+                { _id: { $in: toUpdate.map(m => m._id) } },
+                { $set: { movieStatus: "Released", lastUpdated: new Date() } }
+            )
+        }
+
+        console.log(`🎬 Updated ${toUpdate.length} movies from Upcoming to Released`)
+        return { success: true }
     } catch(error) {
         console.error("Error updating Upcoming to Released:", error);
         throw error;
@@ -645,7 +649,12 @@ exports.updateReleasedToExpired = async () => {
         const releasedMovies = await CreateShow.find({ movieStatus: "Released" });
 
         for(const movies of releasedMovies){
-            const releaseDate = new Date(movies.releasedate);
+            // releasedate is stored as "Mon, 05 May 2025" — new Date() can't parse this format
+            const releaseDate = date.parse(movies.releasedate, 'ddd, DD MMM YYYY')
+            if (!releaseDate || isNaN(releaseDate.getTime())) {
+                console.log(`Skipping movie "${movies.title}" — could not parse releasedate: ${movies.releasedate}`)
+                continue
+            }
             releaseDate.setHours(0, 0, 0, 0);
 
             const expiryDate = new Date(releaseDate);
