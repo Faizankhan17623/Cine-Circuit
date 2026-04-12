@@ -1,23 +1,44 @@
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { removeFavourite } from '../../Slices/AddtoFavouritslistSlice'
 import { CiBookmark } from 'react-icons/ci'
 import { FaBookmark, FaPlay, FaTrash } from 'react-icons/fa'
+import { fetchMyWatchlist, removeMovieFromWatchlist } from '../../Services/operations/Watchlist'
 
 const PLACEHOLDER_IMG = 'https://res.cloudinary.com/dit2bnxnd/image/upload/v1767976754/2_phppq2.png'
 
 const Wishlist = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const wishlist = useSelector((state) => state.addtofavourite.Add)
 
-  if (wishlist.length === 0) {
+  const { token } = useSelector((state) => state.auth)
+  const { movies, loaded } = useSelector((state) => state.watchlist)
+
+  useEffect(() => {
+    if (!loaded && token) {
+      dispatch(fetchMyWatchlist(token))
+    }
+  }, [token, loaded, dispatch])
+
+  const handleRemove = (movieId) => {
+    dispatch(removeMovieFromWatchlist(movieId, token))
+  }
+
+  if (!loaded) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (movies.length === 0) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center text-center px-6">
         <div className="w-16 h-16 rounded-2xl bg-richblack-700 flex items-center justify-center mb-4">
           <CiBookmark className="text-3xl text-yellow-200" />
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">Your Wishlist is Empty</h2>
+        <h2 className="text-xl font-bold text-white mb-2">Your Watchlist is Empty</h2>
         <p className="text-richblack-300 text-sm max-w-sm mb-6">
           Movies and shows you bookmark will appear here. Start exploring and save your favourites!
         </p>
@@ -42,16 +63,16 @@ const Wishlist = () => {
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              My Wishlist
+              My Watchlist
             </h1>
-            <p className="text-gray-500 text-sm">{wishlist.length} saved {wishlist.length === 1 ? 'movie' : 'movies'}</p>
+            <p className="text-gray-500 text-sm">{movies.length} saved {movies.length === 1 ? 'movie' : 'movies'}</p>
           </div>
         </div>
       </div>
 
       {/* Movie Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {wishlist.map((movie) => (
+        {movies.map((movie) => (
           <div
             key={movie._id}
             className="group relative rounded-xl overflow-hidden bg-richblack-800 border border-richblack-700 hover:border-yellow-400/50 transition-all duration-300"
@@ -75,9 +96,9 @@ const Wishlist = () => {
                   <FaPlay className="text-black text-sm ml-0.5" />
                 </button>
                 <button
-                  onClick={() => dispatch(removeFavourite(movie))}
+                  onClick={() => handleRemove(movie._id)}
                   className="w-10 h-10 rounded-full bg-red-500/90 hover:bg-red-400 flex items-center justify-center transition-all active:scale-95"
-                  title="Remove from wishlist"
+                  title="Remove from watchlist"
                 >
                   <FaTrash className="text-white text-sm" />
                 </button>
@@ -105,7 +126,7 @@ const Wishlist = () => {
                 {movie.title}
               </p>
               <button
-                onClick={() => dispatch(removeFavourite(movie))}
+                onClick={() => handleRemove(movie._id)}
                 className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs text-red-400 border border-red-400/30 hover:bg-red-400/10 transition-all"
               >
                 <FaTrash className="text-[10px]" />
