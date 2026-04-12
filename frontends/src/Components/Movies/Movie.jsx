@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { MovieDetailsFinding } from "../../Services/operations/User"
 import { createRating, getAverageRating, bannerLike, bannerDislike, createComment, getAllComments, deleteComment } from "../../Services/operations/Auth"
 import { PurcahsedTickets } from "../../Services/operations/User"
-import { addFavourite, removeFavourite } from "../../Slices/AddtoFavouritslistSlice"
+import { addMovieToWatchlist, removeMovieFromWatchlist, fetchMyWatchlist } from "../../Services/operations/Watchlist"
 import { FaArrowLeft } from "react-icons/fa"
 import {
   FaPlay,
@@ -48,8 +48,8 @@ const Movie = () => {
 
   const { token, isLoggedIn } = useSelector((state) => state.auth)
   const { user } = useSelector((state) => state.profile)
-  const wishlist = useSelector((state) => state.addtofavourite.Add)
-  const isWishlisted = wishlist?.some((item) => item._id === id)
+  const { movies: watchlistMovies, loaded: watchlistLoaded } = useSelector((state) => state.watchlist)
+  const isWishlisted = watchlistMovies?.some((item) => item._id === id)
   const navigate = useNavigate()
   
 const previousTag = location.state?.tag
@@ -76,6 +76,10 @@ const previousTag = location.state?.tag
         const ratingRes = await dispatch(getAverageRating(id))
         if (ratingRes?.success) {
           setAverageRating(ratingRes.averageRating)
+        }
+        // Load watchlist from backend if not already loaded
+        if (token && user?.usertype === "Viewer" && !watchlistLoaded) {
+          dispatch(fetchMyWatchlist(token))
         }
         // Check if user has purchased tickets for this movie (Viewers only)
         if (token && user?.usertype === "Viewer") {
@@ -346,9 +350,9 @@ const previousTag = location.state?.tag
                   <button
                     onClick={() => {
                       if (isWishlisted) {
-                        dispatch(removeFavourite({ _id: id }))
+                        dispatch(removeMovieFromWatchlist(id, token))
                       } else {
-                        dispatch(addFavourite({ _id: id, title: movie.title, Posterurl: movie.Posterurl, genre: movie.genre }))
+                        dispatch(addMovieToWatchlist(id, { _id: id, title: movie.title, Posterurl: movie.Posterurl, genre: movie.genre }, token))
                       }
                     }}
                     className={`flex items-center gap-2 px-4 py-3 backdrop-blur-md border rounded-xl text-white transition-all ${
