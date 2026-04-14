@@ -447,27 +447,19 @@ exports.ExpireTickets = async () => {
         const allTickets = await Theatrestickets.find();
         // console.log(allTickets)
 
-        if (!allTickets) {
-            return res.status(400).json({
-                message: "There are no Tickets present",
-                success: false
-            });
+        if (!allTickets || allTickets.length === 0) {
+            console.log("There are no Tickets present");
+            return
         }
-        // console.log("THis is the date that was yesterday",Yesterday)
-        // console.log("This one is been formatted",YesterdayDate)
+
         const TicketsToexpiry = allTickets.filter(ticket => {
-            // console.log("This is the ticket",ticket)
             let ticketDate;
             if (typeof ticket.Date === "string") {
-                ticketDate = ticket.Date.trim(); // If stored as string in "DD/MM/YYYY"
+                ticketDate = ticket.Date.trim()
             } else {
-                ticketDate = new Date(ticket.Date).toISOString().split("T")[0]; // If stored as ISO Date
+                ticketDate = date.format(new Date(ticket.Date), "DD/MM/YYYY")
             }
-        
-            // console.log("Formatted Ticket Date:", ticketDate);
-            // console.log("Formatted Current Date:", formattedCurrentDate);
-        
-            return ticketDate === YesterdayDate; //
+            return ticketDate === YesterdayDate
         });
         // console.log("This is the tickets to update array",TicketsToexpiry)
 
