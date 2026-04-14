@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { Helmet } from "react-helmet-async"
 import toast from "react-hot-toast"
 import { useDispatch, useSelector } from "react-redux"
@@ -19,10 +19,16 @@ import {
   FaThumbsUp,
   FaThumbsDown,
   FaBookmark,
-  FaRegBookmark
+  FaRegBookmark,
+  FaShareAlt,
+  FaWhatsapp,
+  FaTwitter,
+  FaFacebook,
+  FaLink,
 } from "react-icons/fa"
 import Loader from "../extra/Loading"
 import Navbar from "../Home/Navbar"
+import TrailerModal from "../extra/TrailerModal"
 
 const Movie = () => {
   const { id } = useParams()
@@ -49,6 +55,9 @@ const Movie = () => {
   const { token, isLoggedIn } = useSelector((state) => state.auth)
   const { user } = useSelector((state) => state.profile)
   const { movies: watchlistMovies, loaded: watchlistLoaded } = useSelector((state) => state.watchlist)
+  const [showTrailerModal, setShowTrailerModal] = useState(false)
+  const [showShareMenu, setShowShareMenu] = useState(false)
+  const shareRef = useRef(null)
   const isWishlisted = watchlistMovies?.some((item) => item._id === id)
   const navigate = useNavigate()
   
@@ -109,6 +118,29 @@ const previousTag = location.state?.tag
 
     fetchMovie()
   }, [id])
+
+  // Close trailer modal on Escape key
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "Escape") {
+        setShowTrailerModal(false)
+        setShowShareMenu(false)
+      }
+    }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [])
+
+  // Close share dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e) => {
+      if (shareRef.current && !shareRef.current.contains(e.target)) {
+        setShowShareMenu(false)
+      }
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
 
   const handleSubmitReview = async () => {
     if (!userRating || !reviewText.trim()) return
@@ -316,15 +348,13 @@ const previousTag = location.state?.tag
             </div>
 
             <div className="flex items-center gap-3 flex-wrap">
-              <a
-                href={movie.trailerurl}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                onClick={() => setShowTrailerModal(true)}
                 className="inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-300 text-black px-6 py-3 rounded-xl font-semibold transition shadow-lg shadow-yellow-400/20"
               >
                 <FaPlay />
                 Watch Trailer
-              </a>
+              </button>
 
               {/* Like / Dislike */}
               <div className="flex items-center gap-2">
@@ -368,6 +398,59 @@ const previousTag = location.state?.tag
                     }
                   </button>
                 )}
+
+                {/* Share Button */}
+                <div className="relative" ref={shareRef}>
+                  <button
+                    onClick={() => setShowShareMenu(prev => !prev)}
+                    className="flex items-center gap-2 px-4 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white hover:bg-blue-500/20 hover:border-blue-500/30 transition-all"
+                    title="Share this movie"
+                  >
+                    <FaShareAlt />
+                  </button>
+
+                  {showShareMenu && (
+                    <div className="absolute bottom-14 left-0 bg-richblack-800 border border-richblack-600 rounded-2xl p-2 w-48 shadow-2xl z-50 flex flex-col gap-1">
+                      <a
+                        href={`https://wa.me/?text=Check out ${encodeURIComponent(movie.title)} on Cine Circuit! ${encodeURIComponent(`${siteUrl}/Movie/${movie._id}`)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() => setShowShareMenu(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-green-500/20 hover:text-green-400 transition-all"
+                      >
+                        <FaWhatsapp className="text-green-400 text-base" /> WhatsApp
+                      </a>
+                      <a
+                        href={`https://twitter.com/intent/tweet?text=Check out ${encodeURIComponent(movie.title)} on Cine Circuit!&url=${encodeURIComponent(`${siteUrl}/Movie/${movie._id}`)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() => setShowShareMenu(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-sky-500/20 hover:text-sky-400 transition-all"
+                      >
+                        <FaTwitter className="text-sky-400 text-base" /> Twitter / X
+                      </a>
+                      <a
+                        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${siteUrl}/Movie/${movie._id}`)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() => setShowShareMenu(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-blue-500/20 hover:text-blue-400 transition-all"
+                      >
+                        <FaFacebook className="text-blue-400 text-base" /> Facebook
+                      </a>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${siteUrl}/Movie/${movie._id}`)
+                          toast.success("Link copied!")
+                          setShowShareMenu(false)
+                        }}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-richblack-700 transition-all"
+                      >
+                        <FaLink className="text-richblack-300 text-base" /> Copy Link
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -728,6 +811,14 @@ const previousTag = location.state?.tag
 
         </div>
       </div>
+
+      <TrailerModal
+        isOpen={showTrailerModal}
+        onClose={() => setShowTrailerModal(false)}
+        trailerUrl={movie.trailerurl}
+        movieTitle={movie.title}
+      />
+
     </div>
   )
 }
