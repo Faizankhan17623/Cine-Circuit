@@ -127,6 +127,38 @@ Login via \`POST /api/v1/createAccount/Login\` to receive the cookie automatical
             razorpay_signature: { type: 'string', example: 'abc123...' },
           },
         },
+        // ─── Bug Report ───────────────────────────────
+        ReportBugBody: {
+          type: 'object',
+          required: ['title', 'description'],
+          properties: {
+            title: { type: 'string', example: 'Movie poster not loading' },
+            description: { type: 'string', example: 'On the home page slider, the poster image fails to load on mobile devices.' },
+            images: { type: 'array', items: { type: 'string', format: 'binary' }, description: 'Optional screenshot images (max 10MB each)' },
+            videos: { type: 'array', items: { type: 'string', format: 'binary' }, description: 'Optional screen recording videos (max 50MB each)' },
+          },
+        },
+        // ─── Feedback ─────────────────────────────────
+        FeedbackBody: {
+          type: 'object',
+          required: ['firstName', 'lastName', 'email', 'number', 'message'],
+          properties: {
+            firstName: { type: 'string', example: 'Faizan' },
+            lastName: { type: 'string', example: 'Khan' },
+            email: { type: 'string', example: 'faizan@example.com' },
+            number: { type: 'string', example: '9876543210' },
+            message: { type: 'string', example: 'Great platform! Would love a dark mode option.' },
+          },
+        },
+        // ─── Recommend ────────────────────────────────
+        RecommendMoviesBody: {
+          type: 'object',
+          required: ['genreId'],
+          properties: {
+            genreId: { type: 'string', example: '64abc123def456' },
+            subgenreId: { type: 'string', example: '64xyz789ghi000', description: 'Optional subgenre for narrower results' },
+          },
+        },
       },
     },
     // ─── Tags (groups in the UI) ─────────────────────
@@ -139,6 +171,12 @@ Login via \`POST /api/v1/createAccount/Login\` to receive the cookie automatical
       { name: 'Show', description: 'Show creation — tags, cast, upload (Organizer only)' },
       { name: 'Theatre', description: 'Theatre registration and ticket distribution' },
       { name: 'Payment', description: 'Razorpay payment flow and ticket download' },
+      { name: 'Maintenance', description: 'Platform maintenance mode — status check (public) and toggle (admin)' },
+      { name: 'AI Recommendations', description: 'AI-powered movie recommendations by genre and subgenre' },
+      { name: 'Bug Reports', description: 'Bug reporting by users and bug management by admin' },
+      { name: 'Watchlist', description: 'Viewer watchlist — add, remove, and fetch saved movies' },
+      { name: 'Feedback', description: 'Public feedback/contact form submission' },
+      { name: 'Audit Logs', description: 'Admin audit trail — view and export activity logs' },
     ],
 
     // ─── All Paths ────────────────────────────────────
@@ -952,6 +990,253 @@ Login via \`POST /api/v1/createAccount/Login\` to receive the cookie automatical
           summary: 'Admin creates/finalises theatre record (Admin only)',
           security: [{ cookieAuth: [] }],
           responses: { 200: { description: 'Theatre record finalised' } },
+        },
+      },
+
+      // ════════════════════════════════════════════════
+      // MAINTENANCE ROUTES
+      // ════════════════════════════════════════════════
+      '/api/v1/createAccount/Maintenance-Status': {
+        get: {
+          tags: ['Maintenance'],
+          summary: 'Get current maintenance mode status (public)',
+          description: 'Returns whether the platform is currently under maintenance. No authentication required. Admins are never blocked.',
+          responses: {
+            200: {
+              description: 'Maintenance status returned',
+              content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, isActive: { type: 'boolean', example: false }, message: { type: 'string', example: 'Platform is running normally' } } } } },
+            },
+          },
+        },
+      },
+
+      '/api/v1/Admin/Set-Maintenance': {
+        put: {
+          tags: ['Maintenance'],
+          summary: 'Enable or disable maintenance mode (Admin only)',
+          description: 'Toggles platform maintenance mode. When active, all non-admin users see a blocking maintenance popup. An email notification is sent to all registered users.',
+          security: [{ cookieAuth: [] }],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { type: 'object', required: ['isActive'], properties: { isActive: { type: 'boolean', example: true }, message: { type: 'string', example: 'We are upgrading our servers. Back in 2 hours.' } } } } },
+          },
+          responses: {
+            200: { description: 'Maintenance mode updated — notification emails sent to all users' },
+            400: { description: 'isActive field missing or invalid' },
+            401: { description: 'Not authenticated' },
+            403: { description: 'Admin access required' },
+          },
+        },
+      },
+
+      // ════════════════════════════════════════════════
+      // AI MOVIE RECOMMENDATIONS
+      // ════════════════════════════════════════════════
+      '/api/v1/createAccount/Public-Genres': {
+        get: {
+          tags: ['AI Recommendations'],
+          summary: 'Get all genres with their subgenres (public)',
+          description: 'Returns all genres and their associated subgenres. Used by the AI recommendation agent to let users pick preferences.',
+          responses: {
+            200: {
+              description: 'Genres with subgenres returned',
+              content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, genres: { type: 'array', items: { type: 'object', properties: { _id: { type: 'string' }, name: { type: 'string', example: 'Action' }, subgenres: { type: 'array', items: { type: 'object', properties: { _id: { type: 'string' }, name: { type: 'string', example: 'Superhero' } } } } } } } } } } },
+            },
+          },
+        },
+      },
+
+      '/api/v1/createAccount/Recommend-Movies': {
+        post: {
+          tags: ['AI Recommendations'],
+          summary: 'Get AI-recommended movies by genre/subgenre (public)',
+          description: 'Returns a list of movies matching the selected genre. Optionally filter by subgenre for more targeted recommendations.',
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/RecommendMoviesBody' } } },
+          },
+          responses: {
+            200: { description: 'Recommended movies returned', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, movies: { type: 'array', items: { type: 'object' } } } } } } },
+            400: { description: 'Invalid genre ID' },
+            404: { description: 'No movies found for selected genre' },
+          },
+        },
+      },
+
+      // ════════════════════════════════════════════════
+      // BUG REPORTS (User)
+      // ════════════════════════════════════════════════
+      '/api/v1/createAccount/Report-Bug': {
+        post: {
+          tags: ['Bug Reports'],
+          summary: 'Submit a bug report (any logged-in user)',
+          description: 'Allows any authenticated user to report a bug. Supports optional image/video attachments stored in Cloudinary. A confirmation email with bug ID is sent on submission.',
+          security: [{ cookieAuth: [] }],
+          requestBody: {
+            required: true,
+            content: { 'multipart/form-data': { schema: { $ref: '#/components/schemas/ReportBugBody' } } },
+          },
+          responses: {
+            200: { description: 'Bug report submitted — confirmation email sent with bug ID' },
+            400: { description: 'Title or description missing' },
+            401: { description: 'Not authenticated' },
+          },
+        },
+      },
+
+      '/api/v1/createAccount/My-Bug-Reports': {
+        get: {
+          tags: ['Bug Reports'],
+          summary: 'Get all bug reports submitted by the logged-in user',
+          security: [{ cookieAuth: [] }],
+          responses: {
+            200: { description: 'Bug reports returned', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, bugReports: { type: 'array', items: { type: 'object', properties: { bugId: { type: 'string', example: 'BUG-00042' }, title: { type: 'string' }, status: { type: 'string', enum: ['open', 'in-progress', 'resolved'] }, createdAt: { type: 'string', format: 'date-time' } } } } } } } } },
+            401: { description: 'Not authenticated' },
+          },
+        },
+      },
+
+      // ════════════════════════════════════════════════
+      // BUG REPORTS (Admin)
+      // ════════════════════════════════════════════════
+      '/api/v1/Admin/Bug-Reports': {
+        get: {
+          tags: ['Bug Reports'],
+          summary: 'Get all bug reports (Admin only)',
+          description: 'Returns all bug reports across all users. Can be filtered by status.',
+          security: [{ cookieAuth: [] }],
+          parameters: [
+            { name: 'status', in: 'query', schema: { type: 'string', enum: ['open', 'in-progress', 'resolved'] }, description: 'Filter by status' },
+          ],
+          responses: {
+            200: { description: 'All bug reports returned' },
+            401: { description: 'Not authenticated' },
+            403: { description: 'Admin access required' },
+          },
+        },
+      },
+
+      '/api/v1/Admin/Update-Bug-Status': {
+        put: {
+          tags: ['Bug Reports'],
+          summary: 'Update bug report status (Admin only)',
+          description: 'Changes the status of a bug report. When resolved, an email is sent to the reporter with optional admin note.',
+          security: [{ cookieAuth: [] }],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { type: 'object', required: ['bugReportId', 'status'], properties: { bugReportId: { type: 'string', example: '64abc123def456' }, status: { type: 'string', enum: ['open', 'in-progress', 'resolved'], example: 'resolved' }, adminNote: { type: 'string', example: 'Fixed in v2.3.1 — poster CDN cache cleared.' } } } } },
+          },
+          responses: {
+            200: { description: 'Bug status updated — resolution email sent if resolved' },
+            400: { description: 'Invalid bugReportId or status value' },
+            401: { description: 'Not authenticated' },
+            403: { description: 'Admin access required' },
+            404: { description: 'Bug report not found' },
+          },
+        },
+      },
+
+      // ════════════════════════════════════════════════
+      // WATCHLIST (Viewer only)
+      // ════════════════════════════════════════════════
+      '/api/v1/createAccount/Add-To-Watchlist': {
+        post: {
+          tags: ['Watchlist'],
+          summary: 'Add a movie to the logged-in viewer\'s watchlist',
+          security: [{ cookieAuth: [] }],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { type: 'object', required: ['movieId'], properties: { movieId: { type: 'string', example: '64abc123def456' } } } } },
+          },
+          responses: {
+            200: { description: 'Movie added to watchlist' },
+            400: { description: 'Already in watchlist or invalid movie ID' },
+            401: { description: 'Not authenticated' },
+            403: { description: 'Viewer role required' },
+          },
+        },
+      },
+
+      '/api/v1/createAccount/Remove-From-Watchlist': {
+        delete: {
+          tags: ['Watchlist'],
+          summary: 'Remove a movie from the logged-in viewer\'s watchlist',
+          security: [{ cookieAuth: [] }],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { type: 'object', required: ['movieId'], properties: { movieId: { type: 'string', example: '64abc123def456' } } } } },
+          },
+          responses: {
+            200: { description: 'Movie removed from watchlist' },
+            400: { description: 'Movie not in watchlist or invalid ID' },
+            401: { description: 'Not authenticated' },
+          },
+        },
+      },
+
+      '/api/v1/createAccount/My-Watchlist': {
+        get: {
+          tags: ['Watchlist'],
+          summary: 'Get all movies in the viewer\'s watchlist',
+          security: [{ cookieAuth: [] }],
+          responses: {
+            200: { description: 'Watchlist returned', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, watchlist: { type: 'array', items: { type: 'object' } } } } } } },
+            401: { description: 'Not authenticated' },
+          },
+        },
+      },
+
+      // ════════════════════════════════════════════════
+      // FEEDBACK (Public)
+      // ════════════════════════════════════════════════
+      '/api/v1/createAccount/Submit-Feedback': {
+        post: {
+          tags: ['Feedback'],
+          summary: 'Submit a feedback / contact form (public)',
+          description: 'No authentication required. Anyone can submit feedback. Admin receives an email notification.',
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/FeedbackBody' } } },
+          },
+          responses: {
+            200: { description: 'Feedback submitted — admin notified by email' },
+            400: { description: 'Missing required fields' },
+          },
+        },
+      },
+
+      // ════════════════════════════════════════════════
+      // AUDIT LOGS (Admin only)
+      // ════════════════════════════════════════════════
+      '/api/v1/Admin/Audit-Logs': {
+        get: {
+          tags: ['Audit Logs'],
+          summary: 'Get platform audit logs (Admin only)',
+          description: 'Returns a paginated list of admin and user actions tracked for auditing purposes.',
+          security: [{ cookieAuth: [] }],
+          parameters: [
+            { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+            { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } },
+          ],
+          responses: {
+            200: { description: 'Audit logs returned' },
+            401: { description: 'Not authenticated' },
+            403: { description: 'Admin access required' },
+          },
+        },
+      },
+
+      '/api/v1/Admin/Export-Audit-Log': {
+        get: {
+          tags: ['Audit Logs'],
+          summary: 'Export audit logs as CSV (Admin only)',
+          description: 'Downloads the full audit log as a CSV file for record-keeping or compliance.',
+          security: [{ cookieAuth: [] }],
+          responses: {
+            200: { description: 'CSV file downloaded', content: { 'text/csv': {} } },
+            401: { description: 'Not authenticated' },
+            403: { description: 'Admin access required' },
+          },
         },
       },
 
