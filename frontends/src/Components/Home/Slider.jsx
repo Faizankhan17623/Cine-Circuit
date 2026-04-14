@@ -8,6 +8,7 @@ import { BannerImages } from '../../Services/operations/User'
 import { useDispatch } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import TrailerModal from '../extra/TrailerModal'
 
 const tagConfig = {
   "Trending": {
@@ -47,6 +48,7 @@ const Slider = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [bannerData, setBannerData] = useState([])
+  const [trailerModal, setTrailerModal] = useState({ isOpen: false, url: '', title: '' })
 
   useEffect(() => {
     const fetchBanner = async () => {
@@ -185,17 +187,15 @@ const Slider = () => {
                   {/* Action Buttons */}
                   <div className="flex items-center gap-3 mt-1">
                     {movie.trailerurl && (
-                      <a
-                        href={movie.trailerurl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={() => setTrailerModal({ isOpen: true, url: movie.trailerurl, title: movie.title })}
                         className='group/btn flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-semibold rounded-xl hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg'
                       >
                         <div className='w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center group-hover/btn:scale-110 transition-transform'>
                           <FaPlay className='text-black text-xs ml-0.5' />
                         </div>
                         Watch Trailer
-                      </a>
+                      </button>
                     )}
                     {movie.movieStatus !== "Upcoming" && movie.movieStatus !== "Coming Soon" && movie.movieStatus !== "Expired" && (
                       <button
@@ -214,6 +214,13 @@ const Slider = () => {
 
         </Swiper>
       </div>
+
+      <TrailerModal
+        isOpen={trailerModal.isOpen}
+        onClose={() => setTrailerModal({ isOpen: false, url: '', title: '' })}
+        trailerUrl={trailerModal.url}
+        movieTitle={trailerModal.title}
+      />
     </div>
   )
 }
