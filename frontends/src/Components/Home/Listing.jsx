@@ -2,6 +2,7 @@
   import { useDispatch } from 'react-redux';
   import About from '../extra/AboutUs'
   import JoinCard from '../extra/joinCard'
+  import TrailerModal from '../extra/TrailerModal'
   import { Swiper, SwiperSlide } from 'swiper/react';
   import 'swiper/css';
   import 'swiper/css/navigation';
@@ -16,7 +17,7 @@
 
   const PLACEHOLDER_IMG = 'https://res.cloudinary.com/dit2bnxnd/image/upload/v1767976754/2_phppq2.png';
 
-  const MovieCard = ({ slide, badgeColor, onClick }) => (
+  const MovieCard = ({ slide, badgeColor, onClick, onTrailerClick }) => (
     <div
       className="group relative w-full h-[280px] sm:h-[300px] rounded-xl overflow-hidden cursor-pointer"
       onClick={onClick}
@@ -41,12 +42,18 @@
         {slide.genre?.genreName || "Movie"}
       </div>
 
-      {/* Play button on hover */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-        <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 hover:bg-white/30 transition-colors transform group-hover:scale-100 scale-75 duration-300">
-          <FaPlay className="text-white text-sm ml-0.5" />
+      {/* Play trailer button on hover — stops propagation so card click still navigates */}
+      {slide.trailerurl && (
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <button
+            onClick={(e) => { e.stopPropagation(); onTrailerClick(slide) }}
+            className="w-12 h-12 bg-yellow-400/90 backdrop-blur-md rounded-full flex items-center justify-center border border-yellow-300/50 hover:bg-yellow-300 transition-colors transform group-hover:scale-100 scale-75 duration-300"
+            title="Watch Trailer"
+          >
+            <FaPlay className="text-black text-sm ml-0.5" />
+          </button>
         </div>
-      </div>
+      )}
 
       {/* Bottom info */}
       <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
@@ -59,7 +66,7 @@
     </div>
   );
 
-  const MovieSection = ({ title, highlight, icon, iconColor, badgeColor, data, onCardClick, onViewAllClick }) => (
+  const MovieSection = ({ title, highlight, icon, iconColor, badgeColor, data, onCardClick, onViewAllClick, onTrailerClick }) => (
     <div className="w-full max-w-[92%] mx-auto py-6">
       {/* Section Header */}
       <div className="flex items-center justify-between mb-6">
@@ -106,7 +113,7 @@
       >
         {data.map((slide, index) => (
           <SwiperSlide key={slide._id || index}>
-            <MovieCard slide={slide} badgeColor={badgeColor} onClick={() => onCardClick(slide)} />
+            <MovieCard slide={slide} badgeColor={badgeColor} onClick={() => onCardClick(slide)} onTrailerClick={onTrailerClick} />
           </SwiperSlide>
         ))}
       </Swiper>
@@ -147,6 +154,7 @@
     const [highlyRatedData, setHighlyRatedData] = useState([])
     const [recentlyReleasedData, setRecentlyReleasedData] = useState([])
     const [loading, setLoading] = useState(true)
+    const [trailerModal, setTrailerModal] = useState({ isOpen: false, url: '', title: '' })
 
     useEffect(() => {
       const fetchData = async () => {
@@ -241,6 +249,7 @@
                 data={section.data}
                 onCardClick={(movie) => navigate(`/Movie/${movie._id}`)}
                 onViewAllClick={() => navigate(`/${section.route}`)}
+                onTrailerClick={(movie) => setTrailerModal({ isOpen: true, url: movie.trailerurl, title: movie.title })}
               />
             )
           ))
@@ -256,6 +265,13 @@
 
         <About />
         <Footer />
+
+        <TrailerModal
+          isOpen={trailerModal.isOpen}
+          onClose={() => setTrailerModal({ isOpen: false, url: '', title: '' })}
+          trailerUrl={trailerModal.url}
+          movieTitle={trailerModal.title}
+        />
       </div>
     );
   };
