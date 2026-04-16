@@ -28,6 +28,9 @@ const {TicketPurchased,TicketPurchasedFullDetails} = require("../controllers/Das
 const {GetAlluserDetails,FindUserNames,FindLoginEmail,FindNumber,FindCreationEmail} = require('../controllers/user/User')
 const {BannerMovies,FIndusingMOvieTags,FindWholeMoviesData,FindMovieById,PurcahsingData,MostLikedMovies,HighlyRatedMovies,RecentlyReleased,ContentBasedAlgorithm} = require('../controllers/Dashboard/UserDashboard')
 const {GetSingleTheatreDetails,getTheatreDetails, GetShowsDetails} = require('../controllers/Dashboard/TheatrereDashboard')
+const {AddToWatchlist, RemoveFromWatchlist, GetMyWatchlist} = require('../controllers/user/Watchlist')
+const {GetGenresAndLanguages, EnhancedFinder} = require('../controllers/Dashboard/EnhancedSearch')
+const {ValidateCoupon} = require('../controllers/common/ValidateCoupon')
 // DONE
 const {TheatreNavbar,MovieNavbar}  = require('../controllers/common/Comment')
 // This is the first route that will be used to create the user and all the things that the user will do releated to his personal info
@@ -105,6 +108,10 @@ route.post('/Movie-Tags',FIndusingMOvieTags)
 route.post('/Theatre-Tags',getTheatreDetails)
 route.post('/Finder',FindWholeMoviesData)
 route.get('/Movie-Details',FindMovieById)
+route.get('/Genres-Languages', GetGenresAndLanguages)
+route.post('/Enhanced-Finder', EnhancedFinder)
+route.get('/Theatre-Shows', GetShowsDetails)
+route.get('/Single-Theatre', GetSingleTheatreDetails)
 
 
 route.post("/Comment-Banner", auth, IsUSER, [
@@ -188,6 +195,21 @@ route.post('/Submit-Feedback', [
     body('number').notEmpty().withMessage('Phone number is required'),
     body('message').trim().notEmpty().withMessage('Message is required'),
 ], validate, SubmitFeedback)
+
+// Watchlist
+route.post('/Add-To-Watchlist', auth, IsUSER, [
+    body('movieId').isMongoId().withMessage('Valid movie ID is required'),
+], validate, AddToWatchlist)
+route.delete('/Remove-From-Watchlist', auth, IsUSER, [
+    body('movieId').isMongoId().withMessage('Valid movie ID is required'),
+], validate, RemoveFromWatchlist)
+route.get('/My-Watchlist', auth, IsUSER, GetMyWatchlist)
+
+// Coupon validation
+route.post('/Validate-Coupon', auth, IsUSER, [
+    body('couponCode').trim().notEmpty().withMessage('Coupon code is required'),
+    body('totalAmount').isNumeric().withMessage('totalAmount must be a number'),
+], validate, ValidateCoupon)
 
 module.exports = route
 // memphis
