@@ -15,6 +15,8 @@ const {notUploadedShows,VerifiedButnotUploaded} = require("../controllers/common
 const {SetMaintenance} = require('../controllers/Administrator/Maintenance')
 const {GetAllBugReports, UpdateBugStatus} = require('../controllers/Administrator/BugReportAdmin')
 const {GetAuditLogs, ExportAuditLogCSV} = require('../controllers/Administrator/AuditLog')
+const {GetAdminStats} = require('../controllers/Dashboard/AdminStats')
+const {CreateCoupon, GetAllCoupons, UpdateCoupon, DeleteCoupon} = require('../controllers/Administrator/Coupon')
 
 // Returns first validation error as a 400 response
 const validate = (req, res, next) => {
@@ -147,5 +149,22 @@ route.put("/Update-Bug-Status", auth, IsAdmin, [
 // Audit Logs — admin only
 route.get("/Audit-Logs", auth, IsAdmin, GetAuditLogs)
 route.get("/Export-Audit-Log", auth, IsAdmin, ExportAuditLogCSV)
+
+// Admin Dashboard stats
+route.get("/Admin-Stats", auth, IsAdmin, GetAdminStats)
+
+// Coupon management
+route.post("/Create-Coupon", auth, IsAdmin, [
+    body('code').trim().notEmpty().withMessage('Coupon code is required'),
+    body('discountType').isIn(['flat', 'percentage']).withMessage('discountType must be flat or percentage'),
+    body('discountValue').isNumeric().withMessage('discountValue must be a number'),
+    body('expiryDate').notEmpty().withMessage('expiryDate is required'),
+    body('usageLimit').isInt({ min: 1 }).withMessage('usageLimit must be a positive integer'),
+], validate, CreateCoupon)
+route.get("/Get-All-Coupons", auth, IsAdmin, GetAllCoupons)
+route.put("/Update-Coupon", auth, IsAdmin, [
+    body('couponId').isMongoId().withMessage('Valid couponId is required'),
+], validate, UpdateCoupon)
+route.delete("/Delete-Coupon", auth, IsAdmin, DeleteCoupon)
 
 module.exports = route
