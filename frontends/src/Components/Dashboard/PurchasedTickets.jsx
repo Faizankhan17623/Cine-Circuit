@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Loader from "../extra/Loading";
+import LazyImage from "../extra/LazyImage";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PurchasedTicketsFullDetails } from "../../Services/operations/User";
 import { MakePdf } from "../../Services/operations/Payment";
-import { FaTicketAlt, FaDownload, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaTicketAlt, FaDownload, FaChevronDown, FaChevronUp, FaPrint } from "react-icons/fa";
 
 const formatTime12hr = (time) => {
   if (!time) return "";
@@ -27,6 +28,7 @@ const PurchasedTickets = () => {
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedCard, setExpandedCard] = useState(null);
+  const [printTicketIndex, setPrintTicketIndex] = useState(null);
 
   const postsPerPage = 5;
 
@@ -91,10 +93,38 @@ const PurchasedTickets = () => {
     dispatch(MakePdf(paymentId, token));
   };
 
+  const handlePrint = (index) => {
+    setPrintTicketIndex(index);
+    // Wait one tick for the DOM class to apply, then print
+    setTimeout(() => {
+      window.print();
+      setPrintTicketIndex(null);
+    }, 100);
+  };
+
   if (loading) {
     return (
-      <div className="w-full h-screen flex justify-center items-center bg-richblack-900">
-        <Loader />
+      <div className="bg-richblack-900 min-h-screen p-4 md:p-6">
+        {/* Skeleton summary cards */}
+        <div className="h-4 w-48 bg-richblack-700 rounded animate-pulse mb-1" />
+        <div className="h-7 w-56 bg-richblack-600 rounded-lg animate-pulse mb-6 mt-1" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          {[0,1,2].map(i => (
+            <div key={i} className="h-24 rounded-xl bg-richblack-700 animate-pulse" />
+          ))}
+        </div>
+        {/* Skeleton tab bar */}
+        <div className="flex gap-3 mb-4">
+          {[0,1,2,3].map(i => (
+            <div key={i} className="h-9 w-24 rounded-lg bg-richblack-700 animate-pulse" />
+          ))}
+        </div>
+        {/* Skeleton ticket cards */}
+        <div className="space-y-4">
+          {[0,1,2,3].map(i => (
+            <div key={i} className="h-24 rounded-xl bg-richblack-700 animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -184,10 +214,10 @@ const PurchasedTickets = () => {
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 md:p-5">
                 {/* Poster */}
                 <div className="relative flex-shrink-0">
-                  <img
+                  <LazyImage
                     src={show?.Posterurl}
                     alt={show?.title}
-                    className="w-16 h-20 md:w-14 md:h-18 rounded-lg object-cover ring-1 ring-gray-700/50"
+                    className="w-16 h-20 md:w-14 md:h-[72px] rounded-lg ring-1 ring-gray-700/50"
                   />
                   <div
                     className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-gray-900 ${config.dot}`}
@@ -232,17 +262,26 @@ const PurchasedTickets = () => {
                   {/* Actions */}
                   <div className="flex items-center gap-2">
                     {payment?.Payment_Status === "success" && (
-                      <button
-                        onClick={() => handleDownloadPdf(payment?._id)}
-                        className="p-2 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
-                        title="Download Ticket PDF"
-                      >
-                        <FaDownload size={12} />
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleDownloadPdf(payment?._id)}
+                          className="p-2 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors no-print"
+                          title="Download Ticket PDF"
+                        >
+                          <FaDownload size={12} />
+                        </button>
+                        <button
+                          onClick={() => { setExpandedCard(index); handlePrint(index); }}
+                          className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors no-print"
+                          title="Print Ticket"
+                        >
+                          <FaPrint size={12} />
+                        </button>
+                      </>
                     )}
                     <button
                       onClick={() => setExpandedCard(isExpanded ? null : index)}
-                      className="p-2 rounded-lg bg-gray-800/80 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors"
+                      className="p-2 rounded-lg bg-gray-800/80 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors no-print"
                       title="View Details"
                     >
                       {isExpanded ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
@@ -253,7 +292,7 @@ const PurchasedTickets = () => {
 
               {/* Expanded Details */}
               {isExpanded && (
-                <div className="border-t border-gray-800/50 bg-gray-800/30 px-5 py-4">
+                <div className={`border-t border-gray-800/50 bg-gray-800/30 px-5 py-4${printTicketIndex === index ? ' print-ticket' : ''}`}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Left - Ticket Categories */}
                     <div>
