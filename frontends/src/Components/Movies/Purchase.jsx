@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import Navbar from "../Home/Navbar"
-import { FaMapMarkerAlt, FaCalendarAlt, FaClock, FaArrowLeft, FaPlus, FaMinus } from "react-icons/fa"
+import { FaMapMarkerAlt, FaCalendarAlt, FaClock, FaArrowLeft, FaPlus, FaMinus, FaTag, FaTimes, FaCheck } from "react-icons/fa"
 import { TheatreDetails } from "../../Services/operations/User"
 import { MakePayment } from "../../Services/operations/Payment"
+import { validateCoupon } from "../../Services/operations/Coupon"
 import Loader from "../extra/Loading"
 
 // Convert 24hr time to 12hr AM/PM format
@@ -36,6 +37,12 @@ const Purchase = () => {
   const [selectedTime, setSelectedTime] = useState(null)
   const [tickets, setTickets] = useState([])
   const [paymentLoading, setPaymentLoading] = useState(false)
+
+  // Coupon state
+  const [couponInput, setCouponInput] = useState("")
+  const [couponLoading, setCouponLoading] = useState(false)
+  const [appliedCoupon, setAppliedCoupon] = useState(null)
+  const [couponError, setCouponError] = useState("")
 
   // Fetch data from API
   useEffect(() => {
@@ -108,24 +115,31 @@ const Purchase = () => {
     })
   })()
 
+  const resetCoupon = () => {
+    setCouponInput("")
+    setAppliedCoupon(null)
+    setCouponError("")
+  }
+
   const handleSelectTheatre = (theatre) => {
     setSelectedTheatre(theatre)
     setSelectedDate(null)
     setSelectedTime(null)
     setTickets([])
+    resetCoupon()
   }
 
   const handleSelectDate = (date) => {
     setSelectedDate(date)
     setSelectedTime(null)
     setTickets([])
+    resetCoupon()
   }
 
   const handleSelectTime = (time) => {
     setSelectedTime(time)
-    // Initialize ticket quantities from categories
+    resetCoupon()
     const dateTicket = theatreTickets.find((t) => t.Date === selectedDate)
-    // console.log(dateTicket)
     if (dateTicket?.ticketsCategory) {
       setTickets(
         dateTicket.ticketsCategory.map((cat) => ({
@@ -139,6 +153,19 @@ const Purchase = () => {
     }
   }
 
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return
+    if (rawTotal === 0) { setCouponError("Please select tickets first"); return }
+    setCouponLoading(true)
+    setCouponError("")
+    setAppliedCoupon(null)
+    const result = await validateCoupon(couponInput.trim(), rawTotal, token)
+    result.success ? setAppliedCoupon(result) : setCouponError(result.message)
+    setCouponLoading(false)
+  }
+
+  const handleRemoveCoupon = () => { setAppliedCoupon(null); setCouponInput(""); setCouponError("") }
+
   const MAX_TICKETS_PER_CATEGORY = 5
 
   const increase = (index) => {
@@ -146,6 +173,7 @@ const Purchase = () => {
     const maxAllowed = Math.min(MAX_TICKETS_PER_CATEGORY, updated[index].available)
     if (updated[index].quantity < maxAllowed) {
       updated[index].quantity += 1
+      if (appliedCoupon) setAppliedCoupon(null)
       setTickets(updated)
     }
   }
@@ -155,14 +183,12 @@ const Purchase = () => {
     if (updated[index].quantity > 0) {
       updated[index].quantity -= 1
       setTickets(updated)
+      if (appliedCoupon) setAppliedCoupon(null)
     }
   }
 
-  const totalAmount = tickets.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  )
-
+  const rawTotal = tickets.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const totalAmount = appliedCoupon ? appliedCoupon.finalAmount : rawTotal
   const totalTickets = tickets.reduce((sum, t) => sum + t.quantity, 0)
   // console.log(tickets)
 
@@ -185,7 +211,8 @@ const Purchase = () => {
         user?._id,
         token,
         navigate,
-        setPaymentLoading
+        setPaymentLoading,
+        appliedCoupon?.couponCode || null
       )
     )
   }
@@ -436,9 +463,60 @@ const Purchase = () => {
                       <span className="font-semibold">{totalTickets}</span>
                     </div>
 
+                    {/* Coupon input */}
+                    <div className="my-3">
+                      {!appliedCoupon ? (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={couponInput}
+                            onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError("") }}
+                            onKeyDown={(e) => e.key === "Enter" && handleApplyCoupon()}
+                            placeholder="Promo code"
+                            className="flex-1 bg-richblack-700 border border-richblack-600 rounded-lg px-3 py-2 text-sm text-white placeholder-richblack-400 focus:outline-none focus:border-yellow-400 transition uppercase"
+                            maxLength={20}
+                          />
+                          <button
+                            onClick={handleApplyCoupon}
+                            disabled={couponLoading || !couponInput.trim()}
+                            className="px-3 py-2 bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed text-black text-xs font-bold rounded-lg transition flex items-center gap-1"
+                          >
+                            {couponLoading
+                              ? <span className="w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                              : <FaTag size={10} />}
+                            {couponLoading ? "" : "APPLY"}
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between bg-green-500/10 border border-green-500/30 rounded-lg px-3 py-2">
+                          <div className="flex items-center gap-2">
+                            <FaCheck className="text-green-400 text-xs" />
+                            <span className="text-green-400 text-xs font-semibold">{appliedCoupon.couponCode}</span>
+                            <span className="text-green-300 text-xs">
+                              {appliedCoupon.discountType === "flat" ? `−₹${appliedCoupon.discountAmount}` : `${appliedCoupon.discountValue}% off`}
+                            </span>
+                          </div>
+                          <button onClick={handleRemoveCoupon} className="text-richblack-400 hover:text-red-400 transition">
+                            <FaTimes size={12} />
+                          </button>
+                        </div>
+                      )}
+                      {couponError && <p className="text-red-400 text-xs mt-1">{couponError}</p>}
+                    </div>
+
+                    {appliedCoupon && (
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-green-400">Discount</span>
+                        <span className="text-green-400 font-semibold">−₹{appliedCoupon.discountAmount}</span>
+                      </div>
+                    )}
+
                     <div className="flex justify-between font-bold text-yellow-400 text-lg">
                       <span>Total</span>
-                      <span>₹{totalAmount}</span>
+                      <div className="text-right">
+                        {appliedCoupon && <div className="text-richblack-400 text-xs line-through font-normal">₹{rawTotal}</div>}
+                        <span>₹{totalAmount}</span>
+                      </div>
                     </div>
                   </>
                 )}
