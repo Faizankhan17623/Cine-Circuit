@@ -115,7 +115,20 @@ export const FeedbackApi = {
 }
 
 export const WatchlistApi = {
-    AddToWatchlist: BASE_URL + "/Add-To-Watchlist",
+    AddToWatchlist:      BASE_URL + "/Add-To-Watchlist",
     RemoveFromWatchlist: BASE_URL + "/Remove-From-Watchlist",
-    MyWatchlist: BASE_URL + "/My-Watchlist",
+    MyWatchlist:         BASE_URL + "/My-Watchlist",
+}
+
+export const EnhancedSearchApi = {
+    GenresLanguages: BASE_URL + "/Genres-Languages",
+    EnhancedFinder:  BASE_URL + "/Enhanced-Finder",
+}
+
+export const PersonalRecommendApi = {
+    Personal: BASE_URL + "/Personal"
+}
+
+export const CouponApi = {
+    ValidateCoupon: BASE_URL + "/Validate-Coupon",
 }
