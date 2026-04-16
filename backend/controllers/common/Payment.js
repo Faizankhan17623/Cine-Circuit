@@ -14,6 +14,8 @@ const TicketTemplate = require('../../templates/userTemplates/TicketTemplate')
 const PdfTemplate = require('../../templates/userTemplates/pdfTemplate')
 const paymentFailedTemplate = require('../../templates/userTemplates/paymentFailedTemplate')
 const ticket = require('../../models/ticket')
+const Coupon = require('../../models/Coupon')
+const { applyCouponLogic } = require('./ValidateCoupon')
 
 // Student Features api kar ke ek page hain github main usko dekh lena agay payment ke isme kuch issue aaye to 
 
@@ -24,7 +26,7 @@ exports.MakePayment = async(req,res) => {
         const Theatreid = req.body.Theatreid
         const Ticketid = req.body.Ticketid
         const userId = req.USER?.id
-        const{Categories,totalTickets,time} = req.body
+        const{Categories,totalTickets,time,couponCode} = req.body
 
         // Debug: Log what's received
         console.log("Payment request received:", { ShowId, Theatreid, Ticketid, userId, Categories, totalTickets, time })
@@ -218,9 +220,24 @@ exports.MakePayment = async(req,res) => {
             return sum + (category.price * parseInt(totalTickets[index] || 0));
         }, 0);
 
+        // Apply coupon — server re-validates independently of frontend
+        let discountAmount = 0
+        let appliedCouponCode = null
+        const originalAmount = totalAmount
+
+        if (couponCode && couponCode.trim()) {
+            const couponResult = await applyCouponLogic(couponCode.trim(), totalAmount, userId)
+            if (!couponResult.valid) {
+                return res.status(400).json({ success: false, message: `Coupon error: ${couponResult.message}` })
+            }
+            discountAmount = couponResult.discountAmount
+            totalAmount = couponResult.finalAmount
+            appliedCouponCode = couponResult.coupon.code
+        }
+
         // Create Razorpay order
         const Options = {
-            amount: Math.round(totalAmount*100),
+            amount: Math.round(totalAmount * 100),
             currency: "INR",
             receipt: `rcpt_${Date.now()}`
         }
@@ -244,6 +261,9 @@ exports.MakePayment = async(req,res) => {
             razorpay_order_id: order.id,
             totalTicketpurchased: totalTickets.reduce((a, b) => parseInt(a) + parseInt(b), 0),
             amount: totalAmount,
+            originalAmount: originalAmount,
+            discountAmount: discountAmount,
+            couponCode: appliedCouponCode,
             showid: ShowId,
             Payment_Status: 'created',
             time:time,
@@ -375,6 +395,15 @@ exports.Verifypayment = async(req,res) => {
                 // Update user's payment record
 
                 await USER.findByIdAndUpdate(userId,{$push:{PaymentId:paymentId}})
+
+                // Increment coupon usage — only after confirmed successful payment
+                if (PaymentVerifier.couponCode) {
+                    await Coupon.findOneAndUpdate(
+                        { code: PaymentVerifier.couponCode },
+                        { $inc: { usedCount: 1 }, $push: { usedBy: userId } }
+                    )
+                }
+
                 const paymentIds = await Payment.findOne({_id: paymentId})
                 if(!paymentIds){
                     return res.status(400).json({
