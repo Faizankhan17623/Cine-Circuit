@@ -33,7 +33,8 @@ export function MakePayment(
   userId,
   token,
   navigate,
-  setPaymentLoading
+  setPaymentLoading,
+  couponCode = null
 ) {
   return async (dispatch) => {
     const toastId = toast.loading("Processing Payment...");
@@ -51,22 +52,12 @@ export function MakePayment(
         return;
       }
 
-      const response = await apiConnector(
-        "POST",
-        makepayment,
-        {
-          ShowId,
-          Theatreid,
-          Ticketid,
-          userId,
-          Categories,
-          totalTickets,
-          time,
-        },
-        {
-          Authorization: `Bearer ${token}`,
-        }
-      );
+      const body = { ShowId, Theatreid, Ticketid, userId, Categories, totalTickets, time }
+      if (couponCode) body.couponCode = couponCode
+
+      const response = await apiConnector("POST", makepayment, body, {
+        Authorization: `Bearer ${token}`,
+      });
 
       if (!response.data.success) {
         toast.error(response.data.message || "Order creation failed");
