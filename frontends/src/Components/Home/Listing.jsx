@@ -3,6 +3,7 @@
   import About from '../extra/AboutUs'
   import JoinCard from '../extra/joinCard'
   import TrailerModal from '../extra/TrailerModal'
+  import LazyImage from '../extra/LazyImage'
   import { Swiper, SwiperSlide } from 'swiper/react';
   import 'swiper/css';
   import 'swiper/css/navigation';
@@ -22,11 +23,10 @@
       className="group relative w-full h-[280px] sm:h-[300px] rounded-xl overflow-hidden cursor-pointer"
       onClick={onClick}
     >
-      <img
-        src={slide.Posterurl || PLACEHOLDER_IMG}
+      <LazyImage
+        src={slide.Posterurl}
         alt={slide.title}
-        loading="lazy"
-        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        className="absolute inset-0 w-full h-full transition-transform duration-500 group-hover:scale-110"
       />
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-300" />
