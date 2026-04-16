@@ -74,5 +74,17 @@ const paymentSchema = new mongoose.Schema({
     Showdate:{
         type:String
     },
+    couponCode: {
+        type: String,
+        default: null
+    },
+    discountAmount: {
+        type: Number,
+        default: 0
+    },
+    originalAmount: {
+        type: Number,
+        default: null
+    },
 },{timestamps:true})
 module.exports = mongoose.model("payment",paymentSchema)
