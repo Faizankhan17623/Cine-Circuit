@@ -12,6 +12,7 @@ import {ACCOUNT_TYPE} from './utils/constants'
 import CookieConsent from "react-cookie-consent";
 import { MdDesktopMac } from 'react-icons/md'
 import AIAgent from './Components/extra/AIAgent'
+import BotChat from './Components/extra/BotChat'
 import MaintenanceBanner from './Components/extra/MaintenanceBanner'
 import MaintenancePopup from './Components/extra/MaintenancePopup'
 import { fetchMaintenanceStatus } from './Services/operations/Maintenance'
@@ -68,6 +69,11 @@ const MovieCategory = lazy(() => import('./Components/Home/MovieCategory'))
 const MaintenanceMode = lazy(() => import('./Components/Dashboard/MaintenanceMode'))
 const BugReports = lazy(() => import('./Components/Dashboard/BugReports'))
 const AuditLogs = lazy(() => import('./Components/Dashboard/AuditLogs'))
+const AdminDashboardHome = lazy(() => import('./Components/Dashboard/AdminDashboardHome'))
+const OrganizerDashboardHome = lazy(() => import('./Components/Dashboard/OrganizerDashboardHome'))
+const TheatrerDashboardHome = lazy(() => import('./Components/Dashboard/TheatrerDashboardHome'))
+const OrganizerTicketReport = lazy(() => import('./Components/Dashboard/OrganizerTicketReport'))
+const CouponManager = lazy(() => import('./Components/Dashboard/CouponManager'))
 
 const PageLoader = () => (
   <div className="min-h-screen bg-richblack-900 flex items-center justify-center">
@@ -161,6 +167,7 @@ useEffect(() => {
       <MaintenancePopup />
       <ReviewPopup />
       <AIAgent />
+      <BotChat />
 
       <Suspense fallback={<PageLoader />}>
       <Routes>
@@ -243,6 +250,17 @@ useEffect(() => {
 }>
   
 
+  {/* Dashboard home — role-based */}
+  {user?.usertype === ACCOUNT_TYPE.ADMIN && (
+    <Route path="/Dashboard/Home" element={<AdminDashboardHome />} />
+  )}
+  {user?.usertype === ACCOUNT_TYPE.ORGANIZER && (
+    <Route path="/Dashboard/Home" element={<OrganizerDashboardHome />} />
+  )}
+  {user?.usertype === ACCOUNT_TYPE.THEATER && (
+    <Route path="/Dashboard/Home" element={<TheatrerDashboardHome />} />
+  )}
+
   {/* Common to all */}
   <Route path="/Dashboard/My-Profile" element={<Profile />} />
   <Route path="/Dashboard/Settings" element={<Settings />} />
@@ -273,8 +291,8 @@ useEffect(() => {
       <Route path="/Dashboard/Tickets/Create" element={<CreateTicket/>} />
       <Route path="/Dashboard/Tickets/Update" element={<TicketAllotment/>} />
       <Route path="/Dashboard/Tickets/All" element={<AllTickets/>} />
+      <Route path="/Dashboard/Ticket-Report" element={<OrganizerTicketReport />} />
       <Route path="/Dashboard/Chats" element={<Chat/>} />
-
     </>
   )}
 
@@ -304,6 +322,7 @@ useEffect(() => {
       <Route path="/Dashboard/Maintenance" element={<MaintenanceMode/>} />
       <Route path="/Dashboard/Bug-Reports" element={<BugReports/>} />
       <Route path="/Dashboard/Audit-Logs" element={<AuditLogs/>} />
+      <Route path="/Dashboard/Coupon-Manager" element={<CouponManager/>} />
     </>
   )}
 
