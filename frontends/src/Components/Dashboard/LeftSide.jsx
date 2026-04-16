@@ -16,7 +16,7 @@ import { FaLock, FaHashtag, FaUserFriends, FaFilm, FaUpload, FaList } from 'reac
 import {UserDetails} from '../../Services/operations/Auth'
 import {GetMyOrgDetails} from '../../Services/operations/orgainezer'
 import { FaTheaterMasks } from 'react-icons/fa'
-import { MdAttachMoney, MdLocalMovies, MdAccessTime, MdConstruction, MdBugReport } from 'react-icons/md'
+import { MdAttachMoney, MdLocalMovies, MdAccessTime, MdConstruction, MdBugReport, MdDashboard, MdBarChart, MdLocalOffer } from 'react-icons/md'
 import { FaTicketSimple } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 
@@ -96,6 +96,7 @@ const LeftSide = ({direction}) => {
 
 
   const organizerNav = [
+    { icon: MdDashboard, label: 'Home', path: '/Dashboard/Home', id: 0 },
     { icon: LuUserRound, label: 'My Profile', path: '/Dashboard/My-Profile', id: 1 },
     { icon: FaBookBookmark, label: 'My Shows', path: '/Dashboard/Manage-Events', id: 2 },
     {
@@ -105,18 +106,20 @@ const LeftSide = ({direction}) => {
       id: 3,
       disabled:organizerLocked
     },
-    { icon: CiChat1, label: 'Chat', path: '/Dashboard/Chats', id: 4 },
-    { icon: MdReviews, label: 'Reviews', path: '/Dashboard/My-Venues', id: 5 },
+    { icon: MdBarChart, label: 'Ticket Report', path: '/Dashboard/Ticket-Report', id: 4 },
+    { icon: CiChat1, label: 'Chat', path: '/Dashboard/Chats', id: 5 },
+    { icon: MdReviews, label: 'Reviews', path: '/Dashboard/My-Venues', id: 6 },
     {
       icon: IoSettings,
       label: 'Organizer Verification',
       path: '/Dashboard/Organizer-Verification',
-      id: 6,
+      id: 7,
       disabled: isVerificationDisabled
     },
   ];
 
     const adminNav = [
+    { icon: MdDashboard, label: 'Home', path: '/Dashboard/Home', id: 0 },
     { icon: LuUserRound, label: 'My Profile', path: '/Dashboard/My-Profile', id: 1 },
     { icon: FaBookBookmark, label: 'Org-Verification', path: '/Dashboard/Verifications', id: 2 },
     { icon: IoSettings, label: 'Genre', path: '/Dashboard/Genre', id: 3 },
@@ -127,9 +130,11 @@ const LeftSide = ({direction}) => {
     { icon: CiChat1, label: 'Chat', path: '/Dashboard/Chats', id: 8 },
     { icon: MdConstruction, label: 'Maintenance', path: '/Dashboard/Maintenance', id: 9 },
     { icon: MdBugReport, label: 'Bug Reports', path: '/Dashboard/Bug-Reports', id: 10 },
+    { icon: MdLocalOffer, label: 'Coupon Manager', path: '/Dashboard/Coupon-Manager', id: 11 },
   ];
 
   const theatreNav = [
+    { icon: MdDashboard, label: 'Home', path: '/Dashboard/Home', id: 0 },
     { icon: LuUserRound, label: 'My Profile', path: '/Dashboard/My-Profile', id: 1 },
     { icon: FaTheaterMasks, label: 'Theatre Details', path: '/Dashboard/Theatre-Details', id: 2 },
     { icon: MdAttachMoney, label: 'Total Sales', path: '/Dashboard/Total-Sales', id: 3 },
