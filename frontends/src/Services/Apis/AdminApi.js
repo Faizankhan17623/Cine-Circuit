@@ -108,3 +108,14 @@ export const AuditLogApi = {
     GetAuditLogs:      BASE_URL + "/Audit-Logs",
     ExportAuditLogCSV: BASE_URL + "/Export-Audit-Log",
 }
+
+export const AdminStatsApi = {
+    GetAdminStats: BASE_URL + "/Admin-Stats"
+}
+
+export const CouponAdminApi = {
+    CreateCoupon:  BASE_URL + "/Create-Coupon",
+    GetAllCoupons: BASE_URL + "/Get-All-Coupons",
+    UpdateCoupon:  BASE_URL + "/Update-Coupon",
+    DeleteCoupon:  BASE_URL + "/Delete-Coupon",
+}
