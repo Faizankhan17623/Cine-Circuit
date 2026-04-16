@@ -207,3 +207,45 @@
 .animate-slideUp {
   animation: slideUp 0.2s ease-out forwards;
 }
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* ─── Print styles ─────────────────────────────────────────────────────────── */
+@media print {
+  /* Hide everything on the page */
+  body * { visibility: hidden !important; }
+
+  /* Show only the ticket we marked to print */
+  .print-ticket,
+  .print-ticket * { visibility: visible !important; }
+
+  .print-ticket {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    background: #fff !important;
+    color: #000 !important;
+    padding: 32px !important;
+    font-size: 13px !important;
+    z-index: 99999 !important;
+  }
+
+  /* Force readable colors */
+  .print-ticket h3,
+  .print-ticket h4,
+  .print-ticket p,
+  .print-ticket span { color: #111 !important; }
+
+  .print-ticket .text-yellow-400 { color: #b45309 !important; }
+  .print-ticket .text-green-400  { color: #15803d !important; }
+  .print-ticket .text-red-400    { color: #b91c1c !important; }
+  .print-ticket .text-blue-400   { color: #1d4ed8 !important; }
+
+  .print-ticket hr { border-color: #ccc !important; }
+
+  /* Hide action buttons inside the ticket */
+  .print-ticket button,
+  .print-ticket .no-print { display: none !important; }
+}
