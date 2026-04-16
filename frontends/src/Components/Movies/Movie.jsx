@@ -399,10 +399,20 @@ const previousTag = location.state?.tag
                   </button>
                 )}
 
-                {/* Share Button */}
+                {/* Share Button — uses native share sheet on mobile, dropdown on desktop */}
                 <div className="relative" ref={shareRef}>
                   <button
-                    onClick={() => setShowShareMenu(prev => !prev)}
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: movie.title,
+                          text: `Check out ${movie.title} on Cine Circuit!`,
+                          url: `${siteUrl}/Movie/${movie._id}`,
+                        }).catch(() => {})
+                      } else {
+                        setShowShareMenu(prev => !prev)
+                      }
+                    }}
                     className="flex items-center gap-2 px-4 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white hover:bg-blue-500/20 hover:border-blue-500/30 transition-all"
                     title="Share this movie"
                   >
