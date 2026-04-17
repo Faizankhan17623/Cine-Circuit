@@ -110,7 +110,8 @@ export const AuditLogApi = {
 }
 
 export const AdminStatsApi = {
-    GetAdminStats: BASE_URL + "/Admin-Stats"
+    GetAdminStats:    BASE_URL + "/Admin-Stats",
+    GetVisitorStats:  BASE_URL + "/Visitor-Stats",
 }
 
 export const CouponAdminApi = {

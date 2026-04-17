@@ -15,7 +15,7 @@ const {notUploadedShows,VerifiedButnotUploaded} = require("../controllers/common
 const {SetMaintenance} = require('../controllers/Administrator/Maintenance')
 const {GetAllBugReports, UpdateBugStatus} = require('../controllers/Administrator/BugReportAdmin')
 const {GetAuditLogs, ExportAuditLogCSV} = require('../controllers/Administrator/AuditLog')
-const {GetAdminStats} = require('../controllers/Dashboard/AdminStats')
+const {GetAdminStats, GetVisitorStats} = require('../controllers/Dashboard/AdminStats')
 const {CreateCoupon, GetAllCoupons, UpdateCoupon, DeleteCoupon} = require('../controllers/Administrator/Coupon')
 
 // Returns first validation error as a 400 response
@@ -152,6 +152,7 @@ route.get("/Export-Audit-Log", auth, IsAdmin, ExportAuditLogCSV)
 
 // Admin Dashboard stats
 route.get("/Admin-Stats", auth, IsAdmin, GetAdminStats)
+route.get("/Visitor-Stats", auth, IsAdmin, GetVisitorStats)
 
 // Coupon management
 route.post("/Create-Coupon", auth, IsAdmin, [

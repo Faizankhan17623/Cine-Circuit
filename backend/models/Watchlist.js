@@ -4,14 +4,14 @@ const WatchlistSchema = new mongoose.Schema(
     {
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'user',
+            ref: 'User  ',
             required: true,
             unique: true,
         },
         movies: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'CreateShow',
+                ref: 'Show',
             },
         ],
     },

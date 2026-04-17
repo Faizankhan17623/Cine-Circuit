@@ -2,6 +2,7 @@ import { useState } from 'react'
 import InputBox from '../extra/InputBox'
 import { FaGooglePlay, FaAppStore, FaLinkedin, FaInstagram, FaTwitter, FaGithub, FaRegCopyright, FaHeart, FaFilm } from "react-icons/fa"
 import BugReportModal from '../extra/BugReportModal'
+import SiteStats from './SiteStats'
 
 const Footer = () => {
   const [bugOpen, setBugOpen] = useState(false)
@@ -9,6 +10,7 @@ const Footer = () => {
   return (
     <div className='w-full'>
       <InputBox />
+      <SiteStats />
 
       <footer className='w-full bg-richblack-800 border-t border-richblack-700'>
         {/* Main Footer Content */}

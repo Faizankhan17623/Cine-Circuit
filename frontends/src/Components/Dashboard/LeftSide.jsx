@@ -16,7 +16,7 @@ import { FaLock, FaHashtag, FaUserFriends, FaFilm, FaUpload, FaList } from 'reac
 import {UserDetails} from '../../Services/operations/Auth'
 import {GetMyOrgDetails} from '../../Services/operations/orgainezer'
 import { FaTheaterMasks } from 'react-icons/fa'
-import { MdAttachMoney, MdLocalMovies, MdAccessTime, MdConstruction, MdBugReport, MdDashboard, MdBarChart, MdLocalOffer } from 'react-icons/md'
+import { MdAttachMoney, MdLocalMovies, MdAccessTime, MdConstruction, MdBugReport, MdDashboard, MdBarChart, MdLocalOffer, MdPeople } from 'react-icons/md'
 import { FaTicketSimple } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 
@@ -131,6 +131,7 @@ const LeftSide = ({direction}) => {
     { icon: MdConstruction, label: 'Maintenance', path: '/Dashboard/Maintenance', id: 9 },
     { icon: MdBugReport, label: 'Bug Reports', path: '/Dashboard/Bug-Reports', id: 10 },
     { icon: MdLocalOffer, label: 'Coupon Manager', path: '/Dashboard/Coupon-Manager', id: 11 },
+    { icon: MdPeople,    label: 'Visitor Stats',  path: '/Dashboard/Visitor-Stats',  id: 12 },
   ];
 
   const theatreNav = [

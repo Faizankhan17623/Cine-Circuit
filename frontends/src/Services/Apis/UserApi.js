@@ -100,6 +100,10 @@ export const MaintenanceStatus = {
     status: BASE_URL + "/Maintenance-Status"
 }
 
+export const PublicStatsApi = {
+    GetPublicStats: BASE_URL + "/Public-Stats"
+}
+
 export const Recommendation = {
     PublicGenres: BASE_URL + "/Public-Genres",
     RecommendMovies: BASE_URL + "/Recommend-Movies"

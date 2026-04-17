@@ -20,6 +20,7 @@ const {LinkSend,ResetPassword} = require('../controllers/user/Resetpassword')
 const {AllShows,usingtitle,SearchAll} = require('../controllers/common/Showlist')
 const {GetMaintenance} = require('../controllers/Administrator/Maintenance')
 const {PublicGenres, RecommendMovies} = require('../controllers/common/Recommend')
+const {GetPublicStats} = require('../controllers/Dashboard/AdminStats')
 const {ReportBug, GetMyBugReports} = require('../controllers/common/BugReport')
 const {SubmitFeedback} = require('../controllers/common/Feedback')
 const {AddToWatchlist, RemoveFromWatchlist, GetMyWatchlist} = require('../controllers/user/Watchlist')
@@ -28,7 +29,7 @@ const {TicketPurchased,TicketPurchasedFullDetails} = require("../controllers/Das
 const {GetAlluserDetails,FindUserNames,FindLoginEmail,FindNumber,FindCreationEmail} = require('../controllers/user/User')
 const {BannerMovies,FIndusingMOvieTags,FindWholeMoviesData,FindMovieById,PurcahsingData,MostLikedMovies,HighlyRatedMovies,RecentlyReleased,ContentBasedAlgorithm} = require('../controllers/Dashboard/UserDashboard')
 const {GetSingleTheatreDetails,getTheatreDetails, GetShowsDetails} = require('../controllers/Dashboard/TheatrereDashboard')
-const {AddToWatchlist, RemoveFromWatchlist, GetMyWatchlist} = require('../controllers/user/Watchlist')
+// const {AddToWatchlist, RemoveFromWatchlist, GetMyWatchlist} = require('../controllers/user/Watchlist')
 const {GetGenresAndLanguages, EnhancedFinder} = require('../controllers/Dashboard/EnhancedSearch')
 const {ValidateCoupon} = require('../controllers/common/ValidateCoupon')
 // DONE
@@ -161,6 +162,9 @@ route.get('/Single-Theatre', GetSingleTheatreDetails)
 
 // Public maintenance status — no auth required
 route.get('/Maintenance-Status', GetMaintenance)
+
+// Public platform stats — no auth required, shown on homepage
+route.get('/Public-Stats', GetPublicStats)
 
 // Movie recommendation — public
 route.get('/Public-Genres', PublicGenres)

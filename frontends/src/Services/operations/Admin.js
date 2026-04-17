@@ -1,6 +1,6 @@
 // new update gaha par lageggnage wahe functino create kar ke usko usee kar lenga apun
 import toast from "react-hot-toast";
-import  {Orgaineser, Genre, SubGenre, Language, VerifiedUsers, UnverifiedUsers, VerifiedOrgainesers, UnverifiedOrgainesers, VerifiedTheatres, UnverifiedTheatres, ShowVerification,Theatre,TheatreVerification} from '../Apis/AdminApi'
+import  {Orgaineser, Genre, SubGenre, Language, VerifiedUsers, UnverifiedUsers, VerifiedOrgainesers, UnverifiedOrgainesers, VerifiedTheatres, UnverifiedTheatres, ShowVerification,Theatre,TheatreVerification, AdminStatsApi} from '../Apis/AdminApi'
 import {apiConnector} from '../apiConnector'
 import {setLoading} from '../../Slices/orgainezerSlice'
 import {setAttempts,setStatus,setEditUntil,setRoleProfile,setRoleExperience,setRejectedData,setLockedUntill} from '../../Slices/orgainezerSlice'
@@ -810,5 +810,20 @@ export function VerifyTheatres(token, navigate, id, verification) {
       toast.dismiss(ToastId)
     }
   }
+}
+
+export function GetAdminStats(token) {
+    return async () => {
+        try {
+            const response = await apiConnector("GET", AdminStatsApi.GetAdminStats, null, {
+                Authorization: `Bearer ${token}`,
+            })
+            if (!response.data.success) throw new Error(response.data.message)
+            return { success: true, data: response.data.data }
+        } catch (error) {
+            console.error("GetAdminStats error:", error)
+            return { success: false }
+        }
+    }
 }
 

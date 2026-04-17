@@ -74,6 +74,7 @@ const OrganizerDashboardHome = lazy(() => import('./Components/Dashboard/Organiz
 const TheatrerDashboardHome = lazy(() => import('./Components/Dashboard/TheatrerDashboardHome'))
 const OrganizerTicketReport = lazy(() => import('./Components/Dashboard/OrganizerTicketReport'))
 const CouponManager = lazy(() => import('./Components/Dashboard/CouponManager'))
+const VisitorStats = lazy(() => import('./Components/Dashboard/VisitorStats'))
 
 const PageLoader = () => (
   <div className="min-h-screen bg-richblack-900 flex items-center justify-center">
@@ -323,6 +324,7 @@ useEffect(() => {
       <Route path="/Dashboard/Bug-Reports" element={<BugReports/>} />
       <Route path="/Dashboard/Audit-Logs" element={<AuditLogs/>} />
       <Route path="/Dashboard/Coupon-Manager" element={<CouponManager/>} />
+      <Route path="/Dashboard/Visitor-Stats" element={<VisitorStats/>} />
     </>
   )}
 

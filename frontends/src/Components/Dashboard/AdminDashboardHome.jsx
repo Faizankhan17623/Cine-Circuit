@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { GetAdminStats } from '../../Services/operations/Admin'
 import {
   MdPeople, MdVerified, MdPendingActions, MdBugReport,
-  MdMovie, MdConstruction, MdArrowForward
+  MdMovie, MdConstruction, MdArrowForward, MdTrendingUp, MdToday
 } from 'react-icons/md'
 import { FaUserTie, FaTheaterMasks } from 'react-icons/fa'
 
@@ -182,6 +182,19 @@ const AdminDashboardHome = () => {
           </div>
         </div>
       </div>
+
+      {/* ── Visitor Stats ─────────────────────────────── */}
+      {stats?.visitors && (
+        <div>
+          <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider mb-3">Site Traffic</h2>
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+            <StatCard icon={MdPeople}     label="Total Unique Visitors" value={stats.visitors.totalUnique}     color="blue"   to="/Dashboard/Visitor-Stats" />
+            <StatCard icon={MdTrendingUp} label="Total Page Visits"     value={stats.visitors.totalVisits}     color="purple" to="/Dashboard/Visitor-Stats" />
+            <StatCard icon={MdToday}      label="Visitors Today"        value={stats.visitors.visitorsToday}   color="green"  to="/Dashboard/Visitor-Stats" />
+            <StatCard icon={MdPeople}     label="New Visitors Today"    value={stats.visitors.newVisitorsToday} color="orange" to="/Dashboard/Visitor-Stats" />
+          </div>
+        </div>
+      )}
 
       {/* ── Pending alerts ────────────────────────────── */}
       {((stats?.users?.pendingOrgRequests ?? 0) > 0 || (stats?.shows?.unverified ?? 0) > 0) && (

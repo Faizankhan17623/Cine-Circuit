@@ -7,8 +7,8 @@ import { SendOtp, Login, CreateUser, SearchApi } from '../Apis/UserApi';
 import { CreateOrgainezer } from '../Apis/OranizaerApi';
 import { CreateTheatrere } from '../Apis/TheatreApi';
 import { setToken, setLogin, setUser, setUserImage } from '../../Slices/authSlice';
-import { setuser, setStatus, setAttempts, setEditUntil } from '../../Slices/ProfileSlice';
-import { setRejectedData } from '../../Slices/orgainezerSlice';
+import { setuser } from '../../Slices/ProfileSlice';
+import { setStatus,setRejectedData , setAttempts, setEditUntil} from '../../Slices/orgainezerSlice';
 
 // ── Send OTP ──────────────────────────────────────────────────────────────────
 export async function botSendOtp(email) {
