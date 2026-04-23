@@ -152,6 +152,39 @@ useEffect(() => {
   dispatch(fetchMaintenanceStatus())
 }, [])
 
+useEffect(() => {
+  const goOffline = () => {
+    console.error('[Cine Circuit] No internet connection detected.')
+    toast.error('No internet connection!', {
+      id: 'network-status',
+      duration: Infinity,
+      icon: '📡',
+      style: { background: '#1e1e2e', color: '#fff', border: '1px solid #ef4444' },
+    })
+  }
+
+  const goOnline = () => {
+    console.log('[Cine Circuit] Internet connection restored.')
+    toast.dismiss('network-status')
+    toast.success('Back online!', {
+      id: 'network-online',
+      duration: 3000,
+      icon: '✅',
+      style: { background: '#1e1e2e', color: '#fff', border: '1px solid #22c55e' },
+    })
+  }
+
+  // fire immediately if already offline when component mounts
+  if (!navigator.onLine) goOffline()
+
+  window.addEventListener('offline', goOffline)
+  window.addEventListener('online', goOnline)
+  return () => {
+    window.removeEventListener('offline', goOffline)
+    window.removeEventListener('online', goOnline)
+  }
+}, [])
+
 
  if (user === null) {
     const storedUser = localStorage.getItem("userType");
