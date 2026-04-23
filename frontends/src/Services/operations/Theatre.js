@@ -30,8 +30,6 @@ export function CreateTheatree(name,email,password,number){
                 number:number
             })
 
-            console.log("Theatre created successfully", response)
-
             if(!response.data.success){
                 toast.error("The Theatre is not been created")
                 return
@@ -66,8 +64,6 @@ export function theatreinfo(email,name,locationname,locationurl,typesofseats,Scr
                 Theatreimages:image
             })
 
-            console.log("Theatre info fetched successfully", response)
-
             if(!response.data.success){
                 toast.error("The Theatre info is not fetched")
                 return
@@ -95,8 +91,6 @@ export function AllTheatresInfo(token){
                 Authorization: `Bearer ${token}`
             })
 
-            console.log("All Theatre info fetched successfully", response)
-
             if(!response.data.success){
                 toast.error("The All Theatre info is not fetched")
                 return
@@ -123,8 +117,6 @@ export function TheatreCreationRequestInfo(token){
             const response = await apiConnector("GET", theatrecreationrequest, null, {
                 Authorization: `Bearer ${token}`
             })
-
-            console.log("Theatre Creation Request info fetched successfully", response)
 
             if(!response.data.success){
                 toast.error("The Theatre Creation Request info is not fetched")
@@ -156,8 +148,6 @@ export function DistributeTicketsInfo(ticketCreation, ReleaseDate, showId, token
                 Authorization: `Bearer ${token}`
             })
 
-            console.log("Tickets distributed successfully", response)
-
             if(!response.data.success){
                 return { success: false, message: response.data.message }
             }
@@ -182,8 +172,6 @@ export function UpdateTicketTimeData(theatreId, showId, ticketId, time, token){
             },{
                 Authorization: `Bearer ${token}`
             })
-
-            console.log("Tickets time updated successfully", response)
 
             if(!response.data.success){
                 toast.error(response.data.message || "The time is not updated")

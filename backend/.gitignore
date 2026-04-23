@@ -9,9 +9,8 @@ npm-debug.log*
 
 package-lock.json
 
-# Private planning files
-../BUGS_AND_ISSUES.md
-../FEATURES_TO_ADD.md
-../AI_FEATURES_TO_ADD.md
-../CURRENT_PROJECT_ENHANCEMENTS.md
-../PROJECT_RECOMMENDATIONS.md
+# Seeder / dev-only scripts
+seeder.js
+
+# Private planning files (root-level — handled by root .gitignore)
+# ../BUGS_AND_ISSUES.md  ← ../ patterns don't work in git, removed

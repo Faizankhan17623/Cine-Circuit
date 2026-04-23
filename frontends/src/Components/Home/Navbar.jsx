@@ -184,7 +184,7 @@ const Navbar = () => {
               <div className='fixed inset-0 z-40' onClick={() => setMenuOpen(false)} />
               <div className='absolute right-0 top-full mt-2 z-50 bg-richblack-800 border border-richblack-600 rounded-xl shadow-2xl shadow-black/40 py-2 min-w-[180px] overflow-hidden'>
                 <Link
-                  to={isLoggedIn ? "/Dashboard/my-profile" : "/SignUp"}
+                  to={isLoggedIn ? "/Dashboard/My-Profile" : "/SignUp"}
                   onClick={() => setMenuOpen(false)}
                   className='block px-4 py-2.5 text-sm text-richblack-100 hover:bg-richblack-700 hover:text-yellow-400 transition-colors'
                 >

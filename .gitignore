@@ -1,0 +1,26 @@
+# Documentation & personal files (not for version control)
+Cine_Circuit_Project_Report.md
+RESUME_PROJECT_DESCRIPTION.md
+RESUME_PROJECT_DESCRIPTION
+cine_circuit_analysis.txt
+faizansynopsis_fixed.pdf
+"Srms Documentation1.docx"
+Srms Documentation1.docx
+"Srms Documentation1a.pdf"
+Srms Documentation1a.pdf
+*.docx
+*.pdf
+
+# Private planning files
+BUGS_AND_ISSUES.md
+FEATURES_TO_ADD.md
+AI_FEATURES_TO_ADD.md
+CURRENT_PROJECT_ENHANCEMENTS.md
+PROJECT_RECOMMENDATIONS.md
+
+# Claude local config
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db

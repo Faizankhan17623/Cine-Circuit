@@ -60,19 +60,7 @@ const onsubmit = async (data) => {
   setLoading(true)
   setErrorMessage('')
   try {
-    const response = await dispatch(UserLogin(data.Email, data.Password, navigate))
-    // console.log("Login response:", response) // ADD THIS
-    if (response?.success) {
-      toast.success("Logged in successfully")
-      navigate("/Dashboard/my-profile")
-    } else {
-      // console.log("Login failed:", response) // ADD THIS
-      toast.error(response?.message || "Login failed")
-    }
-  } catch (error) {
-    console.error("Full error:", error) // ADD THIS
-    console.error("Error response:", error.response?.data) // ADD THIS
-    toast.error(error.response?.data?.message || error.message || "Login failed")
+    await dispatch(UserLogin(data.Email, data.Password, navigate))
   } finally {
     setLoading(false)
   }

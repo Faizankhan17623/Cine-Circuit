@@ -92,6 +92,7 @@ const LeftSide = ({direction}) => {
     { icon: FaBookBookmark, label:'Purchased Tickets', path: '/Dashboard/Purchased-Tickets', id: 2 },
     { icon: CiBookmark, label:'Wishlist', path: '/Dashboard/Wishlist', id: 3 },
     { icon: FaCartShopping, label:'Purchase History', path: '/Dashboard/Purchase-History', id: 4 },
+    { icon: MdBugReport, label:'My Bug Reports', path: '/Dashboard/My-Bug-Reports', id: 5 },
   ];
 
 

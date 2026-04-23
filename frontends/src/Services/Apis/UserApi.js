@@ -67,6 +67,7 @@ export const Ratings = {
     CreateRating:BASE_URL+"/createRating",
     GetAverageRating:BASE_URL+"/getAverageRating",
     GetAllRatingReview:BASE_URL+"/getReviews",
+    HasReviewed:BASE_URL+"/hasReviewed",
     banner :BASE_URL+"/Banner",
     finder :BASE_URL+"/Finder"
 }

@@ -11,8 +11,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import {ACCOUNT_TYPE} from './utils/constants'
 import CookieConsent from "react-cookie-consent";
 import { MdDesktopMac } from 'react-icons/md'
-import AIAgent from './Components/extra/AIAgent'
-import BotChat from './Components/extra/BotChat'
+import AgentLauncher from './Components/extra/AgentLauncher'
+import ScrollToTop from './Components/extra/ScrollToTop'
 import MaintenanceBanner from './Components/extra/MaintenanceBanner'
 import MaintenancePopup from './Components/extra/MaintenancePopup'
 import { fetchMaintenanceStatus } from './Services/operations/Maintenance'
@@ -68,6 +68,7 @@ const UpdateTicketTime = lazy(() => import('./Components/Dashboard/UpdateTicketT
 const MovieCategory = lazy(() => import('./Components/Home/MovieCategory'))
 const MaintenanceMode = lazy(() => import('./Components/Dashboard/MaintenanceMode'))
 const BugReports = lazy(() => import('./Components/Dashboard/BugReports'))
+const MyBugReports = lazy(() => import('./Components/Dashboard/MyBugReports'))
 const AuditLogs = lazy(() => import('./Components/Dashboard/AuditLogs'))
 const AdminDashboardHome = lazy(() => import('./Components/Dashboard/AdminDashboardHome'))
 const OrganizerDashboardHome = lazy(() => import('./Components/Dashboard/OrganizerDashboardHome'))
@@ -167,8 +168,8 @@ useEffect(() => {
       <MaintenanceBanner />
       <MaintenancePopup />
       <ReviewPopup />
-      <AIAgent />
-      <BotChat />
+      <AgentLauncher />
+      <ScrollToTop />
 
       <Suspense fallback={<PageLoader />}>
       <Routes>
@@ -274,7 +275,7 @@ useEffect(() => {
       <Route path="/Dashboard/Purchase-History" element={<History />} />
       <Route path="/Dashboard/Tickets" element={<Tickets />} />
       <Route path="/Dashboard/Chats" element={<Chat/>} />
-
+      <Route path="/Dashboard/My-Bug-Reports" element={<MyBugReports/>} />
     </>
   )}
 

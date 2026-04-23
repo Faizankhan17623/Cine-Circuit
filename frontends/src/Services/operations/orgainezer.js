@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast'
 import {apiConnector} from '../apiConnector'
-import {CreateOrgainezer,Ticket,AllotTheatre,GetAllSHowsDetails,GetAllTheatreDetails,orgainezerdata} from "../Apis/OranizaerApi"
+import {CreateOrgainezer,Ticket,AllotTheatre,GetAllSHowsDetails,GetAllTheatreDetails,orgainezerdata,OrganizerReports} from "../Apis/OranizaerApi"
 import {setLoading,setStatus,setAttempts,setEditUntil,setRejectedData} from '../../Slices/orgainezerSlice'
 import {setToken,setLogin,setUserImage,setUser} from '../../Slices/authSlice.js'
 import {setloading, setuser} from '../../Slices/ProfileSlice.js'
@@ -808,6 +808,54 @@ export function Alldetails (token,navigate){
       dispatch(setLoading(false));
     }
   }
+}
+
+export function GetOrganizerStats(token) {
+  return async (dispatch) => {
+    try {
+      let tokenStr = token;
+      try {
+        if (typeof token === "string" && (token.startsWith('"') || token.startsWith("{"))) {
+          tokenStr = JSON.parse(token);
+        }
+      } catch (e) { console.error(e) }
+
+      const response = await apiConnector("GET", OrganizerReports.OrganizerStats, null, {
+        Authorization: `Bearer ${tokenStr}`
+      });
+
+      if (!response?.data?.success) throw new Error(response?.data?.message || "Failed to fetch stats");
+      return { success: true, data: response.data.data };
+    } catch (error) {
+      console.error("GetOrganizerStats error:", error);
+      toast.error(error?.response?.data?.message || error.message || "Failed to fetch stats");
+      return { success: false };
+    }
+  };
+}
+
+export function GetOrganizerTicketReport(token) {
+  return async (dispatch) => {
+    try {
+      let tokenStr = token;
+      try {
+        if (typeof token === "string" && (token.startsWith('"') || token.startsWith("{"))) {
+          tokenStr = JSON.parse(token);
+        }
+      } catch (e) { console.error(e) }
+
+      const response = await apiConnector("GET", OrganizerReports.OrganizerTicketReport, null, {
+        Authorization: `Bearer ${tokenStr}`
+      });
+
+      if (!response?.data?.success) throw new Error(response?.data?.message || "Failed to fetch ticket report");
+      return { success: true, data: response.data.data };
+    } catch (error) {
+      console.error("GetOrganizerTicketReport error:", error);
+      toast.error(error?.response?.data?.message || error.message || "Failed to fetch ticket report");
+      return { success: false };
+    }
+  };
 }
 
 // New function to get organizer's own data

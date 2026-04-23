@@ -112,6 +112,25 @@ exports.getAverageRating = async (req, res) => {
   }
 }
 
+// Check if the logged-in user has already reviewed a specific show
+exports.hasReviewed = async (req, res) => {
+  try {
+    const userId = req.USER.id
+    const { showId } = req.query
+
+    if (!showId) {
+      return res.status(400).json({ success: false, message: "showId is required" })
+    }
+
+    const existing = await RatingAndReview.findOne({ user: userId, course: showId })
+
+    return res.status(200).json({ success: true, hasReviewed: !!existing })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ success: false, message: "Internal server error" })
+  }
+}
+
 // Get all rating and reviews
 exports.getAllRatingReview = async (req, res) => {
   try {

@@ -19,7 +19,7 @@ const {specificshow} = SpecificShow
 const {Comments,GetAllComment,deleteComent} = Comment
 const {SendMessages,UpdateMessage,GetAllMessages} = SendMessage
 const {TicketPurchase,TicketPurchasedFullDetail} = TicketData
-const {CreateRating,GetAverageRating,GetAllRatingReview} = Ratings
+const {CreateRating,GetAverageRating,GetAllRatingReview,HasReviewed} = Ratings
 const {GetAllDetails,FindUserNames,FindloginEmail,FinduserEmail,FindNumber} = AllDetails
 const {MostLiked,HighlyRated,RecentlyReleased} = MovieStats
 const {TheatreData,MovieData} = NavbarData
@@ -85,7 +85,6 @@ export function FindUserName(First, Last) {
             // console.log("Api response...", response)
             
               if (!response.data.success) {
-            console.log("Api response...", response)
             return { success: false, message: response.data.message };
 
             }
@@ -236,7 +235,6 @@ export function UserLogin(email,pass,navigate){
         // const toastId = toast.loading("..loading")
         dispatch(setLoading(true))
         try{
-
              if (!email || !pass) {
                 throw new Error('Email and password are required');
             }
@@ -244,21 +242,17 @@ export function UserLogin(email,pass,navigate){
                 email:email,
                 password:pass
             })
-            // console.log(response)
-
-            console.log("User is been logged in ")
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
 
-            toast.success('Congragulations you are logged in')
+            toast.success('Congratulations you are logged in')
 
             dispatch(setToken(response.data.token))
             dispatch(setLogin(true))
 
             const userimage = response?.data?.user?.image
-            // console.log("This is the user image",userimage)
             dispatch(setUserImage(userimage))
             localStorage.setItem("userImage", userimage)
 
@@ -268,17 +262,15 @@ export function UserLogin(email,pass,navigate){
             localStorage.setItem('token', JSON.stringify(response.data.token))
             localStorage.setItem('Verified', JSON.stringify(response.data.user.verified))
             navigate('/Dashboard/My-Profile')
+            return { success: true }
 
-            
         }catch(error){
-            toast.error(error.response.data.message)
-            console.log(error.response.data.message)
-            console.log("There is an error in the login process",error)
-            console.log("unable to log in")
+            const msg = error?.response?.data?.message || error?.message || "Login failed"
+            toast.error(msg)
+            return { success: false, message: msg }
+        }finally{
+            dispatch(setLoading(false))
         }
-
-        dispatch(setLoading(false))
-        // toast.dismiss(toastId)  
 
     }
 }
@@ -321,9 +313,6 @@ export function GetPasswordResettoken(email,emailsend){
             const response = await apiConnector("POST",LinkSend,{
                 email:email
             })
-            console.log("This is the responsee data",response)
-            console.log("Reset Password Token Send")
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
@@ -332,8 +321,7 @@ export function GetPasswordResettoken(email,emailsend){
             emailsend(true)
             return { success: true, data: response.data };
         } catch (error) {
-            console.log("Error in updating the password",error)
-            console.log("Error in updating the password")
+            toast.error(error?.response?.data?.message || "Error sending reset link")
         }
         dispatch(setloading(false))
         // toast.dismiss(toastId)
@@ -354,17 +342,13 @@ export function Restpassword(password,ConfirmPassword,token,navigate){
                 ConfirmPassword,
                 token
             })
-            console.log("This Password Has Been Resetted")
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
 
             toast.success("Password Reset Successfully")
         } catch (error) {
-            console.log("Error in updating the password",error)
-            console.log("Error in updating the password")
-            toast.error(error.response.data.message || "Error in resetting the password")
+            toast.error(error?.response?.data?.message || "Error in resetting the password")
         }
         dispatch(setLoading(false))
         toast.dismiss(toastId)
@@ -381,17 +365,13 @@ export function Updateusername(name){
             const response = await apiConnector("PUT",UpdateUsername,{
                 userName:name
             })
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
             dispatch(setUser(response.data.user))
             toast.success("UserName Updated Successfully")
         } catch (error) {
-            console.log("Error in updating the username",error)
-            console.log(error.message)
-            console.log("Error in updating the username")
+            toast.error(error?.response?.data?.message || "Error updating username")
         }
         dispatch(setloading(false))
         toast.dismiss(toastId)
@@ -407,18 +387,12 @@ export function Updatepassword(newpass,oldpass){
             const response = await apiConnector("PUT",UpdatePassword,{
                 password:newpass
             })
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
             toast.success("Password Updated Successfully")
         } catch (error) {
-            console.log("Error in updating the password",error)
-            console.log("Error in updating the password")
-            console.log("The old password is not correct")
-            console.log(oldpass)
-            toast.error("The old password is not correct")
+            toast.error(error?.response?.data?.message || "The old password is not correct")
         }
         dispatch(setloading(false))
         toast.dismiss(toastId)
@@ -433,16 +407,13 @@ export function Updateimage(image){
             const response = await apiConnector("PUT",UpdateImage,{
                 image:image
             })
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
 
             toast.success("Image Updated Successfully")
         } catch (error) {
-            console.log("Error in updating the image",error)
-            console.log("Error in updating the image")
+            toast.error(error?.response?.data?.message || "Error updating image")
         }
         dispatch(setloading(false))
         toast.dismiss(toastId)
@@ -457,16 +428,13 @@ export function Updatenumber(newnumber){
             const response = await apiConnector("PUT",UpdateNumber,{
                 number:newnumber
             })
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
 
             toast.success("Number Updated Successfully")
         } catch (error) {
-            console.log("Error in updating the number",error)
-            console.log("Error in updating the number")
+            toast.error(error?.response?.data?.message || "Error updating number")
         }
         dispatch(setloading(false))
         toast.dismiss(toastId)
@@ -479,16 +447,13 @@ export function GetCurrentUserDetails(){
         dispatch(setloading(true))
         try {
             const response = await apiConnector("GET",CurrentUserDetails)
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
 
             dispatch(setUser(response.data.user))
         } catch (error) {
-            console.log("Error in getting the current user details",error)
-            console.log("Error in getting the current user details")
+            toast.error(error?.response?.data?.message || "Error fetching user details")
         }
         dispatch(setloading(false))
         toast.dismiss(toastId)
@@ -556,15 +521,11 @@ export function createComment(movieId, commentText, token) {
         const toastId = toast.loading("Posting comment...")
         dispatch(setLoading(true))
         try {
-            console.log("Creating comment with:", { commentText, movieId })
-
             const response = await apiConnector("POST", `${Comments}?Showid=${movieId}`, {
                 comment: commentText
             }, {
                 Authorization: `Bearer ${token}`
             })
-
-            console.log("Create comment response:", response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
@@ -588,14 +549,10 @@ export function getAllComments(movieId, token) {
     return async (dispatch) => {
         dispatch(setLoading(true))
         try {
-            console.log("Fetching comments for movieId:", movieId)
-
             const response = await apiConnector("GET", `${GetAllComment}?Showid=${movieId}`)
-            console.log("API Response:", response)
 
             if (response?.data) {
                 const commentsData = response.data.data || response.data.comments || response.data
-                console.log("Comments found:", commentsData)
                 return { success: true, data: Array.isArray(commentsData) ? commentsData : [] }
             }
 
@@ -641,15 +598,13 @@ export function GetAllShowsData(){
         dispatch(setlaoding(true))
         try {
             const response = await apiConnector("GET",AllShows)
-            console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
             dispatch(setallShow(response.data.shows))
         } catch (error) {
-            console.log("Error in getting the all shows data",error)
-            console.log("Error in getting the all shows data")
+            toast.error(error?.response?.data?.message || "Error fetching shows")
         }
         dispatch(setlaoding(false))
         toast.dismiss(toastId)
@@ -664,15 +619,12 @@ export function GetSpecificShowData(id){
             const response = await apiConnector("GET",specificshow,{
                 id
             })
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
             dispatch(setShow(response.data.show))
         } catch (error) {
-            console.log("Error in getting the specific show data",error)
-            console.log("Error in getting the specific show data")
+            toast.error(error?.response?.data?.message || "Error fetching show")
         }
         dispatch(setlaoding(false))
         toast.dismiss(toastId)
@@ -688,8 +640,6 @@ export function CommentOnBanner(id,comment){
                 id,
                 comment:comment
             })
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
@@ -711,15 +661,12 @@ export function GetAllComments(id){
             const response = await apiConnector("GET",GetAllComment,{
                 id
             })
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
             dispatch(setShow(response.data.show))
         } catch (error) {
-            console.log("Error in getting the all comments data",error)
-            console.log("Error in getting the all comments data")
+            toast.error(error?.response?.data?.message || "Error fetching comments")
         }
         dispatch(setloading(false))
         toast.dismiss(toastId)
@@ -736,15 +683,12 @@ export function SendMessageFriends(to,message,type){
                 message:message,
                 typeOfmessage:type
             })
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
             toast.success("Message Send Successfully")
         } catch (error) {
-            console.log("Error in sending the message",error)
-            console.log("Error in sending the message")
+            toast.error(error?.response?.data?.message || "Error sending message")
         }
         dispatch(setloading(false))
         toast.dismiss(toastId)
@@ -760,15 +704,12 @@ export function Updatemessage(id,message){
                 id,
                 message:message
             })
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
             toast.success("Message Updated Successfully")
         } catch (error) {
-            console.log("Error in updating the message",error)
-            console.log("Error in updating the message")
+            toast.error(error?.response?.data?.message || "Error updating message")
         }
         dispatch(setloading(false))
         toast.dismiss(toastId)
@@ -781,15 +722,12 @@ export function GetallMessages(){
         dispatch(setloading(true))
         try {
             const response = await apiConnector("GET",GetAllMessages)
-            console.log("This is the responsee data",response)
-
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
             dispatch(setShow(response.data.show))
         } catch (error) {
-            console.log("Error in getting the all messages data",error)
-            console.log("Error in getting the all messages data")
+            toast.error(error?.response?.data?.message || "Error fetching messages")
         }
         dispatch(setloading(false))
         toast.dismiss(toastId)
@@ -803,15 +741,13 @@ export function ticketpurchased(){
         try{
             const response = await apiConnector("GET",TicketPurchase)
             dispatch(setuser(response.data.user))
-            console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
-            dispatch(setShow(response.data.show))            
+            dispatch(setShow(response.data.show))
         }catch(error){
-            console.log("Error in getting the ticket purchase data",error)
-            console.log("Error in getting the ticket purchase data")
+            toast.error(error?.response?.data?.message || "Error fetching tickets")
         }
         dispatch(setlaoding(false))
         toast.dismiss(toastId)
@@ -825,15 +761,13 @@ export function ticketpurchasedfull(){
         try{
             const response = await apiConnector("GET",TicketPurchasedFullDetail)
             dispatch(setuser(response.data.user))
-            console.log("This is the responsee data",response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
-            dispatch(setShow(response.data.show))            
+            dispatch(setShow(response.data.show))
         }catch(error){
-            console.log("Error in getting the ticket purchase data",error)
-            console.log("Error in getting the ticket purchase data")
+            toast.error(error?.response?.data?.message || "Error fetching ticket details")
         }
         dispatch(setlaoding(false))
         toast.dismiss(toastId)
@@ -898,6 +832,21 @@ export function getAllRatingReview(){
         } catch (error) {
             console.log("Error in getting the all rating and review", error)
             return { success: false, data: [] }
+        }
+    }
+}
+
+export function checkHasReviewed(showId, token){
+    return async(dispatch)=>{
+        try {
+            const response = await apiConnector("GET", `${HasReviewed}?showId=${showId}`, null, {
+                Authorization: `Bearer ${token}`
+            })
+            if (!response.data.success) throw new Error(response.data.message)
+            return { success: true, hasReviewed: response.data.hasReviewed }
+        } catch (error) {
+            console.log("Error checking hasReviewed", error)
+            return { success: false, hasReviewed: false }
         }
     }
 }
@@ -981,7 +930,6 @@ export function getNavbarMovieData(){
             }
             return { success: true, data: response.data.data }
         } catch (error) {
-            console.log("Error in getting the navbar movie data",error)
             return { success: false, data: [] }
         }
     }
@@ -997,7 +945,6 @@ export function getNavbarTheatreData(){
             }
             return { success: true, data: response.data.data }
         } catch (error) {
-            console.log("Error in getting the navbar theatre data",error)
             return { success: false, data: [] }
         }
     }

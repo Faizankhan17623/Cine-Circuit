@@ -1,12 +1,7 @@
-// BotChat.jsx — Cine Circuit Form-Filling Bot UI
-// Floating chat window (bottom-left). Lets admins/testers create accounts,
-// login, logout, and search movies via natural language commands.
-
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { FaRobot, FaTimes, FaPaperPlane, FaFilm } from 'react-icons/fa';
-import { MdOutlineSmartToy } from 'react-icons/md';
 import { parseCommand, FLOW_FIELDS, FIELD_PROMPTS } from '../../utils/botCommandParser';
 import {
   botSendOtp,
@@ -81,11 +76,10 @@ const Bubble = ({ msg }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-export default function BotChat() {
+export default function BotChat({ onClose, onBack }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
@@ -103,15 +97,13 @@ export default function BotChat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // ── Focus input when opened ───────────────────────────────────────────────
+  // ── Seed welcome message and focus on mount ───────────────────────────────
   useEffect(() => {
-    if (open) {
-      if (messages.length === 0) {
-        pushBot(WELCOME);
-      }
-      setTimeout(() => inputRef.current?.focus(), 100);
+    if (messages.length === 0) {
+      pushBot(WELCOME);
     }
-  }, [open]);
+    setTimeout(() => inputRef.current?.focus(), 100);
+  }, []);
 
   // ── Helpers ───────────────────────────────────────────────────────────────
   const pushBot = (text, extra = {}) => {
@@ -244,107 +236,97 @@ export default function BotChat() {
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="fixed bottom-8 left-8 z-[9980]">
+    <div className="absolute bottom-20 right-0 w-[360px] max-h-[70vh] flex flex-col bg-richblack-800 border border-richblack-600 rounded-2xl shadow-2xl shadow-yellow-900/20 overflow-hidden"
+      style={{ animation: 'slideUpBot 0.2s ease-out' }}
+    >
 
-      {/* ── Chat window ────────────────────────────────────────────────── */}
-      {open && (
-        <div className="absolute bottom-20 left-0 w-[360px] max-h-[70vh] flex flex-col bg-richblack-800 border border-richblack-600 rounded-2xl shadow-2xl shadow-yellow-900/20 overflow-hidden"
-          style={{ animation: 'slideUpBot 0.2s ease-out' }}
-        >
-
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 shrink-0">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                <FaRobot className="text-white text-sm" />
-              </div>
-              <div>
-                <p className="text-white font-bold text-sm leading-tight">Data Bot</p>
-                <p className="text-yellow-100 text-xs">Account & Search Assistant</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setOpen(false)}
-              className="text-white/70 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10"
-            >
-              <FaTimes />
-            </button>
-          </div>
-
-          {/* Guided-flow bar */}
-          {pendingIntent && (
-            <div className="mx-3 mt-2 px-3 py-1.5 bg-yellow-900/20 border border-yellow-600/30 rounded-xl flex items-center justify-between shrink-0">
-              <p className="text-yellow-300 text-xs">
-                Collecting info for: <span className="font-semibold">{pendingIntent.replace('_', ' ')}</span>
-                {' '}({remainingFields.length} field{remainingFields.length !== 1 ? 's' : ''} left)
-              </p>
-              <button
-                onClick={cancelFlow}
-                className="text-richblack-400 hover:text-red-400 transition-colors text-xs ml-2 shrink-0"
-              >
-                cancel
-              </button>
-            </div>
-          )}
-
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1 scrollbar-thin scrollbar-thumb-richblack-600 scrollbar-track-transparent">
-            {messages.map((msg, i) => (
-              <Bubble key={i} msg={msg} />
-            ))}
-            <div ref={bottomRef} />
-          </div>
-
-          {/* Input */}
-          <form
-            onSubmit={handleSubmit}
-            className="flex items-center gap-2 px-3 py-2.5 border-t border-richblack-600 bg-richblack-800 shrink-0"
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 shrink-0">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onBack}
+            className="text-white/70 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10 mr-1"
+            title="Back to menu"
           >
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={busy}
-              placeholder={
-                pendingIntent
-                  ? FIELD_PROMPTS[remainingFields[0]] || 'Type your answer...'
-                  : 'Type a command...'
-              }
-              className="flex-1 bg-richblack-700 border border-richblack-600 focus:border-yellow-500 rounded-xl px-3 py-2 text-xs text-white outline-none placeholder:text-richblack-400 transition-colors disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={busy || !input.trim()}
-              className="w-8 h-8 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-white disabled:opacity-40 hover:from-yellow-400 hover:to-orange-400 transition-all active:scale-95 shrink-0"
-            >
-              <FaPaperPlane className="text-xs" />
-            </button>
-          </form>
-
-          {/* Footer hint */}
-          <div className="px-4 py-1.5 border-t border-richblack-700 bg-richblack-800/80 shrink-0">
-            <p className="text-xs text-richblack-500 text-center">
-              Press <kbd className="text-richblack-400 bg-richblack-700 px-1 rounded text-[10px]">Enter</kbd> to send &nbsp;·&nbsp; type <span className="text-yellow-600">cancel</span> to abort flow
-            </p>
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <FaRobot className="text-white text-sm" />
           </div>
+          <div>
+            <p className="text-white font-bold text-sm leading-tight">Data Bot</p>
+            <p className="text-yellow-100 text-xs">Account & Search Assistant</p>
+          </div>
+        </div>
+        <button
+          onClick={onClose}
+          className="text-white/70 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10"
+        >
+          <FaTimes />
+        </button>
+      </div>
+
+      {/* Guided-flow bar */}
+      {pendingIntent && (
+        <div className="mx-3 mt-2 px-3 py-1.5 bg-yellow-900/20 border border-yellow-600/30 rounded-xl flex items-center justify-between shrink-0">
+          <p className="text-yellow-300 text-xs">
+            Collecting info for: <span className="font-semibold">{pendingIntent.replace('_', ' ')}</span>
+            {' '}({remainingFields.length} field{remainingFields.length !== 1 ? 's' : ''} left)
+          </p>
+          <button
+            onClick={cancelFlow}
+            className="text-richblack-400 hover:text-red-400 transition-colors text-xs ml-2 shrink-0"
+          >
+            cancel
+          </button>
         </div>
       )}
 
-      {/* ── Floating toggle button ──────────────────────────────────────── */}
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-900/40 hover:from-yellow-400 hover:to-orange-400 transition-all active:scale-95 hover:scale-105"
-        title="Open Data Bot"
-      >
-        {open
-          ? <FaTimes className="text-white text-xl" />
-          : <MdOutlineSmartToy className="text-white text-2xl" />
-        }
-      </button>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1 scrollbar-thin scrollbar-thumb-richblack-600 scrollbar-track-transparent">
+        {messages.map((msg, i) => (
+          <Bubble key={i} msg={msg} />
+        ))}
+        <div ref={bottomRef} />
+      </div>
 
-      {/* Slide-up animation */}
+      {/* Input */}
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center gap-2 px-3 py-2.5 border-t border-richblack-600 bg-richblack-800 shrink-0"
+      >
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={busy}
+          placeholder={
+            pendingIntent
+              ? FIELD_PROMPTS[remainingFields[0]] || 'Type your answer...'
+              : 'Type a command...'
+          }
+          className="flex-1 bg-richblack-700 border border-richblack-600 focus:border-yellow-500 rounded-xl px-3 py-2 text-xs text-white outline-none placeholder:text-richblack-400 transition-colors disabled:opacity-50"
+        />
+        <button
+          type="submit"
+          disabled={busy || !input.trim()}
+          className="w-8 h-8 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-white disabled:opacity-40 hover:from-yellow-400 hover:to-orange-400 transition-all active:scale-95 shrink-0"
+        >
+          <FaPaperPlane className="text-xs" />
+        </button>
+      </form>
+
+      {/* Footer hint */}
+      <div className="px-4 py-1.5 border-t border-richblack-700 bg-richblack-800/80 shrink-0">
+        <p className="text-xs text-richblack-500 text-center">
+          Press <kbd className="text-richblack-400 bg-richblack-700 px-1 rounded text-[10px]">Enter</kbd> to send &nbsp;·&nbsp; type <span className="text-yellow-600">cancel</span> to abort flow
+        </p>
+      </div>
+
       <style>{`
         @keyframes slideUpBot {
           from { opacity: 0; transform: translateY(12px); }

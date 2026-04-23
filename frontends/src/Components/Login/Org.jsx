@@ -61,7 +61,7 @@ const Org = () => {
       const response = await dispatch(OrgainezerLogin(data.Email, data.Password, navigate))
       if (response?.success) {
         toast.success("Logged in successfully")
-        navigate("/Dashboard/my-profile")
+        navigate("/Dashboard/My-Profile")
       }
     } catch (error) {
       toast.error(error.message || "Login failed")

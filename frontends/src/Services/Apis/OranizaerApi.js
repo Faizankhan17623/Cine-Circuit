@@ -34,3 +34,8 @@ export const orgainezerdata = {
     ProducerExperience:BASE_URL + "/Pro-Expe",
     GetMyOrgData: BASE_URL + "/My-Org-Data"
 }
+
+export const OrganizerReports = {
+    OrganizerStats: BASE_URL + "/Organizer-Stats",
+    OrganizerTicketReport: BASE_URL + "/Organizer-Ticket-Report"
+}

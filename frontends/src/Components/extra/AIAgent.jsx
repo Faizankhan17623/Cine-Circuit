@@ -26,8 +26,7 @@ const useTypewriter = (text, speed = 14) => {
   return displayed;
 };
 
-const AIAgent = () => {
-  const [open, setOpen] = useState(false);
+const AIAgent = ({ onClose, onBack }) => {
   const [search, setSearch] = useState('');
   const [expandedCategories, setExpandedCategories] = useState({});
   const [activeAnswer, setActiveAnswer] = useState('');
@@ -42,7 +41,6 @@ const AIAgent = () => {
   const [recMovies, setRecMovies] = useState([]);
   const [recLoading, setRecLoading] = useState(false);
 
-  const popupRef = useRef(null);
   const answerRef = useRef(null);
   const navigate = useNavigate();
 
@@ -76,16 +74,6 @@ const AIAgent = () => {
       ),
     }))
     .filter((cat) => cat.tasks.length > 0);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (popupRef.current && !popupRef.current.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-    if (open) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [open]);
 
   const toggleCategory = (id) => {
     setExpandedCategories((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -318,13 +306,18 @@ const AIAgent = () => {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-50" ref={popupRef}>
-      {open && (
-        <div className="absolute bottom-20 right-0 w-[370px] max-h-[75vh] flex flex-col bg-richblack-800 border border-richblack-600 rounded-2xl shadow-2xl shadow-purple-900/30 overflow-hidden animate-slideUp">
+    <div className="absolute bottom-20 right-0 w-[370px] max-h-[75vh] flex flex-col bg-richblack-800 border border-richblack-600 rounded-2xl shadow-2xl shadow-purple-900/30 overflow-hidden animate-slideUp">
 
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 shrink-0">
             <div className="flex items-center gap-2">
+              <button
+                onClick={onBack}
+                className="text-white/70 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10 mr-1"
+                title="Back to menu"
+              >
+                <IoArrowBack className="text-base" />
+              </button>
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                 <FaRobot className="text-white text-sm" />
               </div>
@@ -334,7 +327,7 @@ const AIAgent = () => {
               </div>
             </div>
             <button
-              onClick={() => setOpen(false)}
+              onClick={onClose}
               className="text-white/70 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10"
             >
               <FaTimes />
@@ -467,32 +460,6 @@ const AIAgent = () => {
               )}
             </p>
           </div>
-        </div>
-      )}
-
-      {/* Floating Button */}
-      <div className="relative group">
-        <button
-          onClick={() => setOpen((prev) => !prev)}
-          className={`w-14 h-14 flex items-center justify-center rounded-full transition-all duration-300 shadow-xl hover:scale-110 ${
-            open
-              ? 'bg-gradient-to-r from-purple-400 to-pink-400 shadow-purple-500/40'
-              : 'bg-gradient-to-r from-purple-500 to-pink-500 shadow-purple-500/30'
-          }`}
-        >
-          {open ? <FaTimes className="text-xl text-white" /> : <FaRobot className="text-2xl text-white" />}
-        </button>
-
-        {!open && (
-          <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute bottom-full right-0 mb-3 pointer-events-none">
-            <div className="bg-richblack-700 border border-richblack-500 rounded-lg px-4 py-2 shadow-xl whitespace-nowrap">
-              <p className="text-sm text-white font-semibold">AI Movie Agent</p>
-              <p className="text-xs text-richblack-400">Click to explore tasks</p>
-              <div className="absolute top-full right-5 -mt-1 border-4 border-transparent border-t-richblack-700" />
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 };

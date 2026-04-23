@@ -1,6 +1,6 @@
 import Left from './LeftSide'
 import Navbar from '../Home/Navbar'
-import { Outlet ,useLocation } from 'react-router-dom'
+import { Outlet, useLocation, Navigate } from 'react-router-dom'
 import { FaChevronRight,FaChevronLeft } from "react-icons/fa";
 import { useState } from 'react';
 import Org from './OrganizerVerificationForm'
@@ -9,6 +9,10 @@ const Connector = () => {
   const location = useLocation();
   const isBaseDashboard = location.pathname === '/Dashboard' || location.pathname === '/Dashboard/';
   const [direction,Setdirection] = useState(false)
+
+  if (isBaseDashboard) {
+    return <Navigate to="/Dashboard/My-Profile" replace />
+  }
 
   return (
     <div className='w-screen h-screen overflow-hidden flex flex-col'>

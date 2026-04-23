@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import { PurcahsedTickets } from "../../Services/operations/User"
-import { createRating } from "../../Services/operations/Auth"
+import { createRating, checkHasReviewed } from "../../Services/operations/Auth"
 import { FaStar, FaRegStar, FaTimes } from "react-icons/fa"
 
 const ReviewPopup = () => {
@@ -60,6 +60,9 @@ const ReviewPopup = () => {
           const popupExpiry = new Date(movieEndTime.getTime() + 24 * 60 * 60 * 1000)
 
           if (now >= movieEndTime && now <= popupExpiry) {
+            const reviewCheck = await dispatch(checkHasReviewed(ticket.showid, token))
+            if (reviewCheck?.hasReviewed) continue
+
             setMovieToReview({
               showId: ticket.showid,
               showDate: showDateStr,
