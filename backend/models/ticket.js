@@ -37,7 +37,7 @@ const CreateTicketSchema = new mongoose.Schema({
     },
     allotedToTheatres: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Theatres", 
+        ref: "Theatrees", 
     }],
 }, { timestamps: true });
 

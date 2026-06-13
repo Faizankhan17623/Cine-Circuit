@@ -44,7 +44,7 @@ const couponSchema = new mongoose.Schema({
     usedBy: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'user'
+            ref: 'User'
         }
     ],
     // How many times a single user can use this coupon
@@ -58,7 +58,7 @@ const couponSchema = new mongoose.Schema({
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user',
+        ref: 'User',
         required: true
     }
 }, { timestamps: true })
