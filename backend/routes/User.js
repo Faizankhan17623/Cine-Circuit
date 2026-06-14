@@ -25,7 +25,7 @@ const {ReportBug, GetMyBugReports} = require('../controllers/common/BugReport')
 const {SubmitFeedback} = require('../controllers/common/Feedback')
 const {AddToWatchlist, RemoveFromWatchlist, GetMyWatchlist} = require('../controllers/user/Watchlist')
 const {createRating,getAverageRating,getAllRatingReview,hasReviewed} = require("../controllers/common/RatingAndRviews")
-const {TicketPurchased,TicketPurchasedFullDetails} = require("../controllers/Dashboard/UserDashboard")
+const {TicketPurchased,TicketPurchasedFullDetails,GetUserDashboardStats} = require("../controllers/Dashboard/UserDashboard")
 const {GetAlluserDetails,FindUserNames,FindLoginEmail,FindNumber,FindCreationEmail} = require('../controllers/user/User')
 const {BannerMovies,FIndusingMOvieTags,FindWholeMoviesData,FindMovieById,PurcahsingData,MostLikedMovies,HighlyRatedMovies,RecentlyReleased,ContentBasedAlgorithm} = require('../controllers/Dashboard/UserDashboard')
 const {GetSingleTheatreDetails,getTheatreDetails, GetShowsDetails} = require('../controllers/Dashboard/TheatrereDashboard')
@@ -143,6 +143,7 @@ route.get("/Get-AllMessages",auth, IsUSER,getAllMessage)
 
 route.get("/Ticket-Purchased",auth, IsUSER,TicketPurchased)
 route.get("/Ticket-Purchased-FullDetails",auth, IsUSER,TicketPurchasedFullDetails)
+route.get("/User-Dashboard-Stats",auth, IsUSER,GetUserDashboardStats)
 
 
 route.post("/createRating", auth, IsUSER, [

@@ -135,7 +135,7 @@ const entriesArray = Object.entries(show);
   
       return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="glass-card rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="relative">
               {show.Posterurl ? (
@@ -382,7 +382,7 @@ const entriesArray = Object.entries(show);
   
       return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-2xl max-w-md w-full p-6">
+          <div className="glass-card rounded-2xl max-w-md w-full p-6">
             <div className="text-center">
               <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
                 isVerify
@@ -467,8 +467,7 @@ const entriesArray = Object.entries(show);
       const isProcessing = verifyingShowId === show._id
   
       return (
-        <div className={`bg-[#1a1a2e] border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-l
-      +g group ${
+        <div className={`glass-card rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg group ${
           isVerified
             ? 'border-green-500/30 hover:border-green-500/50 hover:shadow-green-500/10'
             : 'border-orange-500/30 hover:border-orange-500/50 hover:shadow-orange-500/10'
@@ -712,7 +711,7 @@ const entriesArray = Object.entries(show);
                 placeholder="Search shows..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-[#1a1a2e] border border-gray-700/50 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500/50 w-full"
+                className="bg-richblack-700/50 border border-richblack-600 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30 w-full"
               />
             </div>
   
@@ -723,7 +722,7 @@ const entriesArray = Object.entries(show);
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="bg-[#1a1a2e] border border-gray-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-yellow-500/50"
+                  className="bg-richblack-700/50 border border-richblack-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30"
                 >
                   <option value="all">All Status</option>
                   <option value="verified">Verified Only</option>
@@ -735,7 +734,7 @@ const entriesArray = Object.entries(show);
           <button
             onClick={fetchShows}
             disabled={loading}
-            className="bg-[#1a1a2e] border border-gray-700/50 rounded-lg px-4 py-2 text-gray-400 hover:text-yeow-500 hover:border-yellow-500/50 transition-colors flex items-center gap-2"
+            className="bg-richblack-700/50 border border-richblack-600 rounded-lg px-4 py-2 text-gray-400 hover:text-yellow-500 hover:border-yellow-500/50 transition-colors flex items-center gap-2"
           >
             <FaSync className={loading ? 'animate-spin' : ''} />
             Refresh
@@ -817,7 +816,7 @@ const entriesArray = Object.entries(show);
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-2xl p-12 text-center max-w-md">
+          <div className="glass-card rounded-2xl p-12 text-center max-w-md">
             {activeTab === 'unverified' ? (
               <>
                 <MdCheckCircle className="text-8xl text-green-500/30 mx-auto mb-6" />

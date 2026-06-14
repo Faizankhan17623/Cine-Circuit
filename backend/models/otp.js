@@ -37,4 +37,7 @@ otpschema.pre("save", async function (next) {
        next() 
     }
 });
-module.exports =mongoose.model("OTP",otpschema) 
+// OTP verification lookup (TTL index on createdAt is defined above via `expires`)
+otpschema.index({ email: 1 })
+
+module.exports =mongoose.model("OTP",otpschema)

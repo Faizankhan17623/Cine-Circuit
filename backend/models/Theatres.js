@@ -96,4 +96,9 @@ const CreateLanguageSchema =  new mongoose.Schema({
         enum :["Pending","Approved","Rejected"]
     }
 },{timestamps:true})
+
+// Admin filtering by owner / approval status
+CreateLanguageSchema.index({ Owner: 1 })
+CreateLanguageSchema.index({ status: 1 })
+
 module.exports = mongoose.model('Theatrees',CreateLanguageSchema)

@@ -88,6 +88,7 @@ const LeftSide = ({direction}) => {
 // console.log("This is the data of the user details",data)
 
   const viewerNav = [
+    { icon: MdDashboard, label: 'Home', path: '/Dashboard/Home', id: 0 },
     { icon: LuUserRound, label:'My Profile', path: '/Dashboard/My-Profile', id: 1 },
     { icon: FaBookBookmark, label:'Purchased Tickets', path: '/Dashboard/Purchased-Tickets', id: 2 },
     { icon: CiBookmark, label:'Wishlist', path: '/Dashboard/Wishlist', id: 3 },
@@ -223,7 +224,7 @@ const LeftSide = ({direction}) => {
 
   return (
 <div
-  className={`w-full h-full bg-richblack-800 flex flex-col text-richblack-900 transition-all duration-300 ease-in-out ${
+  className={`w-full h-full bg-richblack-900/60 backdrop-blur-md flex flex-col text-richblack-900 transition-all duration-300 ease-in-out ${
     direction ? "hidden" : "flex h-full"
   }`}
 >

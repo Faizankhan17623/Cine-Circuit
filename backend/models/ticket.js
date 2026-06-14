@@ -41,4 +41,6 @@ const CreateTicketSchema = new mongoose.Schema({
     }],
 }, { timestamps: true });
 
+CreateTicketSchema.index({ showid: 1 });
+
 module.exports = mongoose.model('Ticket', CreateTicketSchema);

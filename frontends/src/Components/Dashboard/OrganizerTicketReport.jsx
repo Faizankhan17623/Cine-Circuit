@@ -23,7 +23,7 @@ const statColours = {
 const StatCard = ({ icon: Icon, label, value, sub, color }) => {
   const c = statColours[color] || statColours.blue
   return (
-    <div className="bg-richblack-800 rounded-xl p-5 border border-richblack-700">
+    <div className="glass-card rounded-xl p-5">
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1 pr-2">
           <p className="text-richblack-400 text-xs mb-1 truncate">{label}</p>
@@ -89,7 +89,7 @@ const TicketCreationTab = ({ batches }) => {
   return (
     <div className="space-y-4">
       {batches.map((b) => (
-        <div key={b.ticketId} className="bg-richblack-800 rounded-xl border border-richblack-700 overflow-hidden">
+        <div key={b.ticketId} className="glass-card rounded-xl overflow-hidden">
           {/* Show header */}
           <div className="flex items-center gap-3 px-5 py-4 border-b border-richblack-700">
             <div className="flex-1 min-w-0">
@@ -165,7 +165,7 @@ const SalesReportTab = ({ batches }) => {
   return (
     <div className="space-y-4">
       {batches.map((b) => (
-        <div key={b.ticketId} className="bg-richblack-800 rounded-xl border border-richblack-700 overflow-hidden">
+        <div key={b.ticketId} className="glass-card rounded-xl overflow-hidden">
 
           {/* Header */}
           <button
@@ -285,7 +285,7 @@ const TheatreAllotmentTab = ({ batches }) => {
   return (
     <div className="space-y-5">
       {batchesWithAllotments.map((b) => (
-        <div key={b.ticketId} className="bg-richblack-800 rounded-xl border border-richblack-700 overflow-hidden">
+        <div key={b.ticketId} className="glass-card rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-richblack-700">
             <p className="text-white font-semibold">{b.showTitle}</p>
             <p className="text-richblack-400 text-xs mt-0.5">
@@ -335,7 +335,7 @@ const DailyBreakdownTab = ({ overallDailySales }) => {
   }
 
   return (
-    <div className="bg-richblack-800 rounded-xl border border-richblack-700 overflow-hidden">
+    <div className="glass-card rounded-xl overflow-hidden">
       <div className="px-5 py-4 border-b border-richblack-700">
         <p className="text-white font-semibold">All Shows — Daily Sales</p>
         <p className="text-richblack-400 text-xs mt-0.5">Aggregated across all your shows</p>

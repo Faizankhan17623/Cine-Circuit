@@ -7,4 +7,7 @@ const visitorSchema = new mongoose.Schema({
     lastVisited: { type: Date, default: Date.now }
 },{timestamps:true});
 
+// Upsert-by-IP on every visit
+visitorSchema.index({ ip: 1 });
+
 module.exports = mongoose.model("Visitor", visitorSchema);

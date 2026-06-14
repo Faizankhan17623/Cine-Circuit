@@ -19,5 +19,5 @@ const CreateOnlineSection = new mongoose.Schema({
         required:true,
         default:false
     }
-},{timeseries:true})
+},{timestamps:true})
 module.exports = mongoose.model("OnlineSection",CreateOnlineSection)

@@ -4,7 +4,7 @@ import { MdPeople, MdRefresh, MdTrendingUp, MdToday, MdPersonAdd, MdCalendarMont
 import { FetchVisitorStats } from "../../Services/operations/VisitorStats"
 
 const StatCard = ({ icon: Icon, label, value, color }) => (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 flex items-center gap-4">
+    <div className="glass-card rounded-xl p-4 flex items-center gap-4">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
             <Icon className="text-xl text-white" />
         </div>
@@ -84,14 +84,14 @@ const VisitorStats = () => {
             {/* Extra range stats */}
             {summary && (
                 <div className="grid grid-cols-2 gap-3 mb-8">
-                    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 flex items-center gap-3">
+                    <div className="glass-card rounded-xl p-4 flex items-center gap-3">
                         <MdCalendarMonth className="text-blue-400 text-xl flex-shrink-0" />
                         <div>
                             <p className="text-[#555] text-xs">Last 7 Days</p>
                             <p className="text-white text-lg font-bold tabular-nums">{summary.visitors7Days}</p>
                         </div>
                     </div>
-                    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 flex items-center gap-3">
+                    <div className="glass-card rounded-xl p-4 flex items-center gap-3">
                         <MdCalendarMonth className="text-purple-400 text-xl flex-shrink-0" />
                         <div>
                             <p className="text-[#555] text-xs">Last 30 Days</p>
@@ -120,7 +120,7 @@ const VisitorStats = () => {
                     {visitors.map((v, index) => (
                         <div
                             key={v._id}
-                            className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-3 flex items-center justify-between gap-3"
+                            className="glass-card rounded-xl px-4 py-3 flex items-center justify-between gap-3"
                         >
                             <div className="flex items-center gap-3 min-w-0">
                                 <span className="text-[#444] text-xs font-mono w-6 flex-shrink-0">

@@ -295,6 +295,10 @@ Comfortable: {
   }
 },{timestamps:true})
 
+// Approval queue lookups
+OrgDataSchema.index({ id: 1 })
+OrgDataSchema.index({ status: 1 })
+
 const Orgdata =  mongoose.model("OrgainezerData", OrgDataSchema);
 
 const CONSTANTS = {

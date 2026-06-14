@@ -323,7 +323,7 @@ export function GetPasswordResettoken(email,emailsend){
         } catch (error) {
             toast.error(error?.response?.data?.message || "Error sending reset link")
         }
-        dispatch(setloading(false))
+        dispatch(setLoading(false))
         // toast.dismiss(toastId)
     }
 }
@@ -385,7 +385,8 @@ export function Updatepassword(newpass,oldpass){
         try {
 
             const response = await apiConnector("PUT",UpdatePassword,{
-                password:newpass
+                newPassword:newpass,
+                oldPassword:oldpass
             })
             if (!response.data.success) {
                 throw new Error(response.data.message)

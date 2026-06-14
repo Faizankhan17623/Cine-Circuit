@@ -21,7 +21,9 @@ const ratingAndReviewSchema = new mongoose.Schema({
 		ref: "Show",
 		index: true,
 	},
-});
+}, { timestamps: true });
+
+ratingAndReviewSchema.index({ user: 1 });
 
 
 module.exports = mongoose.model("RatingAndReview", ratingAndReviewSchema);

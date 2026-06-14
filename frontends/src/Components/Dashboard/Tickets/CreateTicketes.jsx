@@ -82,7 +82,7 @@ const CreateTicketes = () => {
 
   // ---- SHOW CARD ----
   const ShowCard = ({ show }) => (
-    <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-yellow-500/30 group">
+    <div className="glass-card rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-yellow-500/30 group">
       <div className="relative aspect-[2/3] overflow-hidden">
         {show.Posterurl ? (
           <img
@@ -175,7 +175,7 @@ const CreateTicketes = () => {
             <span>Back to Shows</span>
           </button>
 
-          <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-2xl overflow-hidden">
+          <div className="glass-card rounded-2xl overflow-hidden">
             {/* Header Banner */}
             <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-b border-gray-700/50 px-8 py-6">
               <div className="flex items-center gap-3">
@@ -191,7 +191,7 @@ const CreateTicketes = () => {
 
             <div className="p-8">
               {/* Show Info Card */}
-              <div className="flex items-center gap-4 mb-8 p-4 bg-gray-800/60 rounded-xl border border-gray-700/40">
+              <div className="flex items-center gap-4 mb-8 p-4 glass-card rounded-xl">
                 {selectedShow.Posterurl ? (
                   <img src={selectedShow.Posterurl} alt={selectedShow.title} className="w-16 h-24 rounded-lg object-cover shadow-lg" />
                 ) : (
@@ -230,7 +230,7 @@ const CreateTicketes = () => {
                     value={totalTickets}
                     onChange={(e) => setTotalTickets(e.target.value)}
                     placeholder="Enter total number of tickets"
-                    className="w-full bg-gray-800/80 border border-gray-600/50 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30 transition-all"
+                    className="w-full bg-richblack-700/50 border border-richblack-600 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30 transition-all"
                   />
                 </div>
 
@@ -246,7 +246,7 @@ const CreateTicketes = () => {
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="Enter price per ticket"
-                    className="w-full bg-gray-800/80 border border-gray-600/50 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30 transition-all"
+                    className="w-full bg-richblack-700/50 border border-richblack-600 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30 transition-all"
                   />
                 </div>
               </div>
@@ -344,7 +344,7 @@ const CreateTicketes = () => {
       {/* Empty State */}
       {!loading && !error && shows.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-2xl p-12 text-center max-w-md">
+          <div className="glass-card rounded-2xl p-12 text-center max-w-md">
             <FaFilm className="text-8xl text-yellow-500/30 mx-auto mb-6" />
             <h2 className="text-2xl font-bold mb-3">No Shows Found</h2>
             <p className="text-gray-400">

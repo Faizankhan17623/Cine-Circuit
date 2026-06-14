@@ -79,7 +79,7 @@ const Finder = () => {
 
       {/* Search Bar */}
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='max-w-5xl mx-auto bg-richblack-800/80 backdrop-blur-sm border border-richblack-600/60 rounded-2xl p-2 shadow-xl shadow-black/20'>
+        <div className='max-w-5xl mx-auto glass-card rounded-2xl p-4'>
           <div className='flex flex-col lg:flex-row items-stretch'>
 
             {/* Location */}
@@ -208,7 +208,7 @@ const Finder = () => {
                 {visibleResults.map((item, index) => (
                   <div
                     key={index}
-                    className="group bg-richblack-800 border border-richblack-700/60 rounded-2xl overflow-hidden hover:border-yellow-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/5"
+                    className="group glass-card glass-card-hover rounded-2xl overflow-hidden"
                   >
                     {/* Card Header */}
                     <div className='bg-gradient-to-r from-yellow-400/10 via-yellow-400/5 to-transparent px-5 pt-5 pb-4 border-b border-richblack-700/50'>

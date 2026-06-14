@@ -22,7 +22,7 @@ const StatCard = ({ icon: Icon, label, value, sub, color, to }) => {
   const c = colours[color] || colours.blue
   return (
     <Link to={to || '#'} className="block">
-      <div className={`bg-richblack-800 rounded-xl p-5 border border-richblack-700 ${c.border} transition-all duration-200 hover:scale-[1.01]`}>
+      <div className={`glass-card rounded-xl p-5 ${c.border} transition-all duration-200 hover:scale-[1.01]`}>
         <div className="flex items-start justify-between">
           <div className="min-w-0 flex-1 pr-2">
             <p className="text-richblack-400 text-xs mb-1 truncate">{label}</p>
@@ -42,7 +42,7 @@ const QuickAction = ({ icon: Icon, label, to, color }) => {
   const c = colours[color] || colours.blue
   return (
     <Link to={to}>
-      <div className={`flex items-center gap-3 p-3 rounded-lg bg-richblack-800 border border-richblack-700 ${c.border} hover:bg-richblack-700 transition-all duration-200`}>
+      <div className={`flex items-center gap-3 p-3 rounded-lg glass-card ${c.border} hover:bg-richblack-700/30 transition-all duration-200`}>
         <div className={`p-2 rounded-md flex-shrink-0 ${c.bg}`}>
           <Icon className={`text-base ${c.text}`} />
         </div>
@@ -105,31 +105,37 @@ const AdminDashboardHome = () => {
       <div>
         <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider mb-3">Platform Overview</h2>
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-          <StatCard icon={MdPeople}      label="Total Viewers"  value={stats?.users?.totalViewers ?? 0}    color="blue"   to="/Dashboard/users" />
-          <StatCard
-            icon={FaUserTie}
-            label="Organizers"
-            value={stats?.users?.totalOrganizers ?? 0}
-            sub={`${stats?.users?.verifiedOrganizers ?? 0} verified · ${stats?.users?.pendingOrgRequests ?? 0} pending`}
-            color="yellow"
-            to="/Dashboard/Verifications"
-          />
-          <StatCard
-            icon={FaTheaterMasks}
-            label="Theatres"
-            value={stats?.users?.totalTheatrers ?? 0}
-            sub={`${stats?.users?.verifiedTheatrers ?? 0} verified · ${stats?.users?.pendingTheatreRequests ?? 0} requests`}
-            color="purple"
-            to="/Dashboard/VerifyTheatre"
-          />
-          <StatCard
-            icon={MdMovie}
-            label="Total Shows"
-            value={stats?.shows?.total ?? 0}
-            sub={`${stats?.shows?.verified ?? 0} verified · ${stats?.shows?.unverified ?? 0} pending`}
-            color="green"
-            to="/Dashboard/VerifyShows"
-          />
+          <div className="animate-fadeIn opacity-0"><StatCard icon={MdPeople}      label="Total Viewers"  value={stats?.users?.totalViewers ?? 0}    color="blue"   to="/Dashboard/users" /></div>
+          <div className="animate-fadeIn opacity-0 delay-100">
+            <StatCard
+              icon={FaUserTie}
+              label="Organizers"
+              value={stats?.users?.totalOrganizers ?? 0}
+              sub={`${stats?.users?.verifiedOrganizers ?? 0} verified · ${stats?.users?.pendingOrgRequests ?? 0} pending`}
+              color="yellow"
+              to="/Dashboard/Verifications"
+            />
+          </div>
+          <div className="animate-fadeIn opacity-0 delay-200">
+            <StatCard
+              icon={FaTheaterMasks}
+              label="Theatres"
+              value={stats?.users?.totalTheatrers ?? 0}
+              sub={`${stats?.users?.verifiedTheatrers ?? 0} verified · ${stats?.users?.pendingTheatreRequests ?? 0} requests`}
+              color="purple"
+              to="/Dashboard/VerifyTheatre"
+            />
+          </div>
+          <div className="animate-fadeIn opacity-0 delay-300">
+            <StatCard
+              icon={MdMovie}
+              label="Total Shows"
+              value={stats?.shows?.total ?? 0}
+              sub={`${stats?.shows?.verified ?? 0} verified · ${stats?.shows?.unverified ?? 0} pending`}
+              color="green"
+              to="/Dashboard/VerifyShows"
+            />
+          </div>
         </div>
       </div>
 
@@ -139,7 +145,7 @@ const AdminDashboardHome = () => {
         {/* Bug reports summary */}
         <div>
           <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider mb-3">Bug Reports</h2>
-          <div className="bg-richblack-800 rounded-xl border border-richblack-700 p-5 space-y-3">
+          <div className="glass-card rounded-xl p-5 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-richblack-300 text-sm">Total Reports</span>
               <span className="text-white font-semibold tabular-nums">{stats?.bugs?.total ?? 0}</span>

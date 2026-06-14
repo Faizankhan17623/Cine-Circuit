@@ -32,11 +32,11 @@ exports.login = async (req, res) => {
                 })
             }
 
-        const isPasswordValid = await bcrypt.compare(password, user.confirmpass);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
             return res.status(400).json({
-                message: "Ener The Correct Password",
+                message: "Enter The Correct Password",
                 success: false
             });
         }

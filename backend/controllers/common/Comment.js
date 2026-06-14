@@ -16,14 +16,14 @@ exports.UserComments = async(req,res)=>{
         const commentText = coment || comment  // Handle both spelling variants
 
         if(!Showid){
-            return res.status(500).json({
+            return res.status(400).json({
                 message:"The input Fields are been required",
                 success:false
             })
         }
         const Finding = await CreateShow.findOne({_id:Showid})
         if(!Finding){
-            return res.status(500).json({
+            return res.status(404).json({
                 message:"There is some mistake please check you inputs",
                 success:false
             })
@@ -63,14 +63,14 @@ exports.getAllComment = async (req,res)=>{
     try{
         const Showid = req.query.Showid || req.query.movie_id
         if(!Showid){
-            return res.status(500).json({
+            return res.status(400).json({
                 message:"The input Fields are been required",
                 success:false
             })
         }
         const Finding = await CreateShow.findOne({_id:Showid})
         if(!Finding){
-            return res.status(500).json({
+            return res.status(404).json({
                 message:"The show is not present",
                 success:false
             })
@@ -97,7 +97,7 @@ exports.getAllComment = async (req,res)=>{
                     _id:allComm._id,
                     comment:allComm.data,
                     userId:allComm.userId ? allComm.userId._id : null,
-                    userName: userName.userName,
+                    userName: userName ? userName.userName : "Unknown",
                     createdAt:allComm.CreatedAt,
                     updatedAt:allComm.updatedAt
                 }
@@ -132,14 +132,14 @@ exports.deleteComment = async (req,res)=>{
         const Showid = req.query.Showid || req.query.movie_id
         const commentId = req.query.commentId || req.body.commentId
         if(!Showid || !commentId){
-            return res.status(500).json({
+            return res.status(400).json({
                 message:"The input Fields are been required",
                 success:false
             })
         }
         const Finding = await CreateShow.findOne({_id:Showid})
         if(!Finding){
-            return res.status(500).json({
+            return res.status(404).json({
                 message:"The show is not present",
                 success:false
             })

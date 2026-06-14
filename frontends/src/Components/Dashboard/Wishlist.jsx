@@ -35,7 +35,7 @@ const Wishlist = () => {
   if (movies.length === 0) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center text-center px-6">
-        <div className="w-16 h-16 rounded-2xl bg-richblack-700 flex items-center justify-center mb-4">
+        <div className="w-16 h-16 rounded-2xl glass-card flex items-center justify-center mb-4">
           <CiBookmark className="text-3xl text-yellow-200" />
         </div>
         <h2 className="text-xl font-bold text-white mb-2">Your Watchlist is Empty</h2>
@@ -75,7 +75,7 @@ const Wishlist = () => {
         {movies.map((movie) => (
           <div
             key={movie._id}
-            className="group relative rounded-xl overflow-hidden bg-richblack-800 border border-richblack-700 hover:border-yellow-400/50 transition-all duration-300"
+            className="group relative rounded-xl overflow-hidden glass-card hover:border-yellow-400/50 transition-all duration-300"
           >
             {/* Poster */}
             <div className="relative h-[200px] overflow-hidden">

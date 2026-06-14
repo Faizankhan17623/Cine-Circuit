@@ -60,7 +60,8 @@ export const SendMessage = {
 
 export const TicketData = {
     TicketPurchase:BASE_URL+"/Ticket-Purchased",
-    TicketPurchasedFullDetail:BASE_URL+"/Ticket-Purchased-FullDetails"
+    TicketPurchasedFullDetail:BASE_URL+"/Ticket-Purchased-FullDetails",
+    UserDashboardStats:BASE_URL+"/User-Dashboard-Stats"
 }
 
 export const Ratings = {

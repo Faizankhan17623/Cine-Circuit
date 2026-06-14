@@ -54,7 +54,7 @@ const Forgot = () => {
     <div className="min-h-screen w-full bg-richblack-900 flex flex-col overflow-x-hidden">
       <Navbar />
       <div className="flex-1 flex justify-center items-center px-4">
-        <div className="w-full max-w-md rounded-2xl bg-richblack-800 border border-richblack-700 shadow-xl p-8 signup-form-animate">
+        <div className="w-full max-w-md rounded-2xl glass-card p-8 signup-form-animate">
 
           {/* Heading */}
           <h1 className="text-3xl font-bold text-white mb-3">

@@ -130,7 +130,7 @@ const Genres = () => {
 
       {/* Add Genre Inline */}
       {showAddGenre && (
-        <div className="mb-6 bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4 flex gap-3">
+        <div className="mb-6 glass-card rounded-xl p-4 flex gap-3">
           <input
             type="text"
             value={newGenre}
@@ -167,7 +167,7 @@ const Genres = () => {
             <div
               key={genre._id}
               onClick={() => editingGenre !== genre._id && setSelectedGenre(genre)}
-              className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4 cursor-pointer hover:border-purple-500 transition group"
+              className="glass-card rounded-xl p-4 cursor-pointer hover:border-purple-500 transition group"
             >
               {editingGenre === genre._id ? (
                 <div className="flex gap-2">
@@ -225,7 +225,7 @@ const Genres = () => {
           onClick={() => setSelectedGenre(null)}
         >
           <div
-            className="bg-[#12122a] border border-gray-700 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6"
+            className="glass-card rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6"
             onClick={(e) => e.stopPropagation()}
             style={{ scrollbarWidth: 'thin', scrollbarColor: '#7c3aed #1a1a2e' }}
           >

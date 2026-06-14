@@ -194,7 +194,7 @@ exports.DF = async (req,res,next)=>{
       });
     }
 
-    if (roleInfo. Role ===  'Director' && roleInfo.ExperienceLevel ===  'Fresher') {
+    if (roleInfo.Role === 'Director' && roleInfo.ExperienceLevel === 'Fresher') {
       return next();
     }
 

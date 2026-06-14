@@ -25,7 +25,7 @@ exports.AllShows = async(req,res)=>{
         console.log(error)
         console.log(error.message)
         return res.status(500).json({
-            messsage:"There is an error in the Get all show code",
+            message:"There is an error in the Get all show code",
             success:false
         })
     }
@@ -67,7 +67,7 @@ exports.usingtitle = async(req,res)=>{
         console.log(error)
         console.log(error.message)
         return res.status(500).json({
-            messsage:"There is an error in the  show Finding code",
+            message:"There is an error in the  show Finding code",
             success:false
         })
     }
@@ -86,7 +86,7 @@ exports.notUploadedShows = async(req,res)=>{
         console.log(error)
         console.log(error.message)
             return res.status(500).json({
-            messsage:"There is an error in the  show not uploaded codeFinding code",
+            message:"There is an error in the  show not uploaded codeFinding code",
             success:false
         })
     }
@@ -117,7 +117,7 @@ exports.VerifiedButnotUploaded = async(req,res)=>{
         console.log(error)
         console.log(error.message)
             return res.status(500).json({
-            messsage:"There is an error in the show that is verified but not uploaded code",
+            message:"There is an error in the show that is verified but not uploaded code",
             success:false
         })
     }
@@ -172,7 +172,7 @@ exports.FindAllExpiredShows = async(req,res)=>{
         console.log(error)
         console.log(error.message)
             return res.status(500).json({
-            messsage:"There is an error in the find all the expired show code",
+            message:"There is an error in the find all the expired show code",
             success:false
         })
     }

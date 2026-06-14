@@ -26,7 +26,7 @@ const TotalSales = () => {
   return (
     <div className="text-white p-6">
       <h1 className="text-2xl font-bold mb-6">Total Sales</h1>
-      <div className="bg-richblack-800 rounded-lg p-6">
+      <div className="glass-card rounded-xl p-6">
         <p className="text-richblack-300 text-sm mb-2">Total Revenue</p>
         <p className="text-4xl font-bold text-yellow-200">
           {totalAmount > 0 ? `₹${totalAmount.toLocaleString('en-IN')}` : '₹0'}

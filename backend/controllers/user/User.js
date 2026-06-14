@@ -7,7 +7,7 @@ exports.GetAlluserDetails = async(req,res)=>{
 
     const users = await USER.findById(id).populate('orgainezerdata');
 
-    if (!users || users.length === 0) {
+    if (!users) {
       return res.status(404).json({
         success: false,
         message: "No users found",
@@ -109,7 +109,7 @@ exports.FindNumber = async (req,res)=>{
             })
         }
         return res.status(409).json({
-            success:true,
+            success:false,
             message:"Number is already taken",
         })
     }catch(error){

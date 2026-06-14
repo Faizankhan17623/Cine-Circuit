@@ -73,7 +73,7 @@ const Navbar = () => {
         <FaChevronDown className='text-[10px] text-richblack-300 group-hover:text-yellow-400 group-hover:rotate-180 transition-transform duration-200' />
       </button>
       <div className='invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 pt-2 z-50'>
-        <div className='bg-richblack-800 border border-richblack-600 rounded-xl shadow-2xl shadow-black/40 py-2 min-w-[200px] overflow-hidden'>
+        <div className='glass-card rounded-xl py-2 min-w-[200px] overflow-hidden'>
           {items.map((item, index) => (
             <Link
               to={`${basePath}/${item}`}
@@ -89,7 +89,7 @@ const Navbar = () => {
   )
 
   return (
-    <nav className='w-full h-[72px] flex justify-between items-center text-white bg-richblack-800/95 backdrop-blur-md sticky top-0 z-50 border-b border-richblack-700/80 px-6'>
+    <nav className='w-full h-[72px] flex justify-between items-center text-white glass-navbar sticky top-0 z-50 px-6'>
       {/* Logo */}
       <Link to="/" className='flex-shrink-0'>
         <img
@@ -182,7 +182,7 @@ const Navbar = () => {
           {menuOpen && (
             <>
               <div className='fixed inset-0 z-40' onClick={() => setMenuOpen(false)} />
-              <div className='absolute right-0 top-full mt-2 z-50 bg-richblack-800 border border-richblack-600 rounded-xl shadow-2xl shadow-black/40 py-2 min-w-[180px] overflow-hidden'>
+              <div className='absolute right-0 top-full mt-2 z-50 glass-card rounded-xl py-2 min-w-[180px] overflow-hidden'>
                 <Link
                   to={isLoggedIn ? "/Dashboard/My-Profile" : "/SignUp"}
                   onClick={() => setMenuOpen(false)}

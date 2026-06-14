@@ -24,7 +24,7 @@ const PurchasedHistory = () => {
   }
   return (
     <div className="w-full h-full flex flex-col items-center justify-center text-center px-6 animate-fadeIn">
-      <div className="w-16 h-16 rounded-2xl bg-richblack-700 flex items-center justify-center mb-4">
+      <div className="w-16 h-16 rounded-2xl glass-card flex items-center justify-center mb-4">
         <FaCartShopping className="text-2xl text-yellow-200" />
       </div>
       <h2 className="text-xl font-bold text-white mb-2">Purchase History</h2>

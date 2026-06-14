@@ -12,11 +12,7 @@ const maintenanceSchema = new mongoose.Schema({
     endTime: {
         type: Date,
         default: null
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
     }
-})
+}, { timestamps: true })
 
 module.exports = mongoose.model('Maintenance', maintenanceSchema)

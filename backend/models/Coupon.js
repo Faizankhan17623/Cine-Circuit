@@ -63,4 +63,7 @@ const couponSchema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
+// Active-coupon lookups (code already has a unique index)
+couponSchema.index({ isActive: 1, expiryDate: 1 })
+
 module.exports = mongoose.model('Coupon', couponSchema)

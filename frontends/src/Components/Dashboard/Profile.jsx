@@ -67,10 +67,10 @@ const Profile = () => {
       </div>
 
       <div className='max-w-4xl w-full px-6 flex flex-col gap-6 pb-8'>
-      <div className='w-full bg-richblack-800 border border-richblack-700 rounded-xl p-6 flex flex-row justify-between items-center'>
+      <div className='w-full glass-card rounded-xl p-6 flex flex-row justify-between items-center'>
         <div className='flex flex-row items-center gap-4'>
 
-        <img src={isLoggedIn ? image : <Loader />} alt="Profile Image " loading='lazy' draggable="false" className="w-20 h-20 rounded-full object-cover border-4 border-yellow-300"/>
+        <img src={image || `https://ui-avatars.com/api/?name=${encodeURIComponent(data?.userName || 'User')}&background=random`} alt="Profile Image " loading='lazy' draggable="false" className="w-20 h-20 rounded-full object-cover border-4 border-yellow-300"/>
           <div>
           <h1 className='font-black text-2xl'>{data?.userName || "No Name"}</h1>
           <h1 className='text-richblack-300 text-sm'>{data?.email || "No Email"}</h1>
@@ -81,7 +81,7 @@ const Profile = () => {
         <Iconbtn text={<FaRegEdit/>} children={"Edit"} onclick={handleSettingsClick} disabled={false} customClasses={'h-[40px] w-[96px] flex justify-center items-center'}/>
       </div>
 
-      <div className='w-full bg-richblack-800 border border-richblack-700 rounded-xl p-6 flex flex-col gap-6'>
+      <div className='w-full glass-card rounded-xl p-6 flex flex-col gap-6'>
         <div className='flex justify-between items-center'>
           <h2 className='text-white font-semibold text-lg'>Personal Details</h2>
         <Iconbtn text={<FaRegEdit/>} children={"Edit"} onclick={handleSettingsClick} disabled={false} customClasses={'h-[40px] w-[96px] flex justify-center items-center'}/>

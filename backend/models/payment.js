@@ -35,7 +35,7 @@ const paymentSchema = new mongoose.Schema({
     },
     Payment_Status: {
         type: String,
-        enum: ["success", "failure",'created'],
+        enum: ["pending", "success", "failure", 'created'],
         default: "pending",
     },
     showid:{
@@ -87,4 +87,11 @@ const paymentSchema = new mongoose.Schema({
         default: null
     },
 },{timestamps:true})
+
+// Indexes — these fields are looked up on every payment verification / user history
+paymentSchema.index({ userid: 1 })
+paymentSchema.index({ showid: 1 })
+paymentSchema.index({ theatreid: 1 })
+paymentSchema.index({ razorpay_order_id: 1 })
+
 module.exports = mongoose.model("payment",paymentSchema)

@@ -50,4 +50,8 @@ const BugReportSchema = new mongoose.Schema(
     { timestamps: true }
 )
 
+// "My reports" + admin queue
+BugReportSchema.index({ reportedBy: 1 })
+BugReportSchema.index({ status: 1 })
+
 module.exports = mongoose.model('BugReport', BugReportSchema)

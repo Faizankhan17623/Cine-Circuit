@@ -105,7 +105,7 @@ const MaintenanceMode = () => {
             <div className="grid grid-cols-1 gap-5 mb-6">
 
                 {/* Message */}
-                <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16162a] rounded-2xl border border-gray-700/40 p-6">
+                <div className="glass-card rounded-2xl p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
                             <MdOutlineMessage className="text-blue-400 text-base" />
@@ -131,7 +131,7 @@ const MaintenanceMode = () => {
 
                 {/* End Time + Notify row */}
                 <div className="grid grid-cols-2 gap-5">
-                    <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16162a] rounded-2xl border border-gray-700/40 p-6">
+                    <div className="glass-card rounded-2xl p-6">
                         <div className="flex items-center gap-2 mb-4">
                             <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
                                 <MdOutlineSchedule className="text-orange-400 text-base" />
@@ -163,7 +163,7 @@ const MaintenanceMode = () => {
                         )}
                     </div>
 
-                    <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16162a] rounded-2xl border border-gray-700/40 p-6">
+                    <div className="glass-card rounded-2xl p-6">
                         <div className="flex items-center gap-2 mb-4">
                             <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
                                 <MdOutlineEmail className="text-purple-400 text-base" />

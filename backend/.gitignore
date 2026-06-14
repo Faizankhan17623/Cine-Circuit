@@ -14,3 +14,8 @@ seeder.js
 
 # Private planning files (root-level — handled by root .gitignore)
 # ../BUGS_AND_ISSUES.md  ← ../ patterns don't work in git, removed
+
+# Generated schema docs (do not push without permission)
+schema-erd.md
+schema-view.html
+schema-review.md

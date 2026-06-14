@@ -195,7 +195,7 @@ const handleAllot = async () => {
 
   // ---- SHOW CARD (same style as CreateTicketes) ----
   const ShowCard = ({ show }) => (
-    <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-yellow-500/30 group">
+    <div className="glass-card rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-yellow-500/30 group">
       <div className="relative aspect-[2/3] overflow-hidden">
         {show.Posterurl ? (
           <img
@@ -279,7 +279,7 @@ const handleAllot = async () => {
           {/* LEFT SIDE — Form */}
           <div className="w-[380px] shrink-0 border-r border-gray-700/50 p-6 overflow-y-auto">
             {/* Show Info */}
-            <div className="flex items-center gap-4 mb-6 p-4 bg-[#1a1a2e] rounded-xl border border-gray-700/50">
+            <div className="flex items-center gap-4 mb-6 p-4 glass-card rounded-xl">
               {selectedShow.Posterurl ? (
                 <img src={selectedShow.Posterurl} alt={selectedShow.title} className="w-14 h-20 rounded-lg object-cover shadow-lg" />
               ) : (
@@ -300,32 +300,32 @@ const handleAllot = async () => {
 
             {/* Ticket Remaining Info */}
             {ticketDetailsLoading && (
-              <div className="mb-6 p-4 bg-[#1a1a2e] rounded-xl border border-gray-700/50 flex items-center justify-center gap-2">
+              <div className="mb-6 p-4 glass-card rounded-xl flex items-center justify-center gap-2">
                 <div className="w-5 h-5 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
                 <span className="text-gray-400 text-sm">Loading ticket info...</span>
               </div>
             )}
 
             {!ticketDetailsLoading && ticketDetails && (
-              <div className="mb-6 p-4 bg-gradient-to-br from-[#1a1a2e] to-[#12122a] rounded-xl border border-yellow-500/20">
+              <div className="mb-6 p-4 bg-gradient-to-br from-richblack-800/50 to-richblack-900/50 glass-card rounded-xl">
                 <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
                   <MdConfirmationNumber className="text-yellow-500" />
                   Ticket Overview
                 </h4>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                  <div className="bg-richblack-700/30 rounded-lg p-3 text-center">
                     <p className="text-xs text-gray-500 mb-1">Total Created</p>
                     <p className="text-lg font-bold text-white">
                       {Number(ticketDetails.overallTicketCreated || 0).toLocaleString('en-IN')}
                     </p>
                   </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                  <div className="bg-richblack-700/30 rounded-lg p-3 text-center">
                     <p className="text-xs text-gray-500 mb-1">Price</p>
                     <p className="text-lg font-bold text-green-400">
                       ₹{Number(ticketDetails.priceoftheticket || 0).toLocaleString('en-IN')}
                     </p>
                   </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                  <div className="bg-richblack-700/30 rounded-lg p-3 text-center">
                     <p className="text-xs text-gray-500 mb-1">Allotted</p>
                     <p className="text-lg font-bold text-orange-400">
                       {Array.isArray(ticketDetails.totalTicketsAlloted)
@@ -361,7 +361,7 @@ const handleAllot = async () => {
             )}
 
             {!ticketDetailsLoading && !ticketDetails && (
-              <div className="mb-6 p-4 bg-[#1a1a2e] rounded-xl border border-red-500/20 text-center">
+              <div className="mb-6 p-4 glass-card rounded-xl border border-red-500/20 text-center">
                 <p className="text-red-400 text-sm">No ticket data found for this show.</p>
                 <p className="text-gray-500 text-xs mt-1">Create tickets first before allotting.</p>
               </div>
@@ -374,11 +374,11 @@ const handleAllot = async () => {
                 Selected Theatre
               </label>
               {!selectedTheatre ? (
-                <div className="w-full bg-gray-800/80 border border-gray-600/50 border-dashed rounded-xl px-4 py-4 text-gray-500 text-sm text-center">
+                <div className="w-full bg-richblack-700/30 border border-richblack-600 border-dashed rounded-xl px-4 py-4 text-gray-500 text-sm text-center">
                   Click a theatre on the right to select
                 </div>
               ) : (
-                <div className="bg-gray-800/80 border border-yellow-500/30 rounded-xl p-4">
+                <div className="glass-card rounded-xl p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center shrink-0">
                       <FaTheaterMasks className="text-yellow-400" />
@@ -458,7 +458,7 @@ const handleAllot = async () => {
                 value={totalToAllot}
                 onChange={(e) => setTotalToAllot(e.target.value)}
                 placeholder="Enter number of tickets"
-                className="w-full bg-gray-800/80 border border-gray-600/50 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30 transition-all"
+                className="w-full bg-richblack-700/50 border border-richblack-600 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30 transition-all"
               />
             </div>
 
@@ -542,7 +542,7 @@ const handleAllot = async () => {
                   <div
                     key={theatre._id}
                     onClick={() => setSelectedTheatre(theatre)}
-                    className={`bg-[#1a1a2e] border rounded-xl p-4 cursor-pointer transition-all duration-200 hover:shadow-lg ${
+                    className={`glass-card border rounded-xl p-4 cursor-pointer transition-all duration-200 hover:shadow-lg ${
                       selectedTheatre?._id === theatre._id
                         ? 'border-yellow-500 shadow-yellow-500/10 shadow-lg'
                         : 'border-gray-700/50 hover:border-yellow-500/30'
@@ -634,7 +634,7 @@ const handleAllot = async () => {
             {/* Empty - No verified theatres at all */}
             {!theatresLoading && !theatresError && theatres.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16">
-                <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-2xl p-10 text-center max-w-md">
+                <div className="glass-card rounded-2xl p-10 text-center max-w-md">
                   <FaTheaterMasks className="text-6xl text-yellow-500/30 mx-auto mb-4" />
                   <h2 className="text-xl font-bold mb-2">No Theatres Found</h2>
                   <p className="text-gray-400 text-sm">There are no verified theatres available.</p>
@@ -709,7 +709,7 @@ const handleAllot = async () => {
       {/* Empty State */}
       {!showsLoading && !showsError && shows.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-2xl p-12 text-center max-w-md">
+          <div className="glass-card rounded-2xl p-12 text-center max-w-md">
             <FaFilm className="text-8xl text-yellow-500/30 mx-auto mb-6" />
             <h2 className="text-2xl font-bold mb-3">No Shows Found</h2>
             <p className="text-gray-400">There are no shows available right now.</p>

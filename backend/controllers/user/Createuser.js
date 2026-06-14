@@ -96,8 +96,6 @@ if (!otpCreation || otpCreation.length === 0) {
             }) 
             
             await Creation.save()
-            nameChnages.join()
-            USER.id = Creation._id
             const safeUser = Creation.toObject()
             delete safeUser.password
             delete safeUser.confirmpass
@@ -210,7 +208,7 @@ exports.updateUserName = async(req,res)=>{
         const newDate = new Date(userFindgin.lastUsernameUpdate)
         newDate.setDate(newDate.getDate()+30)
 
-        if(userFindgin.lastUsernameUpdate &&(now-new Date(userFindgin.lastUsernameUpdate)) < 30*60*60*1000){
+        if(userFindgin.lastUsernameUpdate &&(now-new Date(userFindgin.lastUsernameUpdate)) < 30*24*60*60*1000){
             return res.status(400).json({
                 message:`The name can only be changed once in 30 days the next date to change it is ${newDate}`,
                 success:false
@@ -283,7 +281,7 @@ exports.updatePassword = async(req,res)=>{
         const newDate = new Date(userDetails.lastPasswordUpdate)
         newDate.setDate(newDate.getDate()+30)
 
-        if(userDetails.lastPasswordUpdate &&(now-new Date(userDetails.lastPasswordUpdate)) < 30*60*60*1000){
+        if(userDetails.lastPasswordUpdate &&(now-new Date(userDetails.lastPasswordUpdate)) < 30*24*60*60*1000){
             return res.status(400).json({
                 message:`The password can only be changed once in 30 days the next date to change it is ${newDate}`,
                 success:false
@@ -435,7 +433,7 @@ exports.updateNUmber= async(req,res)=>{
         const newDate = new Date(userFindgin.lastNumberUpdate)
         newDate.setDate(newDate.getDate()+7)
 
-        if(userFindgin.lastNumberUpdate &&(now-new Date(userFindgin.lastNumberUpdate)) < 7*60*60*1000){
+        if(userFindgin.lastNumberUpdate &&(now-new Date(userFindgin.lastNumberUpdate)) < 7*24*60*60*1000){
             return res.status(400).json({
                 message:`The number can only be changed once in 7 days the next date to change it is ${newDate}`,
                 success:false

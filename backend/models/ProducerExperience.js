@@ -1,6 +1,7 @@
 // ...existing code...
 const mongoose = require('mongoose')
-const { ROLES, EXPERIENCE_LEVELS } = require('./Org_data')
+const { CONSTANTS } = require('./Org_data')
+const { ROLES, EXPERIENCE_LEVELS } = CONSTANTS
 const ProducerExperienceSchema = new mongoose.Schema({
   Resume: {
     type: String,

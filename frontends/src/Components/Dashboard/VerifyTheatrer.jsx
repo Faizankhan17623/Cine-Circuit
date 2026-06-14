@@ -271,7 +271,7 @@ const handleReject = async (theatre, verification) => {
   if (fetchError) {
     return (
       <div className="w-full h-full flex flex-col justify-center items-center gap-4 p-6">
-        <div className="bg-red-900/30 border border-red-700/50 rounded-xl p-8 max-w-md text-center">
+        <div className="glass-card rounded-xl p-8 max-w-md text-center">
           <div className="text-red-500 text-5xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold text-red-400 mb-2">Error Loading Data</h2>
           <p className="text-gray-400 mb-6">{fetchError}</p>
@@ -330,7 +330,7 @@ const handleReject = async (theatre, verification) => {
     // console.log("This isth e dame details date",SamwDetails)
     return (
       <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 overflow-y-auto">
-        <div className="relative w-[80%] max-w-7xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl border-2 border-gray-700 shadow-2xl my-8">
+        <div className="relative w-[80%] max-w-7xl glass-card rounded-2xl shadow-2xl my-8">
           {/* Header */}
           <div className="sticky top-0 z-10 bg-gradient-to-r from-gray-900 to-gray-800 border-b-2 border-gray-700 px-8 py-6 rounded-t-2xl">
             <div className="flex items-center justify-between">
@@ -364,7 +364,7 @@ const handleReject = async (theatre, verification) => {
           {/* Content */}
           <div className="p-8 space-y-8 max-h-[70vh] overflow-y-auto">
             {/* Owner Information */}
-            <div className="bg-gradient-to-br from-gray-800/80 to-gray-800/50 border border-gray-700 rounded-xl p-6">
+            <div className="glass-card rounded-xl p-6">
               <div className="flex items-center gap-3 mb-6">
                 <MdPerson className="text-3xl text-blue-400" />
                 <h3 className="text-2xl font-bold text-white">Owner Information</h3>
@@ -407,7 +407,7 @@ const handleReject = async (theatre, verification) => {
             </div>
 
             {/* Theatre Details */}
-            <div className="bg-gradient-to-br from-gray-800/80 to-gray-800/50 border border-gray-700 rounded-xl p-6">
+            <div className="glass-card rounded-xl p-6">
               <div className="flex items-center gap-3 mb-6">
                 <MdTheaters className="text-3xl text-purple-400" />
                 <h3 className="text-2xl font-bold text-white">Theatre Details</h3>
@@ -488,7 +488,7 @@ const handleReject = async (theatre, verification) => {
 
             {/* Theatre Outside Images */}
             {theatre.Theatreoutsideimages?.length > 0 && (
-              <div className="bg-gradient-to-br from-gray-800/80 to-gray-800/50 border border-gray-700 rounded-xl p-6">
+              <div className="glass-card rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <MdImage className="text-3xl text-pink-400" />
                   <h3 className="text-2xl font-bold text-white">Theatre Outside Images</h3>
@@ -516,7 +516,7 @@ const handleReject = async (theatre, verification) => {
 
             {/* Theatre Inside Images */}
             {theatre.TheatreInsideimages?.length > 0 && (
-              <div className="bg-gradient-to-br from-gray-800/80 to-gray-800/50 border border-gray-700 rounded-xl p-6">
+              <div className="glass-card rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <MdImage className="text-3xl text-cyan-400" />
                   <h3 className="text-2xl font-bold text-white">Theatre Inside Images</h3>
@@ -599,7 +599,7 @@ const handleReject = async (theatre, verification) => {
   const TheatreCard = ({ theatre, isUnverified = false }) => {
     // console.log("This is the theatre date",theatre)
     return (
-      <div className="bg-gradient-to-br from-gray-800/60 to-gray-800/30 border border-gray-700 rounded-xl p-5 hover:border-yellow-500/50 hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
+      <div className="glass-card rounded-xl p-5 hover:border-yellow-500/50 hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
           <div>
@@ -680,7 +680,7 @@ const handleReject = async (theatre, verification) => {
         {/* Stats Cards */}
         <div className='flex gap-4'>
           {/* Pending Card */}
-          <div className='bg-gradient-to-br from-orange-900/40 to-orange-800/20 border-2 border-orange-700/50 rounded-xl px-6 py-4 min-w-[140px] hover:border-orange-600 transition-all shadow-lg'>
+          <div className='glass-card rounded-xl px-6 py-4 min-w-[140px] hover:border-orange-600 transition-all shadow-lg'>
             <div className='flex items-center gap-2 text-orange-400 text-sm font-medium mb-1'>
               <MdPending className="text-xl" />
               <span>Pending</span>
@@ -689,7 +689,7 @@ const handleReject = async (theatre, verification) => {
           </div>
 
           {/* Verified Card */}
-          <div className='bg-gradient-to-br from-green-900/40 to-green-800/20 border-2 border-green-700/50 rounded-xl px-6 py-4 min-w-[140px] hover:border-green-600 transition-all shadow-lg'>
+          <div className='glass-card rounded-xl px-6 py-4 min-w-[140px] hover:border-green-600 transition-all shadow-lg'>
             <div className='flex items-center gap-2 text-green-400 text-sm font-medium mb-1'>
               <MdVerified className="text-xl" />
               <span>Verified</span>
@@ -698,7 +698,7 @@ const handleReject = async (theatre, verification) => {
           </div>
 
           {/* Total Card */}
-          <div className='bg-gradient-to-br from-blue-900/40 to-blue-800/20 border-2 border-blue-700/50 rounded-xl px-6 py-4 min-w-[140px] hover:border-blue-600 transition-all shadow-lg'>
+          <div className='glass-card rounded-xl px-6 py-4 min-w-[140px] hover:border-blue-600 transition-all shadow-lg'>
             <div className='flex items-center gap-2 text-blue-400 text-sm font-medium mb-1'>
               <MdList className="text-xl" />
               <span>Total</span>
@@ -715,13 +715,13 @@ const handleReject = async (theatre, verification) => {
           <input
             type="text"
             placeholder="Search theatres by name, owner, or location..."
-            className='w-full bg-gray-800/50 border border-gray-700 rounded-lg pl-12 pr-4 py-3 text-gray-300 placeholder-gray-500 focus:outline-none focus:border-yellow-500/50 focus:ring-2 focus:ring-yellow-500/20 transition-all'
+            className='w-full bg-richblack-700/50 border border-richblack-600 rounded-lg pl-12 pr-4 py-3 text-gray-300 placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30 transition-all'
           />
         </div>
         <button
           onClick={handleRefresh}
           disabled={refreshing}
-          className={`flex items-center gap-2 bg-gray-800/50 border border-gray-700 hover:border-gray-600 hover:bg-gray-800 rounded-lg px-6 py-3 text-gray-300 hover:text-white transition-all ${refreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`flex items-center gap-2 bg-richblack-700/50 border border-richblack-600 hover:border-yellow-500/50 hover:text-yellow-400 rounded-lg px-6 py-3 text-gray-300 transition-all ${refreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {refreshing ? (
             <div className="w-5 h-5 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />

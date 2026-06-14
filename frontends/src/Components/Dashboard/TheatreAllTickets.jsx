@@ -28,7 +28,7 @@ const TheatreAllTickets = () => {
       <h1 className="text-2xl font-bold mb-6">All Tickets</h1>
 
       {ticketData?.theatre && (
-        <div className="bg-richblack-800 rounded-lg p-4 mb-6 border border-richblack-700">
+        <div className="glass-card rounded-xl p-4 mb-6">
           <p className="text-richblack-300 text-sm">Theatre: <span className="text-white font-semibold">{ticketData.theatre.name}</span></p>
           <p className="text-richblack-300 text-sm">Location: <span className="text-white">{ticketData.theatre.location}</span></p>
           <p className="text-richblack-300 text-sm">Total Shows: <span className="text-yellow-200 font-semibold">{ticketData.totalShows}</span></p>
@@ -39,7 +39,7 @@ const TheatreAllTickets = () => {
       {ticketData?.shows && ticketData.shows.length > 0 ? (
         <div className="grid gap-4">
           {ticketData.shows.map((item, index) => (
-            <div key={index} className="bg-richblack-800 rounded-lg p-4 border border-richblack-700">
+            <div key={index} className="glass-card rounded-xl p-4">
               <p className="font-semibold">{item.showDetails?.title || `Show ${index + 1}`}</p>
               <div className="flex gap-6 mt-2 text-sm text-richblack-300">
                 <p>Tickets Received: <span className="text-white">{item.ticketDetails?.ticketsReceived || 0}</span></p>
@@ -49,7 +49,7 @@ const TheatreAllTickets = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-richblack-800 rounded-lg p-6">
+        <div className="glass-card rounded-xl p-6">
           <p className="text-richblack-300">No ticket details found yet.</p>
         </div>
       )}

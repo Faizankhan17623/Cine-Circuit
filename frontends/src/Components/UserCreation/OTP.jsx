@@ -178,7 +178,7 @@ const OTP = ({ Style }) => {
       <div className="flex-1 flex justify-center items-center px-4 py-10">
         <div className="w-full max-w-md">
           {/* Card */}
-          <div className="bg-richblack-800 border border-richblack-700 rounded-2xl shadow-2xl p-8 space-y-6">
+          <div className="glass-card rounded-2xl p-8 space-y-6">
             {/* Icon */}
             <div className="flex justify-center">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-200 to-yellow-100 flex items-center justify-center shadow-lg">

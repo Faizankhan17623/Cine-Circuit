@@ -99,7 +99,7 @@ const Language = () => {
 
       {/* Add Language Inline */}
       {showAddLang && (
-        <div className="mb-6 bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4 flex gap-3">
+        <div className="mb-6 glass-card rounded-xl p-4 flex gap-3">
           <input
             type="text"
             value={newLang}
@@ -135,7 +135,7 @@ const Language = () => {
           {languages.map((lang) => (
             <div
               key={lang._id}
-              className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4 hover:border-purple-500 transition group"
+              className="glass-card rounded-xl p-4 hover:border-purple-500 transition group"
             >
               {editingLang === lang._id ? (
                 <div className="flex gap-2">

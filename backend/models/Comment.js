@@ -19,4 +19,9 @@ const CreateComment = new mongoose.Schema({
         required:true
     }
 },{timestamps:true})
-module.exports = mongoose.model("Comment",CreateComment)    
+
+// Comment lists are fetched per-show / per-user
+CreateComment.index({ Showid: 1 })
+CreateComment.index({ userId: 1 })
+
+module.exports = mongoose.model("Comment",CreateComment)

@@ -12,6 +12,7 @@ const rateLimit  = require('express-rate-limit')
 const formData = require('express-form-data') // DISABLED: conflicts with express-fileupload (uses multiparty internally) and can consume the request stream twice, causing "BadRequestError: stream ended unexpectedly"
 const swaggerUi = require('swagger-ui-express')
 const swaggerSpec = require('./config/swagger')
+const mongoSanitize = require('mongo-sanitize')
 
 require('./Background_Process/Shows/movieStatusCronjobs')
 require('./Background_Process/Tickets/Tickets')
@@ -64,8 +65,7 @@ app.use('/api/v1/createAccount/Login', authLimiter)
 app.use('/api/v1/createAccount/Create-OTP', authLimiter)
 // app.use(cors())
 
-app.use(express.json())
-app.use(cookieParser ())
+app.use(cookieParser())
 app.use(morgan("dev"));
 
 app.use(VisitorCounter(Visitor))
@@ -80,6 +80,14 @@ app.use(fileUpload({
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
+// Strip MongoDB operators ($gt, $where, $ne, etc.) from all incoming req.body, req.query, req.params
+// This blocks NoSQL injection attacks before any route handler runs
+app.use((req, res, next) => {
+    req.body   = mongoSanitize(req.body)
+    req.query  = mongoSanitize(req.query)
+    req.params = mongoSanitize(req.params)
+    next()
+})
 
 app.use('/api/v1/createAccount',auth)
 app.use('/api/v1/Admin',Admin)

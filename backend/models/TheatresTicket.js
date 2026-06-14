@@ -77,5 +77,11 @@
                 },
             }]
         },{timestamps:true})
+
+        // Ticket availability lookups
+        createTicketSchema.index({ showId: 1 })
+        createTicketSchema.index({ theatreId: 1 })
+        createTicketSchema.index({ Owner: 1 })
+
         module.exports = mongoose.model("CreateTicket",createTicketSchema)
 

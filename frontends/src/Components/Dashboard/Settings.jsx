@@ -94,7 +94,7 @@ const Settings = () => {
       )}
 
       {/* Profile Picture */}
-      <div className="w-full max-w-3xl bg-richblack-800 border border-richblack-700 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-6">
+      <div className="w-full max-w-3xl glass-card rounded-xl p-6 flex flex-col sm:flex-row items-center gap-6">
         <img
           src={
             selectedFile
@@ -146,7 +146,7 @@ const Settings = () => {
       </div>
 
       {/* Profile Information */}
-      <div className="w-full max-w-3xl bg-richblack-800 border border-richblack-700 rounded-xl p-6 flex flex-col gap-6">
+      <div className="w-full max-w-3xl glass-card rounded-xl p-6 flex flex-col gap-6">
         <h2 className="text-lg font-semibold text-yellow-100">Profile Information</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -256,7 +256,7 @@ const Settings = () => {
       </div>
 
       {/* Password Section */}
-      <div className="w-full max-w-3xl bg-richblack-800 border border-richblack-700 rounded-xl p-6 flex flex-col gap-6">
+      <div className="w-full max-w-3xl glass-card rounded-xl p-6 flex flex-col gap-6">
         <h2 className="text-lg font-semibold text-yellow-100">Password</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="flex flex-col gap-1.5">

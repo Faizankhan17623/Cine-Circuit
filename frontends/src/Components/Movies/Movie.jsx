@@ -510,7 +510,7 @@ const previousTag = location.state?.tag
               {movie.castName?.map((cast) => (
                 <div
                   key={cast._id}
-                  className="bg-richblack-800 p-5 rounded-2xl text-center hover:scale-105 transition border border-richblack-700"
+                  className="glass-card p-5 rounded-2xl text-center hover:scale-105 transition"
                 >
                   <img
                     src={cast.images}
@@ -530,7 +530,7 @@ const previousTag = location.state?.tag
               {movie.AllotedToTheNumberOfTheatres?.map((theatre) => (
                 <div
                   key={theatre._id}
-                  className="bg-richblack-800 p-6 rounded-2xl border border-richblack-700 hover:border-yellow-400 transition shadow-lg shadow-black/20"
+                  className="glass-card p-6 rounded-2xl glass-card-hover"
                 >
                   <h3 className="text-lg font-bold mb-2">
                     {theatre.Theatrename}
@@ -582,7 +582,7 @@ const previousTag = location.state?.tag
             <h2 className="text-xl font-semibold mb-6">Ratings</h2>
 
             {/* Average Rating Card */}
-            <div className="flex items-center gap-6 bg-richblack-800 rounded-2xl p-6 border border-richblack-700 mb-6">
+            <div className="flex items-center gap-6 glass-card rounded-2xl p-6 mb-6">
               <div className="text-center">
                 <p className="text-4xl font-bold text-yellow-400">
                   {averageRating > 0 ? (Math.round(averageRating * 10) / 10) : "N/A"}
@@ -633,7 +633,7 @@ const previousTag = location.state?.tag
 
             {/* Write Review Form */}
             {isLoggedIn && user?.usertype === "Viewer" && hasPurchased && !reviewSubmitted ? (
-              <div className="bg-richblack-800 rounded-2xl p-6 border border-richblack-700">
+              <div className="glass-card rounded-2xl p-6">
                 <h3 className="text-sm font-semibold mb-4 text-richblack-200">Write a Review</h3>
 
                 {/* Star Picker */}
@@ -715,7 +715,7 @@ const previousTag = location.state?.tag
 
             {/* Add Comment Form */}
             {isLoggedIn && user?.usertype === "Viewer" ? (
-              <div className="bg-richblack-800 rounded-2xl p-6 border border-richblack-700 mb-6">
+              <div className="glass-card rounded-2xl p-6 mb-6">
                 <h3 className="text-sm font-semibold mb-4 text-richblack-200">Add a Comment</h3>
                 <textarea
                   value={commentText}
@@ -756,7 +756,7 @@ const previousTag = location.state?.tag
                 {(showAllComments ? comments : comments.slice(0, 3)).map((comment, idx) => (
                   <div
                     key={idx}
-                    className="bg-richblack-800 rounded-xl p-4 border border-richblack-700"
+                    className="glass-card rounded-xl p-4"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">

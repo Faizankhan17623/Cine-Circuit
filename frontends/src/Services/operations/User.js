@@ -13,7 +13,7 @@ const {banner,finder} = Ratings
 
 const {Movie,Theatre,Details,purchase,theatreshows,singletheatre} =  Display
 
-const {TicketPurchase,TicketPurchasedFullDetail} = TicketData
+const {TicketPurchase,TicketPurchasedFullDetail,UserDashboardStats} = TicketData
 
 export function GetAllUserDetails(token,navigate) {
     return async (dispatch) => {
@@ -324,6 +324,25 @@ export function PurchasedTicketsFullDetails (token, navigate){
             return { success: false, error: error.message }
         }finally{
             toast.dismiss(toastId)
+            dispatch(setLoading(false))
+        }
+    }
+}
+
+export function GetUserDashStats(token, navigate) {
+    return async (dispatch) => {
+        dispatch(setLoading(true))
+        try {
+            if (!token) { navigate("/Login"); return { success: false } }
+            const response = await apiConnector("GET", UserDashboardStats, null, {
+                Authorization: `Bearer ${token}`
+            })
+            if (!response.data.success) throw new Error(response.data.message)
+            return { success: true, data: response.data.data }
+        } catch (error) {
+            console.log(error)
+            return { success: false }
+        } finally {
             dispatch(setLoading(false))
         }
     }

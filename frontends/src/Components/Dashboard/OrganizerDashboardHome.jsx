@@ -45,7 +45,7 @@ const cardColours = {
 const StatCard = ({ icon: Icon, label, value, sub, color }) => {
   const c = cardColours[color] || cardColours.yellow
   return (
-    <div className={`bg-richblack-800 rounded-xl p-5 border border-richblack-700 ${c.border} transition-all duration-200`}>
+    <div className={`glass-card rounded-xl p-5 ${c.border} transition-all duration-200`}>
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1 pr-2">
           <p className="text-richblack-400 text-xs mb-1 truncate">{label}</p>
@@ -137,10 +137,10 @@ const OrganizerDashboardHome = () => {
       <div>
         <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider mb-3">Your Shows</h2>
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-          <StatCard icon={MdMovie}        label="Total Shows"    value={shows?.total}    color="yellow" />
-          <StatCard icon={MdVerified}     label="Verified"       value={shows?.verified} sub={`${(shows?.total||0)-(shows?.verified||0)} pending`} color="green" />
-          <StatCard icon={MdUpload}       label="Uploaded"       value={shows?.uploaded} color="blue" />
-          <StatCard icon={MdLocalActivity}label="Released"       value={shows?.released} sub={`${shows?.upcoming||0} upcoming`} color="purple" />
+          <div className="animate-fadeIn opacity-0"><StatCard icon={MdMovie}        label="Total Shows"    value={shows?.total}    color="yellow" /></div>
+          <div className="animate-fadeIn opacity-0 delay-100"><StatCard icon={MdVerified}     label="Verified"       value={shows?.verified} sub={`${(shows?.total||0)-(shows?.verified||0)} pending`} color="green" /></div>
+          <div className="animate-fadeIn opacity-0 delay-200"><StatCard icon={MdUpload}       label="Uploaded"       value={shows?.uploaded} color="blue" /></div>
+          <div className="animate-fadeIn opacity-0 delay-300"><StatCard icon={MdLocalActivity}label="Released"       value={shows?.released} sub={`${shows?.upcoming||0} upcoming`} color="purple" /></div>
         </div>
       </div>
 
@@ -148,16 +148,18 @@ const OrganizerDashboardHome = () => {
       <div>
         <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider mb-3">Ticket Summary</h2>
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-          <StatCard icon={IoTicketSharp}  label="Ticket Batches"      value={tickets?.totalTicketBatches}    color="yellow" />
-          <StatCard icon={FaTheaterMasks} label="Theatres Allotted"   value={tickets?.totalTheatresAllotted} color="blue"   />
-          <StatCard icon={IoTicketSharp}  label="Tickets Created"     value={tickets?.totalTicketsCreated}   color="green"  />
-          <StatCard
-            icon={IoTicketSharp}
-            label="Tickets Sold"
-            value={tickets?.ticketsSold}
-            sub={`${tickets?.totalTicketsRemaining||0} remaining`}
-            color="purple"
-          />
+          <div className="animate-fadeIn opacity-0"><StatCard icon={IoTicketSharp}  label="Ticket Batches"      value={tickets?.totalTicketBatches}    color="yellow" /></div>
+          <div className="animate-fadeIn opacity-0 delay-100"><StatCard icon={FaTheaterMasks} label="Theatres Allotted"   value={tickets?.totalTheatresAllotted} color="blue"   /></div>
+          <div className="animate-fadeIn opacity-0 delay-200"><StatCard icon={IoTicketSharp}  label="Tickets Created"     value={tickets?.totalTicketsCreated}   color="green"  /></div>
+          <div className="animate-fadeIn opacity-0 delay-300">
+            <StatCard
+              icon={IoTicketSharp}
+              label="Tickets Sold"
+              value={tickets?.ticketsSold}
+              sub={`${tickets?.totalTicketsRemaining||0} remaining`}
+              color="purple"
+            />
+          </div>
         </div>
       </div>
 
@@ -172,7 +174,7 @@ const OrganizerDashboardHome = () => {
               View all <MdArrowForward />
             </Link>
           </div>
-          <div className="bg-richblack-800 rounded-xl border border-richblack-700 overflow-hidden">
+          <div className="glass-card rounded-xl overflow-hidden">
             {shows?.recentShows?.length > 0 ? (
               <div className="divide-y divide-richblack-700">
                 {shows.recentShows.map((show) => (
@@ -211,7 +213,7 @@ const OrganizerDashboardHome = () => {
               const c = cardColours[color] || cardColours.yellow
               return (
                 <Link key={to} to={to}>
-                  <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg bg-richblack-800 border border-richblack-700 ${c.border} hover:bg-richblack-700 transition-all duration-200`}>
+                  <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg glass-card ${c.border} transition-all duration-200`}>
                     <div className={`p-1.5 rounded-md flex-shrink-0 ${c.bg}`}>
                       <Icon className={`text-sm ${c.text}`} />
                     </div>

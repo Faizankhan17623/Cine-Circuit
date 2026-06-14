@@ -688,3 +688,64 @@ exports.ContentBasedAlgorithm = async(req,res) => {
         });
     }
 };
+
+const Watchlist = require('../../models/Watchlist')
+
+exports.GetUserDashboardStats = async (req, res) => {
+    try {
+        const userId = req.USER.id
+
+        const user = await USER.findById(userId)
+            .select('userName email image UserBannerliked comment PaymentId lastlogin createdAt countrycode number')
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" })
+        }
+
+        const watchlistDoc = await Watchlist.findOne({ user: userId })
+
+        const recentPayments = await Payment.find({ _id: { $in: user.PaymentId } })
+            .sort({ createdAt: -1 })
+            .limit(3)
+            .lean()
+
+        const enrichedPayments = await Promise.all(
+            recentPayments.map(async (payment) => {
+                let showTitle = 'Unknown Show'
+                let showImage = null
+                if (payment.showid) {
+                    const show = await CreateShow.findById(payment.showid).select('title image').lean()
+                    if (show) { showTitle = show.title; showImage = show.image }
+                }
+                return {
+                    _id: payment._id,
+                    showTitle,
+                    showImage,
+                    amount: payment.amount,
+                    totalTickets: payment.totalTicketpurchased,
+                    showDate: payment.Showdate,
+                    paymentDate: payment.paymentDate,
+                    status: payment.Payment_Status,
+                }
+            })
+        )
+
+        return res.status(200).json({
+            success: true,
+            message: "User dashboard stats fetched",
+            data: {
+                ticketCount: user.PaymentId?.length || 0,
+                watchlistCount: watchlistDoc?.movies?.length || 0,
+                likedMoviesCount: user.UserBannerliked?.length || 0,
+                commentsCount: user.comment?.length || 0,
+                lastLogin: user.lastlogin?.length > 0 ? user.lastlogin[user.lastlogin.length - 1] : null,
+                memberSince: user.createdAt,
+                recentPayments: enrichedPayments,
+            }
+        })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ success: false, message: "Internal server error" })
+    }
+}

@@ -119,7 +119,7 @@ const UpdateTicketTime = () => {
       <h1 className="text-2xl font-bold text-white mb-6">Update Ticket Time</h1>
 
       {/* Existing Timings Info */}
-      <div className="bg-richblack-800 rounded-lg p-6 mb-6 border border-richblack-700">
+      <div className="glass-card rounded-xl p-6 mb-6">
         <h2 className="text-lg font-semibold text-white mb-4">How to Update Ticket Time</h2>
         <ul className="text-richblack-400 space-y-2">
           <li>• Select a ticket from the list below</li>
@@ -130,7 +130,7 @@ const UpdateTicketTime = () => {
       </div>
 
       {/* Tickets List */}
-      <div className="bg-richblack-800 rounded-lg p-6 mb-6 border border-richblack-700">
+      <div className="glass-card rounded-xl p-6 mb-6">
         <h2 className="text-lg font-semibold text-white mb-4">Select Ticket</h2>
         {tickets.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -138,36 +138,36 @@ const UpdateTicketTime = () => {
               <div
                 key={index}
                 onClick={() => setSelectedTicket(ticket)}
-                className={`p-4 rounded-lg cursor-pointer transition-all ${
+                className={`p-4 rounded-xl cursor-pointer transition-all ${
                   selectedTicket?._id === ticket._id
-                    ? 'bg-yellow-200 border-2 border-yellow-500'
-                    : 'bg-richblack-700 border-2 border-transparent hover:border-richblack-600'
+                    ? 'glass-card border-2 border-yellow-500 shadow-lg shadow-yellow-500/20'
+                    : 'glass-card border-2 border-transparent hover:border-gray-700/50'
                 }`}
               >
                 <div className="flex justify-between items-start mb-2">
-                  <p className="font-semibold text-richblack-900">{ticket.Date || 'N/A'}</p>
-                  <span className={`px-2 py-1 rounded text-xs text-white ${getStatusColor(ticket.Status)}`}>
+                  <p className={`font-semibold ${selectedTicket?._id === ticket._id ? 'text-yellow-200' : 'text-white'}`}>{ticket.Date || 'N/A'}</p>
+                  <span className={`px-2 py-0.5 rounded-full text-xs text-white border border-white/10 ${getStatusColor(ticket.Status)}`}>
                     {ticket.Status}
                   </span>
                 </div>
-                <p className="text-sm text-richblack-600">Show ID: {ticket.showId?.slice(0, 10)}...</p>
+                <p className="text-sm text-gray-400">Show ID: {ticket.showId?.slice(0, 10)}...</p>
                 <div className="mt-2">
-                  <p className="text-xs text-richblack-500">Existing Timings:</p>
+                  <p className="text-xs text-gray-500">Existing Timings:</p>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {ticket.timings?.length > 0 ? (
                       ticket.timings.map((time, i) => (
-                        <span key={i} className="px-2 py-1 bg-richblack-600 text-white text-xs rounded">
+                        <span key={i} className="px-2 py-0.5 bg-white/10 text-white text-xs rounded">
                           {formatTo12Hour(time)}
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs text-richblack-400">No timings set</span>
+                      <span className="text-xs text-gray-600">No timings set</span>
                     )}
                   </div>
                 </div>
-                <div className="mt-2 pt-2 border-t border-richblack-600">
-                  <p className="text-xs text-richblack-500">Ticket Price: ₹{ticket.pricefromtheorg}</p>
-                  <p className="text-xs text-richblack-500">Total Tickets: {ticket.totalticketfromorg}</p>
+                <div className="mt-2 pt-2 border-t border-white/10">
+                  <p className="text-xs text-gray-400">Ticket Price: <span className="text-white font-medium">₹{ticket.pricefromtheorg}</span></p>
+                  <p className="text-xs text-gray-400">Total Tickets: <span className="text-white font-medium">{ticket.totalticketfromorg}</span></p>
                 </div>
               </div>
             ))}
@@ -179,7 +179,7 @@ const UpdateTicketTime = () => {
 
       {/* Update Time Form */}
       {selectedTicket && (
-        <div className="bg-richblack-800 rounded-lg p-6 border border-richblack-700">
+        <div className="glass-card rounded-xl p-6">
           <h2 className="text-lg font-semibold text-white mb-4">Add New Time</h2>
           <div className="flex flex-col md:flex-row gap-4 items-end">
             <div className="flex-1">

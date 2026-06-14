@@ -140,7 +140,7 @@ const BugReports = () => {
                         <div
                             key={report._id}
                             onClick={() => openDetail(report)}
-                            className="bg-[#1a1a1a] border border-[#2a2a2a] hover:border-red-600/25 rounded-xl p-4 cursor-pointer transition-all duration-200 hover:bg-[#1e1e1e]"
+                            className="glass-card rounded-xl p-4 cursor-pointer transition-all duration-200"
                         >
                             <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1 min-w-0">
@@ -199,7 +199,7 @@ const BugReports = () => {
                     className="fixed inset-0 z-[9992] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
                     onClick={(e) => { if (e.target === e.currentTarget) closeDetail() }}
                 >
-                    <div className="w-full max-w-2xl bg-[#141414] border border-[#2a2a2a] rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+                    <div className="glass-card w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
                         {/* Modal header */}
                         <div className="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a] flex-shrink-0">
                             <div className="flex items-center gap-3">

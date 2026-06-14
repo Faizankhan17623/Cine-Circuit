@@ -21,7 +21,7 @@ const colours = {
 const StatCard = ({ icon: Icon, label, value, sub, color }) => {
   const c = colours[color] || colours.yellow
   return (
-    <div className={`bg-richblack-800 rounded-xl p-5 border border-richblack-700 ${c.border} transition-all duration-200`}>
+    <div className={`glass-card rounded-xl p-5 ${c.border} transition-all duration-200`}>
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1 pr-2">
           <p className="text-richblack-400 text-xs mb-1 truncate">{label}</p>
@@ -106,7 +106,7 @@ const TheatrerDashboardHome = () => {
         </div>
 
         {theatreDetails && (
-          <div className="bg-richblack-800 border border-richblack-700 rounded-xl px-4 py-3 text-right flex-shrink-0">
+          <div className="glass-card rounded-xl px-4 py-3 text-right flex-shrink-0">
             <p className="text-xs text-richblack-400">Theatre</p>
             <p className="text-sm font-semibold text-yellow-200 truncate max-w-[160px]">{theatreDetails.Theatrename || 'Your Theatre'}</p>
             {theatreDetails.locationname && (
@@ -127,21 +127,25 @@ const TheatrerDashboardHome = () => {
       <div>
         <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider mb-3">Overview</h2>
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-          <StatCard
-            icon={MdAttachMoney}
-            label="Total Revenue"
-            value={totalSale > 0 ? `₹${totalSale.toLocaleString('en-IN')}` : '₹0'}
-            color="yellow"
-          />
-          <StatCard icon={MdMovie}       label="Shows Allotted"    value={totalShows}          color="blue"   />
-          <StatCard icon={FaTicketSimple}label="Tickets Received"  value={totalTicketsReceived} color="green"  />
-          <StatCard
-            icon={FaTheaterMasks}
-            label="Screen Formats"
-            value={theatreDetails?.theatreformat?.length || '—'}
-            sub={theatreDetails?.Theatrename || ''}
-            color="purple"
-          />
+          <div className="animate-fadeIn opacity-0">
+            <StatCard
+              icon={MdAttachMoney}
+              label="Total Revenue"
+              value={totalSale > 0 ? `₹${totalSale.toLocaleString('en-IN')}` : '₹0'}
+              color="yellow"
+            />
+          </div>
+          <div className="animate-fadeIn opacity-0 delay-100"><StatCard icon={MdMovie}       label="Shows Allotted"    value={totalShows}          color="blue"   /></div>
+          <div className="animate-fadeIn opacity-0 delay-200"><StatCard icon={FaTicketSimple}label="Tickets Received"  value={totalTicketsReceived} color="green"  /></div>
+          <div className="animate-fadeIn opacity-0 delay-300">
+            <StatCard
+              icon={FaTheaterMasks}
+              label="Screen Formats"
+              value={theatreDetails?.theatreformat?.length || '—'}
+              sub={theatreDetails?.Theatrename || ''}
+              color="purple"
+            />
+          </div>
         </div>
       </div>
 
@@ -156,7 +160,7 @@ const TheatrerDashboardHome = () => {
               View all <MdArrowForward />
             </Link>
           </div>
-          <div className="bg-richblack-800 rounded-xl border border-richblack-700 overflow-hidden">
+          <div className="glass-card rounded-xl overflow-hidden">
             {shows.length > 0 ? (
               <div className="divide-y divide-richblack-700">
                 {shows.slice(0, 5).map((item) => (
@@ -206,7 +210,7 @@ const TheatrerDashboardHome = () => {
               const c = colours[color] || colours.yellow
               return (
                 <Link key={to} to={to}>
-                  <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg bg-richblack-800 border border-richblack-700 ${c.border} hover:bg-richblack-700 transition-all duration-200`}>
+                  <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg glass-card ${c.border} hover:bg-richblack-700/30 transition-all duration-200`}>
                     <div className={`p-1.5 rounded-md flex-shrink-0 ${c.bg}`}>
                       <Icon className={`text-sm ${c.text}`} />
                     </div>
@@ -227,7 +231,7 @@ const TheatrerDashboardHome = () => {
             <MdEventSeat className="inline mr-1 text-sm" />
             Theatre Occupancy
           </h2>
-          <div className="bg-richblack-800 rounded-xl border border-richblack-700 overflow-hidden">
+          <div className="glass-card rounded-xl overflow-hidden">
             <div className="divide-y divide-richblack-700">
               {shows.map((item) => {
                 const received  = item.ticketDetails?.ticketsReceived || 0

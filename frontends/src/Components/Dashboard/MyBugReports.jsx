@@ -114,7 +114,7 @@ const MyBugReports = () => {
                         <button
                             key={report._id}
                             onClick={() => setSelected(report)}
-                            className="w-full text-left bg-richblack-800 border border-richblack-700 rounded-xl p-4 hover:border-richblack-500 hover:bg-richblack-700/60 transition-all group"
+                            className="w-full text-left glass-card rounded-xl p-4 hover:border-richblack-500 transition-all group"
                         >
                             <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1 min-w-0">
@@ -157,7 +157,7 @@ const MyBugReports = () => {
             {/* Detail modal */}
             {selected && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-                    <div className="bg-richblack-800 border border-richblack-600 rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl">
+                    <div className="glass-card rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col">
 
                         {/* Modal header */}
                         <div className="flex items-center justify-between px-5 py-4 border-b border-richblack-700 shrink-0">

@@ -10,7 +10,7 @@ const Banner = () => {
       const timer = setInterval(() => {
         const Datenow = new Date()
 
-    const Expirydate = new Date('2025-05-07T23:59:59')
+    const Expirydate = new Date('2027-05-07T23:59:59')
     const difference = Expirydate - Datenow
 
     // we have to calcuate the total days minutes and second usin the differenece and convert it to the format 
@@ -60,7 +60,7 @@ export default Banner
 //       const timer = setInterval(() => {
 //         const Datenow = new Date()
 
-//     const Expirydate = new Date('2025-05-07T23:59:59')
+//     const Expirydate = new Date('2027-05-07T23:59:59')
 //     const difference = Expirydate - Datenow
 
 //     // we have to calcuate the total days minutes and second usin the differenece and convert it to the format 

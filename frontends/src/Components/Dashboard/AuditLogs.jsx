@@ -148,7 +148,7 @@ const AuditLogs = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-richblack-800 rounded-xl border border-richblack-700 overflow-hidden">
+            <div className="glass-card rounded-xl overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
@@ -232,7 +232,7 @@ const AuditLogs = () => {
                 <>
                     <div className="fixed inset-0 z-40 bg-black/60" onClick={() => setSelected(null)} />
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div className="bg-richblack-800 border border-richblack-600 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <div className="glass-card rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto">
                             <div className="flex items-center justify-between p-5 border-b border-richblack-700">
                                 <div>
                                     <h2 className="text-lg font-bold text-white">Change Details</h2>

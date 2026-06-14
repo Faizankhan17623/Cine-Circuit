@@ -4,7 +4,7 @@ import { GetTheatreDetails } from '../../Services/operations/Theatre'
 import { FaTheaterMasks, FaMapMarkerAlt, FaUser, FaDesktop, FaLanguage, FaFilm, FaCheckCircle, FaTicketAlt, FaExclamationCircle } from 'react-icons/fa'
 
 const DetailCard = ({ icon: Icon, label, value, highlight = false }) => (
-  <div className="bg-richblack-700/50 rounded-xl p-4 flex items-start gap-4 hover:bg-richblack-700/70 transition-all duration-200">
+  <div className="glass-card rounded-xl p-4 flex items-start gap-4 hover:bg-richblack-700/70 transition-all duration-200">
     <div className={`p-3 rounded-lg ${highlight ? 'bg-yellow-200/20 text-yellow-200' : 'bg-richblack-600/50 text-richblack-300'}`}>
       <Icon className="text-xl" />
     </div>
@@ -114,7 +114,7 @@ const TheatreDetails = () => {
 
           {/* Ticket Details Section */}
           {ticketDetails && ticketDetails.length > 0 && (
-            <div className="bg-richblack-800 rounded-xl p-6">
+            <div className="glass-card rounded-xl p-6">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                 <FaTicketAlt className="text-yellow-200" />
                 Ticket Categories
@@ -137,7 +137,7 @@ const TheatreDetails = () => {
           )}
         </>
       ) : (
-        <div className="bg-richblack-800 rounded-xl p-12 text-center">
+        <div className="glass-card rounded-xl p-12 text-center">
           <FaExclamationCircle className="text-5xl text-richblack-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-richblack-300 mb-2">No Theatre Found</h2>
           <p className="text-richblack-400">Your theatre may not be set up yet. Please contact support or create a theatre.</p>

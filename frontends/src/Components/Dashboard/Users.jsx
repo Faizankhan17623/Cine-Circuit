@@ -177,7 +177,7 @@ const Users = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16162a] rounded-xl p-5 border border-gray-700/50 hover:border-gray-600/50 transition group">
+        <div className="glass-card rounded-xl p-5 transition group">
           <div className="flex items-center justify-between mb-3">
             <p className="text-gray-400 text-xs uppercase tracking-wider font-medium">Total</p>
             <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition">
@@ -187,7 +187,7 @@ const Users = () => {
           <p className="text-3xl font-bold">{stats.total}</p>
           <p className="text-gray-600 text-xs mt-1">All {activeTab}</p>
         </div>
-        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16162a] rounded-xl p-5 border border-green-500/20 hover:border-green-500/30 transition group">
+        <div className="glass-card rounded-xl p-5 transition group">
           <div className="flex items-center justify-between mb-3">
             <p className="text-green-400 text-xs uppercase tracking-wider font-medium">Verified</p>
             <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition">
@@ -205,7 +205,7 @@ const Users = () => {
             <span className="text-gray-500 text-xs">{stats.total > 0 ? Math.round((stats.verified / stats.total) * 100) : 0}%</span>
           </div>
         </div>
-        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16162a] rounded-xl p-5 border border-red-500/20 hover:border-red-500/30 transition group">
+        <div className="glass-card rounded-xl p-5 transition group">
           <div className="flex items-center justify-between mb-3">
             <p className="text-red-400 text-xs uppercase tracking-wider font-medium">Unverified</p>
             <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition">
@@ -264,7 +264,7 @@ const Users = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-gradient-to-b from-[#1a1a2e] to-[#161628] rounded-xl border border-gray-700/40 overflow-hidden shadow-xl shadow-black/20">
+      <div className="glass-card rounded-xl overflow-hidden shadow-xl shadow-black/20">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

@@ -17,7 +17,7 @@ const TheatreRequestSchmea = new mongoose.Schema({
         required:true
     },
     confirmpassword:{
-        type:Number,
+        type:String,
         required:true
     },
     locationName:{
@@ -52,5 +52,5 @@ const TheatreRequestSchmea = new mongoose.Schema({
         type:String,
         required:true
     }]
-})
+},{timestamps:true})
 module.exports =  mongoose.model('TheatreRequests',TheatreRequestSchmea)

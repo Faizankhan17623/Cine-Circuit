@@ -296,8 +296,8 @@ const Purchase = () => {
                 className={`p-6 rounded-2xl border cursor-pointer transition
                 ${
                   selectedTheatre?._id === theatre._id
-                    ? "border-yellow-400 bg-yellow-400/10"
-                    : "border-richblack-700 bg-richblack-800 hover:border-yellow-400"
+                    ? "border-yellow-400 bg-yellow-400/10 text-yellow-400"
+                    : "glass-card hover:border-yellow-400"
                 }`}
               >
                 <h3 className="font-semibold text-lg">{theatre.Theatrename}</h3>
@@ -331,7 +331,7 @@ const Purchase = () => {
                     ${
                       selectedDate === date
                         ? "border-yellow-400 bg-yellow-400/10 text-yellow-400"
-                        : "border-richblack-700 bg-richblack-800 hover:border-yellow-400 text-richblack-200"
+                        : "glass-card hover:border-yellow-400 text-richblack-200"
                     }`}
                   >
                     <FaCalendarAlt />
@@ -364,7 +364,7 @@ const Purchase = () => {
                     ${
                       selectedTime === time
                         ? "border-yellow-400 bg-yellow-400/10 text-yellow-400"
-                        : "border-richblack-700 bg-richblack-800 hover:border-yellow-400 text-richblack-200"
+                        : "glass-card hover:border-yellow-400 text-richblack-200"
                     }`}
                   >
                     <FaClock />
@@ -392,7 +392,7 @@ const Purchase = () => {
                 {tickets.map((item, index) => (
                   <div
                     key={index}
-                    className="flex justify-between items-center bg-richblack-800 p-5 rounded-xl border border-richblack-700"
+                    className="flex justify-between items-center glass-card p-5 rounded-xl"
                   >
                     <div>
                       <h3 className="font-semibold">{item.category}</h3>
@@ -434,7 +434,7 @@ const Purchase = () => {
               </div>
 
               {/* Total Calculation */}
-              <div className="bg-richblack-800 p-6 rounded-2xl border border-richblack-700 h-fit sticky top-24">
+              <div className="glass-card p-6 rounded-2xl h-fit sticky top-24">
                 <h3 className="text-lg font-semibold mb-4">Total</h3>
 
                 {tickets.filter((t) => t.quantity > 0).length === 0 ? (

@@ -280,7 +280,7 @@ const handleShowSelect = (show, index) => {
       {/* Show Selection */}
       {step === 1 && (
         <div className="max-w-6xl mx-auto">
-          <div className="bg-gradient-to-br from-richblack-800 via-richblack-800 to-richblack-700 rounded-2xl p-8 border border-richblack-600 shadow-2xl">
+          <div className="glass-card rounded-2xl p-8 shadow-2xl">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
               <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center">
                 <FaFilm className="text-xl text-yellow-400" />
@@ -293,7 +293,7 @@ const handleShowSelect = (show, index) => {
                   <div
                     key={index}
                     onClick={() => handleShowSelect(item, index)}
-                    className="group relative bg-richblack-700/50 rounded-2xl p-6 border-2 border-richblack-600 hover:border-yellow-400 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10 hover:-translate-y-1"
+                    className="group relative glass-card rounded-2xl p-6 hover:border-yellow-400 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10 hover:-translate-y-1"
                   >
                     <div className="absolute top-4 right-4 w-3 h-3 bg-richblack-600 rounded-full group-hover:bg-yellow-400 transition-colors"></div>
                     <h3 className="text-xl font-bold text-white mb-3 group-hover:text-yellow-400 transition-colors">
@@ -355,7 +355,7 @@ const handleShowSelect = (show, index) => {
       {/* Release Date */}
       {step === 2 && (
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-richblack-800 via-richblack-800 to-richblack-700 rounded-2xl p-8 border border-richblack-600 shadow-2xl">
+          <div className="glass-card rounded-2xl p-8 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                 <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center">
@@ -448,7 +448,7 @@ const handleShowSelect = (show, index) => {
       {/* Ticket Categories */}
       {step === 3 && (
         <div className="max-w-5xl mx-auto">
-          <div className="bg-gradient-to-br from-richblack-800 via-richblack-800 to-richblack-700 rounded-2xl p-8 border border-richblack-600 shadow-2xl">
+          <div className="glass-card rounded-2xl p-8 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                 <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center">

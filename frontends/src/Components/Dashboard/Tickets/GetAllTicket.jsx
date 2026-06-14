@@ -115,7 +115,7 @@ const GetAllTicket = () => {
   if (error) {
     return (
       <div className="w-full h-full flex items-center justify-center p-6">
-        <div className="bg-[#1a1a2e] border border-red-500/30 rounded-2xl p-8 text-center max-w-md">
+        <div className="glass-card rounded-2xl p-8 text-center max-w-md border border-red-500/30">
           <MdLocalActivity className="text-5xl text-red-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Something went wrong</h2>
           <p className="text-gray-400 text-sm mb-4">{error}</p>
@@ -134,7 +134,7 @@ const GetAllTicket = () => {
   if (!loading && tickets.length === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center p-6">
-        <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-2xl p-12 text-center max-w-md">
+        <div className="glass-card rounded-2xl p-12 text-center max-w-md">
           <FaTicketAlt className="text-7xl text-yellow-500/30 mx-auto mb-6" />
           <h2 className="text-2xl font-bold text-white mb-3">No Tickets Yet</h2>
           <p className="text-gray-400 text-sm">
@@ -167,7 +167,7 @@ const GetAllTicket = () => {
               placeholder="Search by show name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-gray-800/80 border border-gray-600/50 rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 w-56"
+              className="bg-richblack-700/50 border border-richblack-600 rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30 w-56"
             />
           </div>
           <span className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-3 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap">
@@ -178,14 +178,14 @@ const GetAllTicket = () => {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4">
+        <div className="glass-card rounded-xl p-4">
           <p className="text-xs text-gray-500 mb-1">Total Created</p>
           <p className="text-2xl font-bold text-white">
             {totalTicketsCreated.toLocaleString('en-IN')}
           </p>
           <p className="text-xs text-gray-600 mt-1">across {tickets.length} shows</p>
         </div>
-        <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4">
+        <div className="glass-card rounded-xl p-4">
           <p className="text-xs text-gray-500 mb-1">Total Allotted</p>
           <p className="text-2xl font-bold text-orange-400">
             {totalAllotted.toLocaleString('en-IN')}
@@ -196,14 +196,14 @@ const GetAllTicket = () => {
               : '0% distributed'}
           </p>
         </div>
-        <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4">
+        <div className="glass-card rounded-xl p-4">
           <p className="text-xs text-gray-500 mb-1">Total Remaining</p>
           <p className="text-2xl font-bold text-yellow-400">
             {totalTicketsRemaining.toLocaleString('en-IN')}
           </p>
           <p className="text-xs text-gray-600 mt-1">available to allot</p>
         </div>
-        <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4">
+        <div className="glass-card rounded-xl p-4">
           <p className="text-xs text-gray-500 mb-1">Theatres Covered</p>
           <p className="text-2xl font-bold text-green-400">{totalTheatres}</p>
           <p className="text-xs text-gray-600 mt-1">total allotments</p>
@@ -222,7 +222,7 @@ const GetAllTicket = () => {
           return (
             <div
               key={ticket._id}
-              className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl overflow-hidden transition-all duration-300 hover:border-gray-600/70"
+              className="glass-card rounded-xl overflow-hidden transition-all duration-300 hover:border-gray-600/70"
             >
               {/* Main Row */}
               <div className="flex flex-col md:flex-row">
@@ -284,25 +284,25 @@ const GetAllTicket = () => {
 
                   {/* Stats Row */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                    <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                    <div className="bg-richblack-700/30 rounded-lg p-3 text-center">
                       <p className="text-xs text-gray-500">Created</p>
                       <p className="text-lg font-bold text-white">
                         {created.toLocaleString('en-IN')}
                       </p>
                     </div>
-                    <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                    <div className="bg-richblack-700/30 rounded-lg p-3 text-center">
                       <p className="text-xs text-gray-500">Allotted</p>
                       <p className="text-lg font-bold text-orange-400">
                         {allotted.toLocaleString('en-IN')}
                       </p>
                     </div>
-                    <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                    <div className="bg-richblack-700/30 rounded-lg p-3 text-center">
                       <p className="text-xs text-yellow-400">Remaining</p>
                       <p className="text-lg font-bold text-yellow-400">
                         {remaining.toLocaleString('en-IN')}
                       </p>
                     </div>
-                    <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                    <div className="bg-richblack-700/30 rounded-lg p-3 text-center">
                       <p className="text-xs text-gray-500">Theatres</p>
                       <p className="text-lg font-bold text-blue-400">
                         {ticket.totalTheatresAllotted || 0}
@@ -359,7 +359,7 @@ const GetAllTicket = () => {
 
               {/* Expanded Theatre List */}
               {isExpanded && ticket.allotments && ticket.allotments.length > 0 && (
-                <div className="border-t border-gray-700/50 bg-[#12122a] p-5">
+                <div className="border-t border-richblack-700 bg-richblack-800/30 p-5">
                   <h4 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
                     <FaTheaterMasks className="text-yellow-500" />
                     Allotted Theatres ({ticket.allotments.length})
@@ -368,7 +368,7 @@ const GetAllTicket = () => {
                     {ticket.allotments.map((allot, idx) => (
                       <div
                         key={allot.theatreId || idx}
-                        className="bg-[#1a1a2e] border border-gray-700/50 rounded-lg p-4 flex items-start gap-3"
+                        className="bg-richblack-800/50 border border-richblack-700 rounded-lg p-4 flex items-start gap-3"
                       >
                         <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center shrink-0">
                           <FaTheaterMasks className="text-yellow-400 text-sm" />

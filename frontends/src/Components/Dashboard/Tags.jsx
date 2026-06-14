@@ -104,7 +104,7 @@ const Tags = () => {
 
       {/* Add Tag Inline */}
       {showAddTag && (
-        <div className="mb-6 bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4 flex gap-3">
+        <div className="glass-card rounded-xl p-4 flex gap-3 mb-6">
           <input
             type="text"
             value={newTag}
@@ -141,7 +141,7 @@ const Tags = () => {
           {tags.map((tag) => (
             <div
               key={tag._id}
-              className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4 hover:border-yellow-500/50 transition group"
+              className="glass-card rounded-xl p-4 hover:border-yellow-500/50 transition group"
             >
               {editingTag === tag._id ? (
                 <div className="flex flex-col gap-2">
@@ -207,7 +207,7 @@ const Tags = () => {
           onClick={() => setDeleteConfirm(null)}
         >
           <div
-            className="bg-[#12122a] border border-gray-700 rounded-2xl w-full max-w-sm p-6"
+            className="glass-card rounded-2xl w-full max-w-sm p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-4">Delete Tag</h2>

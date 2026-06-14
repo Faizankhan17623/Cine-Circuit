@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import Slider from './Components/Home/Slider'
 import Finder from './Components/Home/Finder'
 import Listing from './Components/Home/Listing';
+import Footer from './Components/Home/Footer';
 import {  Routes, Route, Navigate} from "react-router-dom";
 import OpenRoute from './Hooks/OpenRoute'
 import PrivateRoute from './Hooks/PrivateRoute';
@@ -76,6 +77,7 @@ const TheatrerDashboardHome = lazy(() => import('./Components/Dashboard/Theatrer
 const OrganizerTicketReport = lazy(() => import('./Components/Dashboard/OrganizerTicketReport'))
 const CouponManager = lazy(() => import('./Components/Dashboard/CouponManager'))
 const VisitorStats = lazy(() => import('./Components/Dashboard/VisitorStats'))
+const UserDashboardHome = lazy(() => import('./Components/Dashboard/UserDashboardHome'))
 
 const PageLoader = () => (
   <div className="min-h-screen bg-richblack-900 flex items-center justify-center">
@@ -107,6 +109,7 @@ const Homelayout = ({Notify}) =>{
       <Finder />
     </div>
       <Listing/>
+      <Footer />
 
       <CookieConsent
   location="bottom"
@@ -294,6 +297,9 @@ useEffect(() => {
   )}
   {user?.usertype === ACCOUNT_TYPE.THEATER && (
     <Route path="/Dashboard/Home" element={<TheatrerDashboardHome />} />
+  )}
+  {user?.usertype === ACCOUNT_TYPE.USER && (
+    <Route path="/Dashboard/Home" element={<UserDashboardHome />} />
   )}
 
   {/* Common to all */}

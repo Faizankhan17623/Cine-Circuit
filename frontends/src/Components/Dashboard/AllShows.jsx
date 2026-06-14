@@ -103,7 +103,7 @@ const AllShows = () => {
           <div className="relative">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-3 bg-[#1a1a2e] border border-gray-700/50 rounded-lg px-4 py-2.5 hover:border-yellow-500/50 transition-colors min-w-[220px]"
+              className="flex items-center gap-3 glass-card rounded-lg px-4 py-2.5 hover:border-yellow-500/50 transition-colors min-w-[220px]"
             >
               <currentOption.icon className={`text-xl ${currentOption.color}`} />
               <span className="flex-1 text-left">{currentOption.label}</span>
@@ -112,7 +112,7 @@ const AllShows = () => {
 
             {/* Dropdown Menu */}
             {dropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a2e] border border-gray-700/50 rounded-lg overflow-hidden z-50 shadow-xl">
+              <div className="absolute top-full left-0 right-0 mt-2 glass-card rounded-lg overflow-hidden z-50 shadow-xl">
                 {showTypeOptions.map((option) => (
                   <button
                     key={option.value}
@@ -201,7 +201,7 @@ const AllShows = () => {
           {filteredShows.map((show) => (
             <div
               key={show._id}
-              className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl overflow-hidden hover:border-yellow-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/10 group"
+              className="glass-card rounded-xl overflow-hidden hover:border-yellow-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/10 group"
             >
               {/* Poster */}
               <div className="relative aspect-[2/3] overflow-hidden">
@@ -335,7 +335,7 @@ const AllShows = () => {
       ) : (
         /* Empty State */
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-2xl p-12 text-center max-w-md">
+          <div className="glass-card rounded-2xl p-12 text-center max-w-md">
             <FaFilm className="text-8xl text-yellow-500/30 mx-auto mb-6" />
             <h2 className="text-2xl font-bold mb-3">No Shows Found</h2>
             <p className="text-gray-400 mb-6">

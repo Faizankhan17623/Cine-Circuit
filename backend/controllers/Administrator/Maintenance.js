@@ -42,7 +42,6 @@ const SetMaintenance = async (req, res) => {
         record.isActive = isActive
         record.message = message || record.message
         record.endTime = endTime ? new Date(endTime) : null
-        record.updatedAt = new Date()
         await record.save()
 
         // Send email blast to all users if notifyUsers is true

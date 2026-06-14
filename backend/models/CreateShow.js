@@ -134,4 +134,10 @@
             ref:'payment'
         }],
     },{timestamps:true})
+
+    // Catalog filtering & "now showing"
+    CreateShowSchema.index({ genre: 1 })
+    CreateShowSchema.index({ showType: 1 })
+    CreateShowSchema.index({ movieStatus: 1 })
+
     module.exports = mongoose.model('Show',CreateShowSchema)

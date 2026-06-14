@@ -159,15 +159,15 @@ const PurchasedTickets = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border border-yellow-500/20 rounded-xl p-5">
+        <div className="glass-card rounded-xl p-5 border-yellow-500/20">
           <p className="text-xs text-yellow-400/70 uppercase tracking-wider font-medium mb-1">Total Bookings</p>
           <p className="text-2xl font-bold text-yellow-400">{successTickets.length}</p>
         </div>
-        <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 rounded-xl p-5">
+        <div className="glass-card rounded-xl p-5 border-blue-500/20">
           <p className="text-xs text-blue-400/70 uppercase tracking-wider font-medium mb-1">Tickets Purchased</p>
           <p className="text-2xl font-bold text-blue-400">{totalTicketCount}</p>
         </div>
-        <div className="bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/20 rounded-xl p-5">
+        <div className="glass-card rounded-xl p-5 border-green-500/20">
           <p className="text-xs text-green-400/70 uppercase tracking-wider font-medium mb-1">Total Spent</p>
           <p className="text-2xl font-bold text-green-400">&#8377;{totalSpent.toLocaleString()}</p>
         </div>
@@ -208,7 +208,7 @@ const PurchasedTickets = () => {
           return (
             <div
               key={globalIndex}
-              className="bg-gray-900/70 rounded-xl border border-gray-800/50 overflow-hidden shadow-lg hover:border-gray-700/60 transition-all duration-200"
+              className="glass-card rounded-xl overflow-hidden hover:border-yellow-400/50 transition-all duration-200"
             >
               {/* Main Row */}
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 md:p-5">

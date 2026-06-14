@@ -742,7 +742,7 @@ const ShowsManager = () => {
             onClick={() => { if (!updating) { setEditMode(null); setUpdateShowId(null) } }}
           >
             <div
-              className="bg-[#12122a] border border-gray-700 rounded-2xl w-full max-w-md p-6"
+              className="glass-card rounded-2xl w-full max-w-md p-6"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-xl font-bold mb-4">Edit Show Title</h2>
@@ -787,7 +787,7 @@ const ShowsManager = () => {
             onClick={() => { if (!updating) { setEditMode(null); setUpdateShowId(null) } }}
           >
             <div
-              className="bg-[#12122a] border border-gray-700 rounded-2xl w-full max-w-md p-6"
+              className="glass-card rounded-2xl w-full max-w-md p-6"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-xl font-bold mb-4">Edit Show Tagline</h2>
@@ -831,10 +831,7 @@ const ShowsManager = () => {
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={() => setDeleteConfirm(null)}
           >
-            <div
-              className="bg-[#12122a] border border-gray-700 rounded-2xl w-full max-w-sm p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="glass-card rounded-2xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
               <h2 className="text-xl font-bold mb-4">Delete Show</h2>
               <p className="text-gray-400 mb-6">Are you sure you want to delete this show? This action cannot be undone.</p>
               <div className="flex gap-3">
@@ -879,7 +876,7 @@ const ShowsManager = () => {
 
       {/* Create Show Form */}
       {showCreateForm && (
-        <div className="mb-6 bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-6">
+        <div className="mb-6 glass-card rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold">Create New Show</h2>
             <button
@@ -1203,7 +1200,7 @@ const ShowsManager = () => {
             <div
               key={show._id}
               onClick={() => handleShowClick(show)}
-              className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl overflow-hidden hover:border-yellow-500/50 transition group cursor-pointer"
+              className="glass-card rounded-xl overflow-hidden hover:border-yellow-500/50 transition group cursor-pointer"
             >
               {/* Show Poster */}
               <div className="relative aspect-[2/3]">
@@ -1283,7 +1280,7 @@ const ShowsManager = () => {
           onClick={() => { if (!updating) { setEditMode(null); setUpdateShowId(null) } }}
         >
           <div
-            className="bg-[#12122a] border border-gray-700 rounded-2xl w-full max-w-md p-6"
+            className="glass-card rounded-2xl w-full max-w-md p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-4">Edit Show Title</h2>

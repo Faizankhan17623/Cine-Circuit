@@ -197,7 +197,7 @@ setShowOtp(false)
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-full rounded-2xl bg-richblack-800 border border-richblack-700 shadow-xl p-6 sm:p-8 space-y-5"
+      className="w-full rounded-2xl glass-card p-6 sm:p-8 space-y-5"
     >
       {/* Error Banner */}
       {errorMessage && (

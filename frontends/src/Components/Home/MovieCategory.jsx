@@ -51,7 +51,7 @@ const MovieCard = ({ slide, badgeColor, onClick, showDetails = false }) => (
 
 const DetailedMovieCard = ({ movie, badgeColor, onClick }) => (
   <div
-    className="group bg-richblack-800 rounded-2xl overflow-hidden border border-richblack-700 hover:border-yellow-400/50 transition-all duration-300 cursor-pointer flex flex-col md:flex-row"
+    className="group glass-card glass-card-hover rounded-2xl overflow-hidden cursor-pointer flex flex-col md:flex-row"
     onClick={onClick}
   >
     {/* Poster */}

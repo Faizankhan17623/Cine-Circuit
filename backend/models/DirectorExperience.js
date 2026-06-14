@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
-const { ROLES, EXPERIENCE_LEVELS } = require('./Org_data')
+const { CONSTANTS } = require('./Org_data')
+const { ROLES, EXPERIENCE_LEVELS } = CONSTANTS
 const DirectorExperienceSchema = new mongoose.Schema({
       Role: {
         type: String,

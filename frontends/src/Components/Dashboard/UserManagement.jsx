@@ -250,7 +250,7 @@ const UserManagement = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16162a] rounded-xl p-5 border border-gray-700/50 hover:border-gray-600/50 transition group">
+        <div className="glass-card rounded-xl p-5 transition group">
           <div className="flex items-center justify-between mb-3">
             <p className="text-gray-400 text-xs uppercase tracking-wider font-medium">Total</p>
             <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition">
@@ -260,7 +260,7 @@ const UserManagement = () => {
           <p className="text-3xl font-bold">{orgdata.length}</p>
           <p className="text-gray-600 text-xs mt-1">All organizers</p>
         </div>
-        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16162a] rounded-xl p-5 border border-yellow-500/20 hover:border-yellow-500/30 transition group">
+        <div className="glass-card rounded-xl p-5 transition group">
           <div className="flex items-center justify-between mb-3">
             <p className="text-yellow-400 text-xs uppercase tracking-wider font-medium">Pending</p>
             <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500/20 transition">
@@ -270,7 +270,7 @@ const UserManagement = () => {
           <p className="text-3xl font-bold text-yellow-400">{pendingCount}</p>
           <p className="text-gray-600 text-xs mt-1">Awaiting review</p>
         </div>
-        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16162a] rounded-xl p-5 border border-green-500/20 hover:border-green-500/30 transition group">
+        <div className="glass-card rounded-xl p-5 transition group">
           <div className="flex items-center justify-between mb-3">
             <p className="text-green-400 text-xs uppercase tracking-wider font-medium">Approved</p>
             <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition">
@@ -280,7 +280,7 @@ const UserManagement = () => {
           <p className="text-3xl font-bold text-green-400">{approvedCount}</p>
           <p className="text-gray-600 text-xs mt-1">Active organizers</p>
         </div>
-        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16162a] rounded-xl p-5 border border-red-500/20 hover:border-red-500/30 transition group">
+        <div className="glass-card rounded-xl p-5 transition group">
           <div className="flex items-center justify-between mb-3">
             <p className="text-red-400 text-xs uppercase tracking-wider font-medium">Rejected</p>
             <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition">
@@ -357,7 +357,7 @@ const UserManagement = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-gradient-to-b from-[#1a1a2e] to-[#161628] rounded-xl border border-gray-700/40 overflow-hidden shadow-xl shadow-black/20">
+      <div className="glass-card rounded-xl overflow-hidden shadow-xl shadow-black/20">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -550,7 +550,7 @@ const UserManagement = () => {
       {/* Detail Modal */}
       {showDetail && selectedOrg && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#12122a] border border-gray-700/50 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 shadow-2xl shadow-black/50"
+          <div className="glass-card rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 shadow-2xl shadow-black/50"
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: '#7c3aed #1a1a2e',

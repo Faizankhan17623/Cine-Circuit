@@ -170,7 +170,7 @@ const CouponManager = () => {
                     <p className="text-lg">No coupons yet. Create your first one!</p>
                 </div>
             ) : (
-                <div className="overflow-x-auto rounded-2xl border border-richblack-700">
+                <div className="overflow-x-auto rounded-2xl glass-card">
                     <table className="w-full text-sm">
                         <thead className="bg-richblack-800 text-richblack-300 uppercase text-xs tracking-wider">
                             <tr>
@@ -270,7 +270,7 @@ const CouponManager = () => {
             {/* Create / Edit Form Modal */}
             {showForm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-                    <div className="bg-richblack-800 rounded-2xl border border-richblack-700 p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                    <div className="glass-card rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                         <div className="flex justify-between items-center mb-5">
                             <h2 className="text-lg font-bold">
                                 {editingId ? 'Edit Coupon' : 'Create Coupon'}
@@ -430,7 +430,7 @@ const CouponManager = () => {
             {/* Delete Confirmation Modal */}
             {deleteConfirm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-                    <div className="bg-richblack-800 rounded-2xl border border-richblack-700 p-6 w-full max-w-sm text-center">
+                    <div className="glass-card rounded-2xl p-6 w-full max-w-sm text-center">
                         <FaTrash className="text-red-400 text-3xl mx-auto mb-4" />
                         <h3 className="text-lg font-bold mb-2">Delete Coupon?</h3>
                         <p className="text-richblack-400 text-sm mb-6">

@@ -137,7 +137,7 @@ const Cast = () => {
 
       {/* Add Cast Form */}
       {showAddCast && (
-        <div className="mb-6 bg-[#1a1a2e] border border-gray-700/50 rounded-xl p-4">
+        <div className="glass-card rounded-xl p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Image Upload */}
             <div className="flex flex-col items-center gap-2">
@@ -210,7 +210,7 @@ const Cast = () => {
           {castList.map((cast) => (
             <div
               key={cast._id}
-              className="bg-[#1a1a2e] border border-gray-700/50 rounded-xl overflow-hidden hover:border-yellow-500/50 transition group"
+              className="glass-card rounded-xl overflow-hidden hover:border-yellow-500/50 transition group"
             >
               {/* Cast Image */}
               <div className="relative aspect-square">
@@ -314,7 +314,7 @@ const Cast = () => {
           onClick={() => setDeleteConfirm(null)}
         >
           <div
-            className="bg-[#12122a] border border-gray-700 rounded-2xl w-full max-w-sm p-6"
+            className="glass-card rounded-2xl w-full max-w-sm p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-4">Delete Cast Member</h2>

@@ -29,7 +29,7 @@ const AllotedShows = () => {
       {shows.length > 0 ? (
         <div className="grid gap-4">
           {shows.map((item, index) => (
-            <div key={index} className="bg-richblack-800 rounded-lg p-4 border border-richblack-700">
+            <div key={index} className="glass-card rounded-xl p-4">
               <p className="font-semibold text-lg">{item.data?.title || `Show ${index + 1}`}</p>
               <p className="text-richblack-300 text-sm mt-1">Status: {item.data?.movieStatus || 'N/A'}</p>
               {item.data?.releasedate && (
@@ -39,7 +39,7 @@ const AllotedShows = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-richblack-800 rounded-lg p-6">
+        <div className="glass-card rounded-xl p-6">
           <p className="text-richblack-300">No shows alloted to your theatre yet.</p>
         </div>
       )}
