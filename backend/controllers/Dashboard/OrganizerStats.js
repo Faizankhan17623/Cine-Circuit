@@ -1,6 +1,7 @@
 const USER = require('../../models/user')
 const CreateShow = require('../../models/CreateShow')
 const ticket = require('../../models/ticket')
+const Payment = require('../../models/payment')
 
 // GET /Organizer-Stats
 // Returns organizer dashboard summary — show counts, ticket counts, allotment summary
@@ -40,6 +41,13 @@ exports.GetOrganizerStats = async (req, res) => {
         const totalTicketsCreated = tickets.reduce((sum, t) => sum + (Number(t.overallTicketCreated) || 0), 0)
         const totalTicketsRemaining = tickets.reduce((sum, t) => sum + (Number(t.TicketsRemaining) || 0), 0)
 
+        // Revenue across all of this organizer's shows — only successful payments count
+        const showIdStrings = showIds.map(id => id.toString())
+        const successfulPayments = showIdStrings.length > 0
+            ? await Payment.find({ showid: { $in: showIdStrings }, Payment_Status: 'success' }).select('amount')
+            : []
+        const totalRevenue = successfulPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+
         return res.status(200).json({
             success: true,
             message: 'Organizer stats fetched',
@@ -58,6 +66,10 @@ exports.GetOrganizerStats = async (req, res) => {
                     totalTicketsCreated,
                     totalTicketsRemaining,
                     ticketsSold: totalTicketsCreated - totalTicketsRemaining,
+                },
+                revenue: {
+                    total: totalRevenue,
+                    totalPurchases: successfulPayments.length,
                 },
             },
         })

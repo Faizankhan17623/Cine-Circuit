@@ -138,3 +138,8 @@ export const PersonalRecommendApi = {
 export const CouponApi = {
     ValidateCoupon: BASE_URL + "/Validate-Coupon",
 }
+
+export const WalletLoyaltyApi = {
+    WalletBalance:  BASE_URL + "/Wallet-Balance",
+    LoyaltyBalance: BASE_URL + "/Loyalty-Balance",
+}

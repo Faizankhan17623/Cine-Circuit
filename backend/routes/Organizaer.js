@@ -8,6 +8,8 @@ const {AllotTheatre} = require('../controllers/Orgainezer/Allotment')
 const {CreateTicket} = require('../controllers/Orgainezer/CreateTicket')
 const {GetAllTheatreDetails,TicketDetails,GetAllTicketDetails} = require("../controllers/Dashboard/OrgainezerDashboard")
 const {notUploadedShows} = require("../controllers/common/Showlist")
+const {GetOrganizerStats} = require("../controllers/Dashboard/OrganizerStats")
+const {GetOrganizerTicketReport} = require("../controllers/Dashboard/OrganizerTicketReport")
 // DONE
 
 route.post('/Create-Orgainezer',CreateOrgainezer)
@@ -29,6 +31,8 @@ route.get("/All-Ticket-Details",auth,IsOrganizer,GetAllTicketDetails)
 
 // new
 route.get("/Get-All-Theatre-Details",auth,IsOrganizer,GetAllTheatreDetails)
+route.get("/Organizer-Stats",auth,IsOrganizer,GetOrganizerStats)
+route.get("/Organizer-Ticket-Report",auth,IsOrganizer,GetOrganizerTicketReport)
 route.post("/Org-Data", auth, IsOrganizer ,OrgData)
 route.get("/My-Org-Data", auth, IsOrganizer, GetMyOrgData)
 route.post("/Dir-Fresh", auth, IsOrganizer, DF, DirectorFresher)

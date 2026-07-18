@@ -47,3 +47,7 @@ export const GetAllTicketsDetails = {
 export const GetSingleShowDetailss = {
     getsingleshowdetails:BASE_URL+"/GetSingleShowDetails"
 }
+
+export const CheckInStats = {
+    checkinstats:BASE_URL+"/Check-In-Stats"
+}

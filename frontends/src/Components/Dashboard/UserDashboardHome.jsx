@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { GetUserDashStats } from '../../Services/operations/User'
+import { GetUserDashStats, GetWalletAndLoyalty } from '../../Services/operations/User'
 import {
   MdMovie, MdArrowForward, MdLocalActivity, MdBugReport,
   MdFavorite, MdChatBubble, MdConfirmationNumber, MdSettings,
-  MdLogin, MdCalendarToday
+  MdLogin, MdCalendarToday, MdAccountBalanceWallet
 } from 'react-icons/md'
 import { IoTicketSharp } from 'react-icons/io5'
 import { FaHeart, FaBookmark, FaFilm } from 'react-icons/fa'
-import { RiVipCrownFill } from 'react-icons/ri'
+import { RiVipCrownFill, RiCoinFill } from 'react-icons/ri'
 
 const colours = {
   yellow: { text: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'hover:border-yellow-400/40' },
@@ -79,6 +79,7 @@ const UserDashboardHome = () => {
   const { user }         = useSelector((s) => s.profile)
 
   const [stats,   setStats]   = useState(null)
+  const [wallet,  setWallet]  = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -89,6 +90,12 @@ const UserDashboardHome = () => {
       setLoading(false)
     }
     load()
+
+    const loadWallet = async () => {
+      const res = await dispatch(GetWalletAndLoyalty(token))
+      if (res?.success) setWallet(res.data)
+    }
+    loadWallet()
   }, [token])
 
   if (loading) {
@@ -156,6 +163,31 @@ const UserDashboardHome = () => {
           <div className="animate-fadeIn opacity-0 delay-100"><StatCard icon={FaBookmark}         label="Watchlist"        value={stats?.watchlistCount}    color="blue"   sub="saved movies"   /></div>
           <div className="animate-fadeIn opacity-0 delay-200"><StatCard icon={FaHeart}            label="Liked Movies"     value={stats?.likedMoviesCount}  color="pink"   sub="movies liked"   /></div>
           <div className="animate-fadeIn opacity-0 delay-300"><StatCard icon={MdChatBubble}       label="Comments"         value={stats?.commentsCount}     color="purple" sub="posted"         /></div>
+        </div>
+      </div>
+
+      {/* ── Wallet & Loyalty row ── */}
+      <div>
+        <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider mb-3">Wallet & Rewards</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="animate-fadeIn opacity-0">
+            <StatCard
+              icon={MdAccountBalanceWallet}
+              label="Wallet Balance"
+              value={`₹${(wallet?.walletBalance ?? 0).toLocaleString('en-IN')}`}
+              color="green"
+              sub="available to spend"
+            />
+          </div>
+          <div className="animate-fadeIn opacity-0 delay-100">
+            <StatCard
+              icon={RiCoinFill}
+              label="Loyalty Points"
+              value={wallet?.loyaltyPoints ?? 0}
+              color="orange"
+              sub={wallet?.redeemableValue ? `worth ₹${wallet.redeemableValue} in credit` : 'earn points on every booking'}
+            />
+          </div>
         </div>
       </div>
 

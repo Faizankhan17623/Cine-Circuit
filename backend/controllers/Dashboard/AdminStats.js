@@ -4,6 +4,7 @@ const BugReport = require('../../models/BugReport')
 const TheatreRequest = require('../../models/TheatrerRequest')
 const Visitor = require('../../models/Visitor')
 const Payment = require('../../models/payment')
+const AuditLog = require('../../models/AuditLog')
 
 // GET /Admin-Stats
 // Returns all key counts in a single call for the admin dashboard home
@@ -30,6 +31,8 @@ exports.GetAdminStats = async (req, res) => {
             visitorsToday,
             newVisitorsToday,
             totalVisitsAgg,
+            revenueAgg,
+            recentActivity,
         ] = await Promise.all([
             USER.countDocuments({ usertype: 'Viewer' }),
             USER.countDocuments({ usertype: 'Organizer' }),
@@ -48,6 +51,11 @@ exports.GetAdminStats = async (req, res) => {
             Visitor.countDocuments({ lastVisited: { $gte: startOfToday } }),
             Visitor.countDocuments({ createdAt: { $gte: startOfToday } }),
             Visitor.aggregate([{ $group: { _id: null, total: { $sum: '$visitCount' } } }]),
+            Payment.aggregate([
+                { $match: { Payment_Status: 'success' } },
+                { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } }
+            ]),
+            AuditLog.find({}).sort({ createdAt: -1 }).limit(6).select('action resource userEmail status createdAt').lean(),
         ])
 
         return res.status(200).json({
@@ -80,6 +88,11 @@ exports.GetAdminStats = async (req, res) => {
                     visitorsToday,
                     newVisitorsToday,
                 },
+                revenue: {
+                    total: revenueAgg[0]?.total || 0,
+                    totalPurchases: revenueAgg[0]?.count || 0,
+                },
+                recentActivity,
             },
         })
     } catch (error) {

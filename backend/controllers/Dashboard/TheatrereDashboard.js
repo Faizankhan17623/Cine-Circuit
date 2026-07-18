@@ -51,7 +51,54 @@ exports.CalculateTotalSale = async(req,res)=>{
     }
 }
 
-// idhar ah na chutiya 4 route baache hain na saale 
+// GET /Check-In-Stats — how many of this theatre's successfully paid tickets
+// have actually been scanned at entry, today and lifetime.
+exports.GetCheckInStats = async(req,res)=>{
+    try{
+        const userId = req.USER.id;
+        if(!userId) {
+            return res.status(400).json({ message: "User ID is required", success: false });
+        }
+        const user = await USER.findOne({_id:userId});
+        if(!user) {
+            return res.status(404).json({ message: "User not found", success: false });
+        }
+
+        if(!user.theatresCreated) {
+            return res.status(200).json({ message: "No theatre created yet", success: true, data: { totalTickets: 0, checkedIn: 0, checkedInToday: 0, pending: 0 } });
+        }
+
+        const theatreId = user.theatresCreated.toString()
+        const successfulTickets = await Payment.find({
+            theatreid: theatreId,
+            Payment_Status: 'success',
+            cancelled: { $ne: true }
+        }).select('checkedIn checkedInAt')
+
+        const totalTickets = successfulTickets.length
+        const checkedIn = successfulTickets.filter(p => p.checkedIn).length
+
+        // checkedInAt is stored as 'ddd, DD/MM/YYYY HH:mm:ss' — match on the date portion
+        const todayDateStr = date.format(new Date(), "DD/MM/YYYY")
+        const checkedInToday = successfulTickets.filter(p => p.checkedIn && p.checkedInAt && p.checkedInAt.includes(todayDateStr)).length
+
+        return res.status(200).json({
+            message: "Check-in stats fetched",
+            success: true,
+            data: {
+                totalTickets,
+                checkedIn,
+                checkedInToday,
+                pending: totalTickets - checkedIn
+            }
+        })
+    }catch(error){
+        console.log(error)
+        console.log("Error in GetCheckInStats controller",error.message)
+        res.status(500).json({message:"Internal Server Error", success: false});
+    }
+}
+
 exports.SingleTheatreDetails = async(req,res)=>{
     try{
         const userId = req.USER.id;
@@ -331,23 +378,6 @@ exports.GetShowsDetails = async (req,res)=>{
             });
         }
 
-        // Get all ticket data for this theatre
-        // const ticketData = await Theatrestickets.find({theatreId: Theatreid})
-
-        // // Combine show data with its ticket details
-        // const showsWithTickets = shows.map((show, index) => {
-        //     const showTickets = ticketData.filter(t => t.showId === show._id.toString())
-        //     return {
-        //         show: show,
-        //         ticketDetails: {
-        //             ticketsReceived: theatre.ticketsReceived[index] ? Number(theatre.ticketsReceived[index]) : 0,
-        //             receivedTime: theatre.ticketsReceivedTime[index] || null,
-        //             ticketPrice: theatre.priceoftheTicket[index] ? Number(theatre.priceoftheTicket[index]) : 0
-        //         },
-        //         tickets: showTickets
-        //     }
-        // })
-
         return res.status(200).json({
             message: "Shows fetched successfully",
             success: true,
@@ -398,5 +428,4 @@ exports.GetSingleTheatreDetails = async (req,res)=>{
         console.log(error.message)
         console.log("There is an error in the get single theatre deatils ")
     }
-}
-// abhe saare shows aayyenga and uske badk dusre isme to apun log theatres and unke received tickets hain wo ayenga adnd jo time pe aaye hain wo bhee show karenge  
+} 

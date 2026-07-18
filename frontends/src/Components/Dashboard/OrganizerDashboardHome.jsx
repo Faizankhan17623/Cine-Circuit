@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { GetOrganizerStats } from '../../Services/operations/orgainezer'
 import {
-  MdMovie, MdVerified, MdArrowForward, MdUpload, MdLocalActivity, MdBarChart
+  MdMovie, MdVerified, MdArrowForward, MdUpload, MdLocalActivity, MdBarChart, MdCurrencyRupee
 } from 'react-icons/md'
 import { IoTicketSharp } from 'react-icons/io5'
 import { FaTheaterMasks, FaFilm } from 'react-icons/fa'
@@ -117,6 +117,7 @@ const OrganizerDashboardHome = () => {
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const shows   = stats?.shows
   const tickets = stats?.tickets
+  const revenue = stats?.revenue
 
   return (
     <div className="p-5 text-white space-y-7 max-w-6xl">
@@ -158,6 +159,31 @@ const OrganizerDashboardHome = () => {
               value={tickets?.ticketsSold}
               sub={`${tickets?.totalTicketsRemaining||0} remaining`}
               color="purple"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Revenue ───────────────────────────────────── */}
+      <div>
+        <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider mb-3">Revenue</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="animate-fadeIn opacity-0">
+            <StatCard
+              icon={MdCurrencyRupee}
+              label="Total Revenue"
+              value={`₹${(revenue?.total || 0).toLocaleString('en-IN')}`}
+              sub="across all your shows"
+              color="green"
+            />
+          </div>
+          <div className="animate-fadeIn opacity-0 delay-100">
+            <StatCard
+              icon={IoTicketSharp}
+              label="Successful Purchases"
+              value={revenue?.totalPurchases}
+              sub="completed bookings"
+              color="yellow"
             />
           </div>
         </div>

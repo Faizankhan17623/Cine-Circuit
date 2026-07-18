@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { GetAdminStats } from '../../Services/operations/Admin'
 import {
   MdPeople, MdVerified, MdPendingActions, MdBugReport,
-  MdMovie, MdConstruction, MdArrowForward, MdTrendingUp, MdToday
+  MdMovie, MdConstruction, MdArrowForward, MdTrendingUp, MdToday, MdCurrencyRupee, MdHistory
 } from 'react-icons/md'
 import { FaUserTie, FaTheaterMasks } from 'react-icons/fa'
 
@@ -139,6 +139,31 @@ const AdminDashboardHome = () => {
         </div>
       </div>
 
+      {/* ── Platform revenue ──────────────────────────── */}
+      <div>
+        <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider mb-3">Platform Revenue</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="animate-fadeIn opacity-0">
+            <StatCard
+              icon={MdCurrencyRupee}
+              label="Total Revenue (GMV)"
+              value={`₹${(stats?.revenue?.total ?? 0).toLocaleString('en-IN')}`}
+              sub="across the whole platform"
+              color="green"
+            />
+          </div>
+          <div className="animate-fadeIn opacity-0 delay-100">
+            <StatCard
+              icon={MdTrendingUp}
+              label="Successful Purchases"
+              value={stats?.revenue?.totalPurchases ?? 0}
+              sub="completed bookings, platform-wide"
+              color="blue"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* ── Bug reports + Quick actions ───────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
 
@@ -186,6 +211,51 @@ const AdminDashboardHome = () => {
             <QuickAction icon={MdConstruction} label="Maintenance Mode"      to="/Dashboard/Maintenance"   color="orange" />
             <QuickAction icon={MdPendingActions}label="Audit Logs"           to="/Dashboard/Audit-Logs"    color="blue"   />
           </div>
+        </div>
+      </div>
+
+      {/* ── Recent Activity ───────────────────────────── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider">
+            <MdHistory className="inline mr-1 text-sm" />
+            Recent Admin Activity
+          </h2>
+          <Link to="/Dashboard/Audit-Logs" className="text-xs text-yellow-200 hover:text-yellow-100 flex items-center gap-1">
+            View all <MdArrowForward />
+          </Link>
+        </div>
+        <div className="glass-card rounded-xl overflow-hidden">
+          {stats?.recentActivity?.length > 0 ? (
+            <div className="divide-y divide-richblack-700">
+              {stats.recentActivity.map((log) => (
+                <div key={log._id} className="flex items-center justify-between px-4 py-3 gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-white truncate">
+                      <span className="font-medium">{log.action}</span>
+                      {' '}<span className="text-richblack-400">on</span>{' '}
+                      <span className="font-medium">{log.resource}</span>
+                    </p>
+                    <p className="text-xs text-richblack-400 mt-0.5 truncate">
+                      {log.userEmail || 'unknown'} · {log.createdAt ? new Date(log.createdAt).toLocaleString('en-IN') : ''}
+                    </p>
+                  </div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full border flex-shrink-0 ${
+                    log.status === 'FAILED'
+                      ? 'bg-red-400/10 text-red-400 border-red-400/20'
+                      : 'bg-green-400/10 text-green-400 border-green-400/20'
+                  }`}>
+                    {log.status || 'SUCCESS'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-6 text-center">
+              <MdHistory className="text-3xl text-richblack-600 mx-auto mb-2" />
+              <p className="text-richblack-400 text-sm">No recent activity recorded</p>
+            </div>
+          )}
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import {CreateTheatrere,theatreinfos,AllTheatres,TheatreCreationRequest,DistributeTickets,UpdateTicketTime,TicketsCreated,TheatreDetails,totalsale,GetShowAllotedDetailss,GetAllTicketsDetails,GetSingleShowDetailss} from '../Apis/TheatreApi'
+import {CreateTheatrere,theatreinfos,AllTheatres,TheatreCreationRequest,DistributeTickets,UpdateTicketTime,TicketsCreated,TheatreDetails,totalsale,GetShowAllotedDetailss,GetAllTicketsDetails,GetSingleShowDetailss,CheckInStats} from '../Apis/TheatreApi'
 import {setTheatre,setLoading,setImage,setUser} from '../../Slices/TheatreSlice'
 import { toast } from 'react-hot-toast'
 import {apiConnector} from '../apiConnector'
@@ -14,6 +14,7 @@ const {ticketscreated} = TicketsCreated
 const {theatredetails} = TheatreDetails
 const {TotalSale} = totalsale
 const {getshowalloteddetails} = GetShowAllotedDetailss
+const {checkinstats} = CheckInStats
 const {getallticketsdetails} = GetAllTicketsDetails
 const {getsingleshowdetails} = GetSingleShowDetailss
 // const {TheatreInfo} = 
@@ -271,6 +272,24 @@ export function CalculateTotalSale(token){
         }finally{
             toast.dismiss(toastId)
             dispatch(setLoading(false))
+        }
+    }
+}
+
+export function GetCheckInStats(token){
+    return async()=>{
+        try{
+            const response = await apiConnector("GET",checkinstats,null,{
+                Authorization: `Bearer ${token}`
+            })
+
+            if(!response.data.success){
+                return { success: false }
+            }
+            return { success: true, data: response.data.data }
+        }catch(error){
+            console.log(error)
+            return { success: false }
         }
     }
 }

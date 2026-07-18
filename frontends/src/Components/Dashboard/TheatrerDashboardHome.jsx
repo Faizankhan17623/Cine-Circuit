@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { CalculateTotalSale, GetTheatreDetails, FetchAllTicketsDetails } from '../../Services/operations/Theatre'
+import { CalculateTotalSale, GetTheatreDetails, FetchAllTicketsDetails, GetCheckInStats } from '../../Services/operations/Theatre'
 import {
-  MdAttachMoney, MdMovie, MdArrowForward, MdLocalActivity, MdAccessTime, MdEventSeat
+  MdAttachMoney, MdMovie, MdArrowForward, MdLocalActivity, MdAccessTime, MdEventSeat, MdQrCodeScanner
 } from 'react-icons/md'
 import { IoTicketSharp } from 'react-icons/io5'
 import { FaTheaterMasks } from 'react-icons/fa'
@@ -53,19 +53,22 @@ const TheatrerDashboardHome = () => {
   const [totalSale,     setTotalSale]     = useState(0)
   const [theatreDetails,setTheatreDetails]= useState(null)
   const [ticketData,    setTicketData]    = useState(null)
+  const [checkInStats,  setCheckInStats]  = useState(null)
   const [loading,       setLoading]       = useState(true)
 
   useEffect(() => {
     if (!token) return
     const load = async () => {
-      const [saleRes, theatreRes, ticketRes] = await Promise.all([
+      const [saleRes, theatreRes, ticketRes, checkInRes] = await Promise.all([
         dispatch(CalculateTotalSale(token)),
         dispatch(GetTheatreDetails(token)),
         dispatch(FetchAllTicketsDetails(token)),
+        dispatch(GetCheckInStats(token)),
       ])
       if (saleRes?.success)    setTotalSale(saleRes.data?.totalAmount || 0)
       if (theatreRes?.success) setTheatreDetails(theatreRes.data?.TheatreDetails || null)
       if (ticketRes?.success)  setTicketData(ticketRes.data?.data || null)
+      if (checkInRes?.success) setCheckInStats(checkInRes.data || null)
       setLoading(false)
     }
     load()
@@ -144,6 +147,43 @@ const TheatrerDashboardHome = () => {
               value={theatreDetails?.theatreformat?.length || '—'}
               sub={theatreDetails?.Theatrename || ''}
               color="purple"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Check-in stats ────────────────────────────── */}
+      <div>
+        <h2 className="text-xs font-semibold text-richblack-400 uppercase tracking-wider mb-3">
+          <MdQrCodeScanner className="inline mr-1 text-sm" />
+          Entry Check-ins
+        </h2>
+        <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
+          <div className="animate-fadeIn opacity-0">
+            <StatCard
+              icon={MdQrCodeScanner}
+              label="Checked In Today"
+              value={checkInStats?.checkedInToday}
+              sub="scanned at entry today"
+              color="green"
+            />
+          </div>
+          <div className="animate-fadeIn opacity-0 delay-100">
+            <StatCard
+              icon={MdQrCodeScanner}
+              label="Checked In (Total)"
+              value={checkInStats?.checkedIn}
+              sub={`${checkInStats?.totalTickets || 0} tickets sold`}
+              color="blue"
+            />
+          </div>
+          <div className="animate-fadeIn opacity-0 delay-200">
+            <StatCard
+              icon={MdEventSeat}
+              label="Awaiting Check-in"
+              value={checkInStats?.pending}
+              sub="not scanned yet"
+              color="orange"
             />
           </div>
         </div>

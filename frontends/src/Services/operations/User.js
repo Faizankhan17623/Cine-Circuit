@@ -3,7 +3,7 @@ import {apiConnector} from '../apiConnector'
 import {setuser,setloading,setCooldownDate } from '../../Slices/ProfileSlice'
 import {setUser,setLoading,setToken,setLogin,setUserImage} from '../../Slices/authSlice.js'
 
-import  {AllDetails,UpdatePersonalDetails,Ratings,Display,TicketData} from '../Apis/UserApi'
+import  {AllDetails,UpdatePersonalDetails,Ratings,Display,TicketData,WalletLoyaltyApi} from '../Apis/UserApi'
 import {UserLogout} from './Auth'
 
 const {GetAllDetails} = AllDetails
@@ -344,6 +344,32 @@ export function GetUserDashStats(token, navigate) {
             return { success: false }
         } finally {
             dispatch(setLoading(false))
+        }
+    }
+}
+
+export function GetWalletAndLoyalty(token) {
+    return async () => {
+        try {
+            if (!token) return { success: false }
+            const [walletRes, loyaltyRes] = await Promise.all([
+                apiConnector("GET", WalletLoyaltyApi.WalletBalance, null, { Authorization: `Bearer ${token}` }),
+                apiConnector("GET", WalletLoyaltyApi.LoyaltyBalance, null, { Authorization: `Bearer ${token}` }),
+            ])
+            if (!walletRes.data.success || !loyaltyRes.data.success) {
+                throw new Error("Failed to fetch wallet/loyalty details")
+            }
+            return {
+                success: true,
+                data: {
+                    walletBalance: walletRes.data.balance,
+                    loyaltyPoints: loyaltyRes.data.points,
+                    redeemableValue: loyaltyRes.data.redeemableValue,
+                }
+            }
+        } catch (error) {
+            console.log(error)
+            return { success: false }
         }
     }
 }
