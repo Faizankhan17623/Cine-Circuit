@@ -32,6 +32,8 @@ const {GetSingleTheatreDetails,getTheatreDetails, GetShowsDetails} = require('..
 // const {AddToWatchlist, RemoveFromWatchlist, GetMyWatchlist} = require('../controllers/user/Watchlist')
 const {GetGenresAndLanguages, EnhancedFinder} = require('../controllers/Dashboard/EnhancedSearch')
 const {ValidateCoupon} = require('../controllers/common/ValidateCoupon')
+const {GetWalletBalance, GetWalletHistory} = require('../controllers/common/Wallet')
+const {GetLoyaltyBalance, GetLoyaltyHistory, RedeemPoints} = require('../controllers/common/LoyaltyPoints')
 // DONE
 const {TheatreNavbar,MovieNavbar}  = require('../controllers/common/Comment')
 // This is the first route that will be used to create the user and all the things that the user will do releated to his personal info
@@ -216,6 +218,17 @@ route.post('/Validate-Coupon', auth, IsUSER, [
     body('couponCode').trim().notEmpty().withMessage('Coupon code is required'),
     body('totalAmount').isNumeric().withMessage('totalAmount must be a number'),
 ], validate, ValidateCoupon)
+
+// Wallet — Viewer only
+route.get('/Wallet-Balance', auth, IsUSER, GetWalletBalance)
+route.get('/Wallet-History', auth, IsUSER, GetWalletHistory)
+
+// Loyalty points — Viewer only
+route.get('/Loyalty-Balance', auth, IsUSER, GetLoyaltyBalance)
+route.get('/Loyalty-History', auth, IsUSER, GetLoyaltyHistory)
+route.post('/Redeem-Points', auth, IsUSER, [
+    body('blocks').isInt({ min: 1 }).withMessage('blocks must be a positive integer'),
+], validate, RedeemPoints)
 
 module.exports = route
 // memphis

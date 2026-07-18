@@ -6,6 +6,7 @@ const USER = require('../../models/user')
 const instance = require('../../config/razorpay')
 const mailSender = require('../../utils/mailsender')
 const cancellationTemplate = require('../../templates/userTemplates/cancellationTemplate')
+const { creditWallet } = require('./Wallet')
 
 const CANCELLATION_CUTOFF_HOURS = 2
 
@@ -19,11 +20,13 @@ const parseShowDateTime = (showDate, time) => {
     return parsedDate
 }
 
-// POST /Payment/Cancel-Ticket  { paymentId }
+// POST /Payment/Cancel-Ticket  { paymentId, refundToWallet }
+// refundToWallet=true skips Razorpay (which can take 5-7 days) and credits the
+// amount to the user's in-app wallet instantly instead.
 exports.CancelTicket = async (req, res) => {
     try {
         const userId = req.USER?.id
-        const { paymentId } = req.body
+        const { paymentId, refundToWallet } = req.body
 
         if (!userId) {
             return res.status(400).json({ message: "You are not logged in", success: false })
@@ -68,19 +71,22 @@ exports.CancelTicket = async (req, res) => {
             return res.status(400).json({ message: "No payment record to refund", success: false })
         }
 
-        // Call Razorpay refund first — if it fails, no state should change.
-        let refund
-        try {
-            refund = await instance.payments.refund(paymentDoc.razorpay_payment_id, {
-                amount: Math.round(paymentDoc.amount * 100),
-                speed: "normal"
-            })
-        } catch (refundError) {
-            console.error("Razorpay refund error:", refundError)
-            return res.status(502).json({
-                message: "Refund could not be processed right now. Please try again later.",
-                success: false
-            })
+        // Two refund paths: instant wallet credit, or the original Razorpay refund (5-7 business days).
+        let refund = null
+        if (!refundToWallet) {
+            // Call Razorpay refund first — if it fails, no state should change.
+            try {
+                refund = await instance.payments.refund(paymentDoc.razorpay_payment_id, {
+                    amount: Math.round(paymentDoc.amount * 100),
+                    speed: "normal"
+                })
+            } catch (refundError) {
+                console.error("Razorpay refund error:", refundError)
+                return res.status(502).json({
+                    message: "Refund could not be processed right now. Please try again later.",
+                    success: false
+                })
+            }
         }
 
         const session = await mongoose.startSession()
@@ -93,9 +99,23 @@ exports.CancelTicket = async (req, res) => {
 
             paymentDoc.cancelled = true
             paymentDoc.cancelledAt = ps
-            paymentDoc.refundId = refund.id
-            paymentDoc.refundStatus = refund.status === "processed" ? "processed" : "pending"
             paymentDoc.refundAmount = paymentDoc.amount
+
+            if (refundToWallet) {
+                await creditWallet(
+                    userId,
+                    paymentDoc.amount,
+                    'cancellation_refund',
+                    `Refund for cancelled booking on ${paymentDoc.Showdate}`,
+                    paymentDoc._id,
+                    session
+                )
+                paymentDoc.refundId = 'wallet'
+                paymentDoc.refundStatus = 'processed'
+            } else {
+                paymentDoc.refundId = refund.id
+                paymentDoc.refundStatus = refund.status === "processed" ? "processed" : "pending"
+            }
             await paymentDoc.save({ session })
 
             // Restore ticket counts and free up seats

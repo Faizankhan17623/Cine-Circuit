@@ -118,6 +118,10 @@ const paymentSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    walletAmountUsed: {
+        type: Number,
+        default: 0
+    },
 },{timestamps:true})
 
 // Indexes — these fields are looked up on every payment verification / user history

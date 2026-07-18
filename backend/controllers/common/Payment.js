@@ -18,6 +18,9 @@ const Coupon = require('../../models/Coupon')
 const { applyCouponLogic } = require('./ValidateCoupon')
 const { generateSeatLabels } = require('./Seats')
 const { generateTicketQrDataUrl } = require('../../utils/generateTicketQr')
+const { earnPoints } = require('./LoyaltyPoints')
+const { debitWallet, creditWallet } = require('./Wallet')
+const Wallet = require('../../models/Wallet')
 
 // Shared by MakePdf (download) and Verifypayment (email attachment)
 const buildTicketPdf = async (ticketData) => {
@@ -338,6 +341,59 @@ exports.MakePayment = async(req,res) => {
             appliedCouponCode = couponResult.coupon.code
         }
 
+        // Optionally use wallet balance to cover part (or all) of the remaining amount.
+        // Deducted upfront — refunded back to wallet if Razorpay order creation fails below.
+        let walletAmountUsed = 0
+        if (req.body.useWallet) {
+            const walletDoc = await Wallet.findOne({ userId })
+            const availableBalance = walletDoc ? walletDoc.balance : 0
+            walletAmountUsed = Math.min(availableBalance, totalAmount)
+
+            if (walletAmountUsed > 0) {
+                await debitWallet(userId, walletAmountUsed, 'booking_payment', 'Used towards booking payment')
+                totalAmount = Math.round((totalAmount - walletAmountUsed) * 100) / 100
+            }
+        }
+
+        // Fully covered by wallet — no Razorpay order needed
+        if (walletAmountUsed > 0 && totalAmount <= 0) {
+            const now = new Date();
+            const pattern = date.compile('ddd, DD/MM/YYYY HH:mm:ss');
+            const ps = date.format(now, pattern);
+
+            const PaymentStatus = await Payment.create({
+                userid: userId,
+                Showdate: Theatreticketsdata.Date,
+                theatreid: Theatreid,
+                ticketid: Ticketid,
+                purchaseDate: ps,
+                razorpay_order_id: `wallet_${Date.now()}`,
+                totalTicketpurchased: totalTickets.reduce((a, b) => parseInt(a) + parseInt(b), 0),
+                amount: 0,
+                originalAmount,
+                discountAmount,
+                couponCode: appliedCouponCode,
+                walletAmountUsed,
+                showid: ShowId,
+                Payment_Status: 'created',
+                time,
+                ticketCategorey: results.map((category, index) => ({
+                    categoryid: category._id,
+                    categoryName: category.category,
+                    price: category.price,
+                    ticketsPurchased: totalTickets[index],
+                    seats: seatsPerCategory ? seatsPerCategory[category._id.toString()] : []
+                }))
+            });
+
+            return res.status(200).json({
+                message: "Order fully paid using wallet balance",
+                success: true,
+                walletFullyPaid: true,
+                data: PaymentStatus
+            })
+        }
+
         // Create Razorpay order
         const Options = {
             amount: Math.round(totalAmount * 100),
@@ -345,9 +401,18 @@ exports.MakePayment = async(req,res) => {
             receipt: `rcpt_${Date.now()}`
         }
 
-        const order = await instance.orders.create(Options);
-        if (!order) {
-            throw new Error("Unable to create Razorpay order");
+        let order
+        try {
+            order = await instance.orders.create(Options);
+            if (!order) {
+                throw new Error("Unable to create Razorpay order");
+            }
+        } catch (orderError) {
+            // Roll back the wallet deduction since no order/payment record will exist
+            if (walletAmountUsed > 0) {
+                await creditWallet(userId, walletAmountUsed, 'admin_adjustment', 'Refund: order creation failed')
+            }
+            throw orderError
         }
 
         // Create payment record
@@ -367,6 +432,7 @@ exports.MakePayment = async(req,res) => {
             originalAmount: originalAmount,
             discountAmount: discountAmount,
             couponCode: appliedCouponCode,
+            walletAmountUsed,
             showid: ShowId,
             Payment_Status: 'created',
             time:time,
@@ -522,6 +588,9 @@ exports.Verifypayment = async(req,res) => {
                         { $inc: { usedCount: 1 }, $push: { usedBy: userId } }
                     )
                 }
+
+                // Award loyalty points on the amount actually paid — best-effort within the same transaction
+                await earnPoints(userId, PaymentVerifier.amount, PaymentVerifier._id, session)
 
                 const paymentIds = await Payment.findOne({_id: paymentId})
                 if(!paymentIds){
