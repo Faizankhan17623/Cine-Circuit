@@ -45,18 +45,35 @@ const CreateLanguageSchema =  new mongoose.Schema({
     CreationDate:{
         type:String,
     },
-    showAlloted:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Show"
-    }],
-    ticketsReceived:[{
-        type:String,
-    }],
-    ticketsReceivedTime:[{
-        type:String,
-    }],
-    priceoftheTicket:[{
-        type:String
+    // One sub-document per show allotted to this theatre — replaces the old
+    // showAlloted/ticketsReceived/ticketsReceivedTime/priceoftheTicket parallel
+    // arrays, which were only ever correlated by matching array index and could
+    // silently desync (partial writes, concurrent allotments, etc).
+    allotments:[{
+        showId:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"Show",
+            required:true
+        },
+        ticketsReceived:{
+            type:Number,
+            required:true
+        },
+        price:{
+            type:Number,
+            required:true
+        },
+        receivedAt:{
+            type:String,
+            required:true
+        },
+        // Running counter of tickets this theatre has distributed into
+        // Theatrestickets categories for this show, across all dates.
+        // Maintained via $inc so it never needs an O(n) re-sum.
+        ticketsDistributed:{
+            type:Number,
+            default:0
+        }
     }],
     issues:{
         type:String,
@@ -95,10 +112,16 @@ const CreateLanguageSchema =  new mongoose.Schema({
         default:"Pending",
         enum :["Pending","Approved","Rejected"]
     }
-},{timestamps:true})
+},{timestamps:true, toJSON:{virtuals:true}, toObject:{virtuals:true}})
 
 // Admin filtering by owner / approval status
 CreateLanguageSchema.index({ Owner: 1 })
 CreateLanguageSchema.index({ status: 1 })
+
+// Backward-compatible read-only view of allotted show IDs — kept so existing
+// frontend code (theatre.showAlloted.length / .some(...)) needs no changes.
+CreateLanguageSchema.virtual('showAlloted').get(function () {
+    return this.allotments.map(a => a.showId)
+})
 
 module.exports = mongoose.model('Theatrees',CreateLanguageSchema)

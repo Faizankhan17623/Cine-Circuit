@@ -17,8 +17,8 @@
                 required:true
             },
             totalticketfromorg:{
-                type:String,
-                required:true   
+                type:Number,
+                required:true
             },
             ticketsCategory:[{
                 category: {
@@ -62,7 +62,7 @@
                 required:true
             },
             TicketsRemaining: {
-                type: String
+                type: Number
             },
             timings:[{
                 type:String

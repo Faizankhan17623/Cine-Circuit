@@ -11,18 +11,18 @@ const CreateTicketSchema = new mongoose.Schema({
         required: true,
     },
     overallTicketCreated: {
-        type: String,
+        type: Number,
         required: true,
     },
     totalTicketsAlloted: [{
-        type: String, 
+        type: Number,
     }],
     priceoftheticket: {
-        type: String,
+        type: Number,
         required: true,
     },
     TicketsRemaining: {
-        type:String, 
+        type: Number,
     },
     typeofticket: {
         type: String,

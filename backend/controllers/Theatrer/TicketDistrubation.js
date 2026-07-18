@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const USER = require('../../models/user');
 const Theatrestickets = require('../../models/TheatresTicket');
 const Theatre = require('../../models/Theatres');
@@ -8,6 +9,7 @@ const date = require('date-and-time');
 // need to do a lot of changes in the code os we will do it from staring 
 // 1 try to understand this code because most of the things are been copied from gpt
 exports.TicketDistributionSystem = async (req, res) => {
+    const session = await mongoose.startSession()
     try {
         const userId = req.USER.id;
         const ShowId = req.query.ShowId;
@@ -50,7 +52,8 @@ exports.TicketDistributionSystem = async (req, res) => {
             });
         }
 
-        if (!TheatreFinding.showAlloted.includes(ShowId)) {
+        const allotment = TheatreFinding.allotments.find(a => a.showId.toString() === ShowId.toString());
+        if (!allotment) {
             return res.status(403).json({
                 message: "This show is created, but you are not allotted this show",
                 success: false
@@ -65,10 +68,9 @@ exports.TicketDistributionSystem = async (req, res) => {
             });
         }
 
-        const index = TheatreFinding.showAlloted.findIndex(id => id.toString() === ShowId.toString());
-        const TicketPrice = Number(TheatreFinding.priceoftheTicket[index]);
-        const TicketReceived = Number(TheatreFinding.ticketsReceived[index]);
-        const TicketReceivedTime = TheatreFinding.ticketsReceivedTime[index];
+        const TicketPrice = allotment.price;
+        const TicketReceived = allotment.ticketsReceived;
+        const TicketReceivedTime = allotment.receivedAt;
 
         const Dates = new Date()
         const formats = date.format(Dates, "DD/MM/YYYY")
@@ -101,22 +103,11 @@ exports.TicketDistributionSystem = async (req, res) => {
 
 
 
-        // console.log("This is the index",index,"This is the ticket price",TicketPrice,"This are the total tickets received,",TicketReceived)
-        const ExistingTickets = await Theatrestickets.find({ showId: ShowId, theatreId: UserFinding.theatresCreated }).sort({ Date: -1 }).limit(1);
-
-        // Calculate remaining tickets from organizer
-        let totalTicketsFromOrganizer = Number(TicketReceived);
-        let alreadyDistributed = 0;
-
-        // If there are existing tickets, calculate how many were already distributed
-        if (ExistingTickets.length > 0) {
-            const allTicketsForShow = await Theatrestickets.find({ showId: ShowId, theatreId: UserFinding.theatresCreated });
-            alreadyDistributed = allTicketsForShow.reduce((sum, ticket) => {
-                const categorySum = ticket.ticketsCategory.reduce((catSum, cat) => catSum + Number(cat.ticketsCreated || 0), 0);
-                return sum + categorySum;
-            }, 0);
-        }
-
+        // Remaining tickets come straight from the running counter on the
+        // allotment sub-document — no need to re-sum every past Theatrestickets
+        // document for this show/theatre on every distribution call.
+        const totalTicketsFromOrganizer = TicketReceived;
+        const alreadyDistributed = allotment.ticketsDistributed || 0;
         const remainingTickets = totalTicketsFromOrganizer - alreadyDistributed;
 
         if (totalTicketsCreated > remainingTickets) {
@@ -171,7 +162,9 @@ if (parsedReleaseDate.getTime() === formattedNow.getTime()) {
 }
 
 
-        const TicketCreations = await Theatrestickets.create({
+        session.startTransaction()
+
+        const [TicketCreations] = await Theatrestickets.create([{
             showId: ShowId,
             theatreId: UserFinding.theatresCreated,
             userId: userId,
@@ -189,10 +182,20 @@ if (parsedReleaseDate.getTime() === formattedNow.getTime()) {
             ticketsReceivingTime: TicketReceivedTime,
             Status: "Upcoming",
             TicketsRemaining: remainingTickets - totalTicketsCreated
-        });
+        }], { session });
 
-  TheatreFinding.ticketCreation.push(TicketCreations._id);
-await TheatreFinding.save();
+        // Atomically bump the running counter on this specific allotment
+        // sub-document — avoids re-summing every past distribution document.
+        await Theatre.updateOne(
+            { _id: TheatreFinding._id, "allotments.showId": ShowId },
+            {
+                $inc: { "allotments.$.ticketsDistributed": totalTicketsCreated },
+                $push: { ticketCreation: TicketCreations._id }
+            },
+            { session }
+        );
+
+        await session.commitTransaction()
 
         return res.status(201).json({
             message: "Ticket distribution created successully",
@@ -201,12 +204,17 @@ await TheatreFinding.save();
         });
 
     } catch (error) {
+        if (session.inTransaction()) {
+            await session.abortTransaction()
+        }
         console.log("Error in Ticket Distribution:",error)
         console.error( error.message);
         return res.status(500).json({
             message: "Internal Server Error",
             success: false,
         });
+    } finally {
+        session.endSession()
     }
 };
 

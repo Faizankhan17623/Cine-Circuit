@@ -104,20 +104,20 @@ exports.GetShowAllotedDetails = async(req,res)=>{
             return res.status(200).json({ message: "Theatre not found", success: true, show: [] });
         }
 
-        if(!Finding.showAlloted || Finding.showAlloted.length === 0) {
+        if(!Finding.allotments || Finding.allotments.length === 0) {
             return res.status(200).json({ message: "No shows alloted yet", success: true, show: [] });
         }
 
         const ShowData = await Promise.all(
-            Finding.showAlloted.map(async(item,index)=>{
-                const data = await CreateShow.findOne({_id:item})
+            Finding.allotments.map(async(allotment,index)=>{
+                const data = await CreateShow.findOne({_id:allotment.showId})
                 return {
                     data,
                     index,
                     ticketAllocation: {
-                        ticketsReceived: Finding.ticketsReceived?.[index] || 0,
-                        ticketPrice: Finding.priceoftheTicket?.[index] || 0,
-                        ticketsReceivedTime: Finding.ticketsReceivedTime?.[index] || null
+                        ticketsReceived: allotment.ticketsReceived || 0,
+                        ticketPrice: allotment.price || 0,
+                        ticketsReceivedTime: allotment.receivedAt || null
                     }
                 }
             })
@@ -160,7 +160,7 @@ exports.getAllticketsDetails = async(req,res)=>{
             return res.status(200).json({ message: "Theatre not found", success: true, data: { theatre: null, shows: [], totalShows: 0, totalTicketsReceived: 0 } });
         }
 
-        if(!Finding.showAlloted || Finding.showAlloted.length === 0) {
+        if(!Finding.allotments || Finding.allotments.length === 0) {
             return res.status(200).json({
                 message: "No shows alloted yet",
                 success: true,
@@ -174,13 +174,13 @@ exports.getAllticketsDetails = async(req,res)=>{
         }
 
         const ShowData = await Promise.all(
-            Finding.showAlloted.map(async(item, index) => {
-                const showDetails = await CreateShow.findOne({_id:item});
+            Finding.allotments.map(async(allotment, index) => {
+                const showDetails = await CreateShow.findOne({_id:allotment.showId});
 
                 const ticketInfo = {
-                    ticketsReceived: Finding.ticketsReceived?.[index] ? Number(Finding.ticketsReceived[index]) : 0,
-                    receivedTime: Finding.ticketsReceivedTime?.[index] || null,
-                    ticketPrice: Finding.priceoftheTicket?.[index] ? Number(Finding.priceoftheTicket[index]) : 0
+                    ticketsReceived: allotment.ticketsReceived || 0,
+                    receivedTime: allotment.receivedAt || null,
+                    ticketPrice: allotment.price || 0
                 };
 
                 return {
@@ -201,7 +201,7 @@ exports.getAllticketsDetails = async(req,res)=>{
                 },
                 shows: ShowData,
                 totalShows: ShowData.length,
-                totalTicketsReceived: (Finding.ticketsReceived || []).reduce((sum, tickets) => sum + Number(tickets), 0)
+                totalTicketsReceived: Finding.allotments.reduce((sum, a) => sum + Number(a.ticketsReceived || 0), 0)
             }
         });
 
@@ -227,32 +227,27 @@ exports.getSingleShowDetails = async(req,res)=>{
         }
 
 
-        const Finding = await Theatres.findOne({_id:user.theatresCreated,showAlloted:showId});
+        const Finding = await Theatres.findOne({_id:user.theatresCreated,"allotments.showId":showId});
 
         if(!Finding) {
             return res.status(404).json({ message: "THis show is not alloted to you",success:false });
         }
 
-        console.log(Finding,"THis is the found data")    
-
         const data = await CreateShow.findOne({_id:showId})
     if(!data) {
         return res.status(404).json({ message: "Show not found",success:false });
     }
-    
-    const IndexFinding = Finding.showAlloted.indexOf(showId)
-    const Ticketseceived = Finding.ticketsReceived[IndexFinding]
-    const TicketPrice = Finding.priceoftheTicket[IndexFinding]
-    const TicketTime = Finding.ticketsReceivedTime[IndexFinding]
-        
+
+    const allotment = Finding.allotments.find(a => a.showId.toString() === showId.toString())
+
         return res.status(200).json({
             message: "Theatre Details",
             success: true,
             showDetails:data,
             ticketDetails:{
-                ticketsReceived: Ticketseceived ? Number(Ticketseceived) : 0,
-                receivedTime: TicketTime || null,
-                ticketPrice: TicketPrice ? Number(TicketPrice) : 0
+                ticketsReceived: allotment ? Number(allotment.ticketsReceived) : 0,
+                receivedTime: allotment ? allotment.receivedAt : null,
+                ticketPrice: allotment ? Number(allotment.price) : 0
             }
         });
     }catch(error){

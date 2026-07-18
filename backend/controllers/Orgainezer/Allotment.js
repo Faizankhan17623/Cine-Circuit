@@ -8,6 +8,7 @@ const USER = require('../../models/user')
 
 // THis is the function that is been created on the route of orgainezer on line no 14
 exports.AllotTheatre = async (req, res) => {
+    const session = await mongoose.startSession()
     try {
         const ShowId = req.query.ShowId;
         const TheatreId = req.query.TheatreId;
@@ -45,29 +46,20 @@ exports.AllotTheatre = async (req, res) => {
             });
         }
 
-        const ShowAllottingFinding = await Theatre.findOne({showAlloted: ShowId, _id: TheatreId});
-        if (ShowAllottingFinding) {
+        const alreadyAllotted = TheatreFinding.allotments.some(a => a.showId.toString() === ShowId.toString())
+        if (alreadyAllotted) {
             return res.status(400).json({
                 message: "This theatre has already been allotted the show",
                 success: false,
             });
         }
 
-        const ticketDetails = await Ticket.findOne({ showid: ShowId });
-        if (!ticketDetails) {
-            return res.status(404).json({
-                message: "No ticket details found for the given show",
-                success: false,
-            });
-        }
-
+        const ticketDetails = TicketsCheckers
         const { priceoftheticket } = ticketDetails;
 
-        // ✅ CONVERT TO NUMBERS
         const ticketsRemaining = Number(ticketDetails.TicketsRemaining);
         const ticketsToAllot = Number(TotalTicketsToAllot);
 
-        // Check if tickets are over
         if (ticketsRemaining === 0) {
             return res.status(400).json({
                 message: "The tickets for this show are over",
@@ -82,7 +74,6 @@ exports.AllotTheatre = async (req, res) => {
             })
         }
 
-        // ✅ NOW COMPARE NUMBERS, NOT STRINGS
         if (ticketsRemaining < ticketsToAllot) {
             return res.status(400).json({
                 message: `Cannot allot more tickets than available. Available: ${ticketsRemaining}, Requested: ${ticketsToAllot}`,
@@ -90,48 +81,58 @@ exports.AllotTheatre = async (req, res) => {
             });
         }
 
-        // ✅ CALCULATE REMAINING AS NUMBER
         const TotalRemaining = ticketsRemaining - ticketsToAllot;
 
-        // Get current timestamp
         const now = new Date();
         const pattern = date.compile('DD/MM/YYYY HH:mm:ss');
         let AllotmentTime = date.format(now, pattern);
 
-        // Update ticket collection
+        // All 4 collections must move together — a crash partway through would
+        // otherwise leave the ticket batch decremented but the theatre without
+        // its allotment (or vice versa).
+        session.startTransaction()
+
         await Ticket.updateOne(
             { showid: ShowId },
             {
                 timeofAllotmentofTicket: AllotmentTime,
-                TicketsRemaining: TotalRemaining,  // Store as number
-                $push: { 
+                TicketsRemaining: TotalRemaining,
+                $push: {
                     allotedToTheatres: TheatreId,
                     totalTicketsAlloted: ticketsToAllot
                 },
-            }
+            },
+            { session }
         );
 
-        // Update theatre collection
         await Theatre.updateOne(
             { _id: TheatreId },
-            { $push: { 
-                showAlloted: ShowId,
-                ticketsReceived: ticketsToAllot,  // Store as number
-                ticketsReceivedTime: AllotmentTime,
-                priceoftheTicket: priceoftheticket
-            }}
+            { $push: {
+                allotments: {
+                    showId: ShowId,
+                    ticketsReceived: ticketsToAllot,
+                    price: Number(priceoftheticket),
+                    receivedAt: AllotmentTime,
+                    ticketsDistributed: 0
+                }
+            }},
+            { session }
         );
-        
+
         await CreateShow.updateOne(
             {_id: ShowId},
-            {$push: {AllotedToTheNumberOfTheatres: TheatreId}}
+            {$push: {AllotedToTheNumberOfTheatres: TheatreId}},
+            { session }
         )
-        
+
         await USER.updateOne(
-            {_id: userId},  // ✅ Fixed: should be userId, not TheatreId
-            {$push: {AllotedNumber: TheatreId}}
+            {_id: userId},
+            {$push: {AllotedNumber: TheatreId}},
+            { session }
         )
-        
+
+        await session.commitTransaction()
+
         console.log("Allotted tickets successfully");
 
         return res.status(200).json({
@@ -146,10 +147,15 @@ exports.AllotTheatre = async (req, res) => {
         });
 
     } catch (error) {
+        if (session.inTransaction()) {
+            await session.abortTransaction()
+        }
         console.error(error);
         return res.status(500).json({
             message: "An error occurred while allotting tickets to the theatre",
             success: false,
         });
+    } finally {
+        session.endSession()
     }
 };
