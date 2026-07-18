@@ -14,7 +14,7 @@ const paymentSchema = new mongoose.Schema({
             categoryid:{
                 type:mongoose.Schema.Types.ObjectId,
                 ref:"CreateTicket"
-            },  
+            },
             categoryName:{
                 type:String,
                 required:true
@@ -26,7 +26,10 @@ const paymentSchema = new mongoose.Schema({
             ticketsPurchased:{
                 type:String,
                 required:true
-            }
+            },
+            seats:[{
+                type:String
+            }]
         }
     ],
     time:{
@@ -85,6 +88,35 @@ const paymentSchema = new mongoose.Schema({
     originalAmount: {
         type: Number,
         default: null
+    },
+    checkedIn: {
+        type: Boolean,
+        default: false
+    },
+    checkedInAt: {
+        type: String,
+        default: null
+    },
+    cancelled: {
+        type: Boolean,
+        default: false
+    },
+    cancelledAt: {
+        type: String,
+        default: null
+    },
+    refundId: {
+        type: String,
+        default: null
+    },
+    refundStatus: {
+        type: String,
+        enum: ["none", "pending", "processed", "failed"],
+        default: "none"
+    },
+    refundAmount: {
+        type: Number,
+        default: 0
     },
 },{timestamps:true})
 

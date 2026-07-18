@@ -11,3 +11,11 @@ export const paymentVerification = {
 export const TicketDetails = {
     downloadticketdata:BASE_URL+"/download/:ticketId"
 }
+
+export const SeatMapApi = {
+    getSeatMap:BASE_URL+"/Seat-Map"
+}
+
+export const CancelTicketApi = {
+    cancelTicket:BASE_URL+"/Cancel-Ticket"
+}

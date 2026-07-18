@@ -36,7 +36,26 @@
                 price: {
                     type: Number,
                     required: true
+                },
+                seatsPerRow: {
+                    type: Number,
+                    default: 10
                 }
+            }],
+            // Seats booked so far, grouped per showtime so the same category
+            // capacity can be reused safely across the different `timings` entries.
+            bookedSeats: [{
+                time: {
+                    type: String,
+                    required: true
+                },
+                category: {
+                    type: String,
+                    required: true
+                },
+                seats: [{
+                    type: String
+                }]
             }],
             Date:{
                 type:String,

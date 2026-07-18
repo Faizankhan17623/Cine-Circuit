@@ -115,7 +115,8 @@ exports.TicketPurchasedFullDetails = async(req,res)=>{
                         category: ticket.categoryName,
                         quantity: ticket.ticketsPurchased,
                         price: ticket.price,
-                        totalAmount: parseInt(ticket.price) * parseInt(ticket.ticketsPurchased)
+                        totalAmount: parseInt(ticket.price) * parseInt(ticket.ticketsPurchased),
+                        seats: ticket.seats || []
                     }));
 
                     return {

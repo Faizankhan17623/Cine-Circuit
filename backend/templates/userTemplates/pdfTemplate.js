@@ -38,7 +38,8 @@ const pdfTemplate = (data) => {
         timeChnage = `${hour}:${minute.toString().padStart(2, '0')} ${period}`;
     }
 
-    const reference = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    const reference = (data._id || '').toString().slice(-8).toUpperCase() || Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    const seatCategories = categories.filter(cat => Array.isArray(cat.seats) && cat.seats.length > 0);
 
     return `<!DOCTYPE html>
         <html lang="en">
@@ -673,6 +674,15 @@ const pdfTemplate = (data) => {
                             `).join('')}
                         </tbody>
                     </table>
+                    ${seatCategories.length > 0 ? `
+                    <div style="margin-top: 14px;">
+                        ${seatCategories.map(cat => `
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 4px;">
+                                <strong style="color: rgba(255,255,255,0.75);">${cat.categoryName} seats:</strong> ${cat.seats.join(', ')}
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
                 </div>
 
                 <!-- Total -->
@@ -709,6 +719,16 @@ const pdfTemplate = (data) => {
                         <div class="ref-code">#${reference}</div>
                     </div>
                 </div>
+
+                ${data.qrCodeDataUrl ? `
+                <!-- QR Check-in Code -->
+                <div class="reference-section" style="padding-top: 0;">
+                    <div class="ref-box">
+                        <div class="ref-label">Show this at entry</div>
+                        <img src="${data.qrCodeDataUrl}" alt="Ticket QR Code" style="width: 140px; height: 140px; margin-top: 8px;" />
+                    </div>
+                </div>
+                ` : ''}
 
                 <!-- Divider -->
                 <div class="divider"></div>

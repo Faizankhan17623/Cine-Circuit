@@ -1,14 +1,15 @@
 require('dotenv').config()
 // const sendingOtpTeemplate = require('../templates/emailTemplate')
 const transporter = require('../config/nodemailer')
-const mailSenders = async(email,title,body)=>{
+const mailSenders = async(email,title,body,attachments)=>{
   try {
     const info = await transporter.sendMail({
       from:`Movie Webiste <${process.env.MAIL_USER}>`,
       to:`${email}`,
       subject:`${title}`,
       html:body,
-    })  
+      ...(attachments ? { attachments } : {}),
+    })
     // console.log("THis is the message send to thee mail",info)
     return info
   } catch (error) {

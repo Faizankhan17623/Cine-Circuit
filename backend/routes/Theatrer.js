@@ -5,6 +5,7 @@ const {CreateTheatrere} = require('../controllers/Theatrer/Theatrer')
 const {TicketDistributionSystem,GetAllticketsCreated,UpdateTime} = require('../controllers/Theatrer/TicketDistrubation')
 const {TheatreCreationRequestPassing,GetAllTheatres,TheatreCreationRequest} = require('../controllers/Administrator/CreateTheatres')
 const {CalculateTotalSale,SingleTheatreDetails,GetShowAllotedDetails,getAllticketsDetails,getSingleShowDetails} = require('../controllers/Dashboard/TheatrereDashboard')
+const {CheckInTicket} = require('../controllers/Theatrer/CheckIn')
 // THis are all the routes that are present an all of them are working fine 
 // ya first wala hain iske andar theatrer apen  email id and password input main denga 
 // 1 This is the first step for creating the theatre
@@ -34,4 +35,8 @@ route.get("/CalculateTotalSale",auth,IsTheatrer,CalculateTotalSale)
 route.get("/Show-Alloted-Details",auth,IsTheatrer,GetShowAllotedDetails)
 route.get("/All-Tickets-Details",auth,IsTheatrer,getAllticketsDetails)
 route.get("/GetSingleShowDetails",auth,IsTheatrer,getSingleShowDetails)
+
+// QR check-in at theatre entry
+route.post("/Check-In",auth,IsTheatrer,CheckInTicket)
+
 module.exports = route

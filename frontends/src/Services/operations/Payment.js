@@ -1,11 +1,13 @@
 import toast from 'react-hot-toast'
 import {apiConnector, axiosinstance} from '../apiConnector'
-import {CreatePayment,paymentVerification,TicketDetails} from '../Apis/PaymentApi'
+import {CreatePayment,paymentVerification,TicketDetails,SeatMapApi,CancelTicketApi} from '../Apis/PaymentApi'
 import {setUser,setLoading} from '../../Slices/PaymentSlice'
 
 const {makepayment} = CreatePayment
 const {downloadticketdata} = TicketDetails
 const {verifypayment} = paymentVerification
+const {getSeatMap} = SeatMapApi
+const {cancelTicket} = CancelTicketApi
 
 const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID
 
@@ -34,7 +36,8 @@ export function MakePayment(
   token,
   navigate,
   setPaymentLoading,
-  couponCode = null
+  couponCode = null,
+  SelectedSeats = null
 ) {
   return async (dispatch) => {
     const toastId = toast.loading("Processing Payment...");
@@ -54,6 +57,7 @@ export function MakePayment(
 
       const body = { ShowId, Theatreid, Ticketid, userId, Categories, totalTickets, time }
       if (couponCode) body.couponCode = couponCode
+      if (SelectedSeats) body.SelectedSeats = SelectedSeats
 
       const response = await apiConnector("POST", makepayment, body, {
         Authorization: `Bearer ${token}`,
@@ -166,6 +170,51 @@ export function PaymentVerify(
     dispatch(setLoading(false));
     if (setPaymentLoading) setPaymentLoading(false);
   };
+}
+
+export async function GetSeatMap(ticketId, time, token) {
+  try {
+    const response = await apiConnector(
+      "GET",
+      getSeatMap,
+      null,
+      { Authorization: `Bearer ${token}` },
+      { ticketId, time }
+    )
+    if (!response.data.success) {
+      return { success: false, message: response.data.message, data: [] }
+    }
+    return { success: true, data: response.data.data }
+  } catch (error) {
+    console.log(error)
+    return { success: false, message: error?.response?.data?.message || "Failed to load seat map", data: [] }
+  }
+}
+
+export function CancelTicket(paymentId, token) {
+  return async (dispatch) => {
+    const toastId = toast.loading("Cancelling ticket...")
+    try {
+      const response = await apiConnector(
+        "POST",
+        cancelTicket,
+        { paymentId },
+        { Authorization: `Bearer ${token}` }
+      )
+      if (!response.data.success) {
+        toast.error(response.data.message || "Cancellation failed")
+        return { success: false }
+      }
+      toast.success(response.data.message || "Ticket cancelled, refund initiated")
+      return { success: true, data: response.data.data }
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.response?.data?.message || "Cancellation failed")
+      return { success: false }
+    } finally {
+      toast.dismiss(toastId)
+    }
+  }
 }
 
 export function MakePdf(ticketId, token) {

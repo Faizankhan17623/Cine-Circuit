@@ -4,8 +4,8 @@ import LazyImage from "../extra/LazyImage";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PurchasedTicketsFullDetails } from "../../Services/operations/User";
-import { MakePdf } from "../../Services/operations/Payment";
-import { FaTicketAlt, FaDownload, FaChevronDown, FaChevronUp, FaPrint } from "react-icons/fa";
+import { MakePdf, CancelTicket } from "../../Services/operations/Payment";
+import { FaTicketAlt, FaDownload, FaChevronDown, FaChevronUp, FaPrint, FaBan } from "react-icons/fa";
 
 const formatTime12hr = (time) => {
   if (!time) return "";
@@ -29,8 +29,24 @@ const PurchasedTickets = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedCard, setExpandedCard] = useState(null);
   const [printTicketIndex, setPrintTicketIndex] = useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
 
   const postsPerPage = 5;
+
+  const CANCELLATION_CUTOFF_HOURS = 2;
+
+  const isCancellable = (payment) => {
+    if (!payment || payment.Payment_Status !== "success") return false;
+    if (payment.cancelled || payment.checkedIn) return false;
+    if (!payment.Showdate) return true;
+    const parts = payment.Showdate.split("/");
+    if (parts.length !== 3) return true;
+    const [hours, minutes] = (payment.time || "00:00").split(":").map(Number);
+    const showDateTime = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+    showDateTime.setHours(hours || 0, minutes || 0, 0, 0);
+    const cutoff = new Date(showDateTime.getTime() - CANCELLATION_CUTOFF_HOURS * 60 * 60 * 1000);
+    return new Date() <= cutoff;
+  };
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -51,6 +67,7 @@ const PurchasedTickets = () => {
 
   const getStatus = (ticket) => {
     const paymentStatus = ticket.paymentDetails?.Payment_Status;
+    if (ticket.paymentDetails?.cancelled) return "Cancelled";
     if (paymentStatus === "failure") return "Failed";
     if (paymentStatus === "created") return "Pending";
 
@@ -91,6 +108,22 @@ const PurchasedTickets = () => {
 
   const handleDownloadPdf = (paymentId) => {
     dispatch(MakePdf(paymentId, token));
+  };
+
+  const handleCancel = async (paymentId) => {
+    if (!window.confirm("Cancel this ticket? A refund will be initiated to your original payment method.")) return;
+    setCancellingId(paymentId);
+    const result = await dispatch(CancelTicket(paymentId, token));
+    if (result?.success) {
+      setTickets((prev) =>
+        prev.map((t) =>
+          t.paymentDetails?._id === paymentId
+            ? { ...t, paymentDetails: { ...t.paymentDetails, cancelled: true, ...result.data } }
+            : t
+        )
+      );
+    }
+    setCancellingId(null);
   };
 
   const handlePrint = (index) => {
@@ -143,6 +176,7 @@ const PurchasedTickets = () => {
     Completed: { bg: "bg-green-500/15", text: "text-green-400", ring: "ring-green-500/20", dot: "bg-green-400" },
     Failed: { bg: "bg-red-500/15", text: "text-red-400", ring: "ring-red-500/20", dot: "bg-red-400" },
     Pending: { bg: "bg-orange-500/15", text: "text-orange-400", ring: "ring-orange-500/20", dot: "bg-orange-400" },
+    Cancelled: { bg: "bg-gray-500/15", text: "text-gray-400", ring: "ring-gray-500/20", dot: "bg-gray-400" },
   };
 
   return (
@@ -277,6 +311,16 @@ const PurchasedTickets = () => {
                         >
                           <FaPrint size={12} />
                         </button>
+                        {isCancellable(payment) && (
+                          <button
+                            onClick={() => handleCancel(payment?._id)}
+                            disabled={cancellingId === payment?._id}
+                            className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors no-print disabled:opacity-40"
+                            title="Cancel Ticket"
+                          >
+                            <FaBan size={12} />
+                          </button>
+                        )}
                       </>
                     )}
                     <button
@@ -310,6 +354,11 @@ const PurchasedTickets = () => {
                               <p className="text-[11px] text-gray-500">
                                 {cat.quantity || cat.ticketsPurchased} x &#8377;{cat.price}
                               </p>
+                              {cat.seats && cat.seats.length > 0 && (
+                                <p className="text-[11px] text-yellow-400/80 mt-0.5">
+                                  Seats: {cat.seats.join(", ")}
+                                </p>
+                              )}
                             </div>
                             <p className="text-sm font-semibold text-yellow-400">
                               &#8377;{(parseInt(cat.quantity || cat.ticketsPurchased) * parseInt(cat.price)).toLocaleString()}
@@ -367,6 +416,20 @@ const PurchasedTickets = () => {
                             {payment?.Payment_Status}
                           </span>
                         </div>
+                        {payment?.cancelled && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Refund Status</span>
+                            <span className="text-gray-300 font-medium capitalize">
+                              {payment.refundStatus} (&#8377;{payment.refundAmount})
+                            </span>
+                          </div>
+                        )}
+                        {payment?.checkedIn && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Checked In</span>
+                            <span className="text-green-400 font-medium">{payment.checkedInAt}</span>
+                          </div>
+                        )}
                         <hr className="border-gray-700/50" />
                         <div className="flex justify-between font-bold">
                           <span className="text-gray-300">Total Amount</span>

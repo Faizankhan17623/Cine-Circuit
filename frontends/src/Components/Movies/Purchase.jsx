@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
+import toast from "react-hot-toast"
 import Navbar from "../Home/Navbar"
-import { FaMapMarkerAlt, FaCalendarAlt, FaClock, FaArrowLeft, FaPlus, FaMinus, FaTag, FaTimes, FaCheck } from "react-icons/fa"
+import { FaMapMarkerAlt, FaCalendarAlt, FaClock, FaArrowLeft, FaTag, FaTimes, FaCheck, FaChair } from "react-icons/fa"
 import { TheatreDetails } from "../../Services/operations/User"
-import { MakePayment } from "../../Services/operations/Payment"
+import { MakePayment, GetSeatMap } from "../../Services/operations/Payment"
 import { validateCoupon } from "../../Services/operations/Coupon"
 import Loader from "../extra/Loading"
 
@@ -37,6 +38,9 @@ const Purchase = () => {
   const [selectedTime, setSelectedTime] = useState(null)
   const [tickets, setTickets] = useState([])
   const [paymentLoading, setPaymentLoading] = useState(false)
+  const [seatMap, setSeatMap] = useState([])
+  const [seatMapLoading, setSeatMapLoading] = useState(false)
+  const [selectedSeats, setSelectedSeats] = useState({}) // { categoryId: [seatLabels] }
 
   // Coupon state
   const [couponInput, setCouponInput] = useState("")
@@ -136,9 +140,10 @@ const Purchase = () => {
     resetCoupon()
   }
 
-  const handleSelectTime = (time) => {
+  const handleSelectTime = async (time) => {
     setSelectedTime(time)
     resetCoupon()
+    setSelectedSeats({})
     const dateTicket = theatreTickets.find((t) => t.Date === selectedDate)
     if (dateTicket?.ticketsCategory) {
       setTickets(
@@ -151,6 +156,40 @@ const Purchase = () => {
         }))
       )
     }
+
+    if (dateTicket?._id) {
+      setSeatMapLoading(true)
+      const result = await GetSeatMap(dateTicket._id, time, token)
+      setSeatMap(result.success ? result.data : [])
+      setSeatMapLoading(false)
+    }
+  }
+
+  const MAX_SEATS_PER_CATEGORY = 5
+
+  const toggleSeat = (categoryId, seatLabel, isBooked) => {
+    if (isBooked) return
+    setSelectedSeats((prev) => {
+      const current = prev[categoryId] || []
+      const isSelected = current.includes(seatLabel)
+      let updated
+      if (isSelected) {
+        updated = current.filter((s) => s !== seatLabel)
+      } else {
+        if (current.length >= MAX_SEATS_PER_CATEGORY) {
+          toast.error(`You can select up to ${MAX_SEATS_PER_CATEGORY} seats per category`)
+          return prev
+        }
+        updated = [...current, seatLabel]
+      }
+      const next = { ...prev, [categoryId]: updated }
+
+      setTickets((prevTickets) =>
+        prevTickets.map((t) => (t.id === categoryId ? { ...t, quantity: updated.length } : t))
+      )
+      if (appliedCoupon) setAppliedCoupon(null)
+      return next
+    })
   }
 
   const handleApplyCoupon = async () => {
@@ -166,27 +205,6 @@ const Purchase = () => {
 
   const handleRemoveCoupon = () => { setAppliedCoupon(null); setCouponInput(""); setCouponError("") }
 
-  const MAX_TICKETS_PER_CATEGORY = 5
-
-  const increase = (index) => {
-    const updated = [...tickets]
-    const maxAllowed = Math.min(MAX_TICKETS_PER_CATEGORY, updated[index].available)
-    if (updated[index].quantity < maxAllowed) {
-      updated[index].quantity += 1
-      if (appliedCoupon) setAppliedCoupon(null)
-      setTickets(updated)
-    }
-  }
-
-  const decrease = (index) => {
-    const updated = [...tickets]
-    if (updated[index].quantity > 0) {
-      updated[index].quantity -= 1
-      setTickets(updated)
-      if (appliedCoupon) setAppliedCoupon(null)
-    }
-  }
-
   const rawTotal = tickets.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const totalAmount = appliedCoupon ? appliedCoupon.finalAmount : rawTotal
   const totalTickets = tickets.reduce((sum, t) => sum + t.quantity, 0)
@@ -200,6 +218,17 @@ const Purchase = () => {
     const Categories = selectedTickets.map((t) => t.id)
     const ticketCounts = selectedTickets.map((t) => String(t.quantity))
 
+    const hasSeatMap = seatMap.length > 0
+    if (hasSeatMap) {
+      for (const t of selectedTickets) {
+        const chosen = selectedSeats[t.id] || []
+        if (chosen.length !== t.quantity) {
+          toast.error(`Please select ${t.quantity} seat(s) for ${t.category}`)
+          return
+        }
+      }
+    }
+
     dispatch(
       MakePayment(
         show._id,
@@ -212,7 +241,8 @@ const Purchase = () => {
         token,
         navigate,
         setPaymentLoading,
-        appliedCoupon?.couponCode || null
+        appliedCoupon?.couponCode || null,
+        hasSeatMap ? selectedSeats : null
       )
     )
   }
@@ -376,61 +406,94 @@ const Purchase = () => {
           </div>
         )}
 
-        {/* Step 4: Ticket selection with +/- and total */}
+        {/* Step 4: Seat selection and total */}
         {selectedTime && (
           <div className="mb-10">
             <h2 className="text-xl font-semibold mb-2">
-              Select Tickets
+              Select Seats
             </h2>
             <p className="text-richblack-400 text-sm mb-6">
               {selectedTheatre.Theatrename} &bull; {selectedDate} &bull; {formatTime12hr(selectedTime)}
             </p>
 
             <div className="grid md:grid-cols-3 gap-8">
-              {/* Ticket Categories with +/- */}
-              <div className="md:col-span-2 space-y-4">
-                {tickets.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center glass-card p-5 rounded-xl"
-                  >
-                    <div>
-                      <h3 className="font-semibold">{item.category}</h3>
-                      <p className="text-yellow-400 text-sm">₹{item.price}</p>
-                      <p className="text-richblack-500 text-xs mt-1">
-                        {item.available > 0 ? (
-                          <span className="text-green-400">
-                            {item.available} available (max {Math.min(MAX_TICKETS_PER_CATEGORY, item.available)} per person)
-                          </span>
-                        ) : (
-                          <span className="text-red-400">Sold out</span>
-                        )}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => decrease(index)}
-                        disabled={item.available === 0}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-richblack-700 hover:bg-red-500 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                      >
-                        <FaMinus size={12} />
-                      </button>
-
-                      <span className="text-lg font-semibold w-6 text-center">
-                        {item.quantity}
-                      </span>
-
-                      <button
-                        onClick={() => increase(index)}
-                        disabled={item.available === 0 || item.quantity >= Math.min(MAX_TICKETS_PER_CATEGORY, item.available)}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-richblack-700 hover:bg-green-500 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                      >
-                        <FaPlus size={12} />
-                      </button>
-                    </div>
+              {/* Seat grid per category */}
+              <div className="md:col-span-2 space-y-6">
+                {seatMapLoading ? (
+                  <div className="glass-card p-8 rounded-xl flex justify-center">
+                    <Loader />
                   </div>
-                ))}
+                ) : seatMap.length === 0 ? (
+                  <p className="text-richblack-400 text-sm">Seat map unavailable for this show.</p>
+                ) : (
+                  seatMap.map((cat) => {
+                    const chosen = selectedSeats[cat.categoryId] || []
+                    return (
+                      <div key={cat.categoryId} className="glass-card p-5 rounded-xl">
+                        <div className="flex justify-between items-center mb-3">
+                          <div>
+                            <h3 className="font-semibold">{cat.category}</h3>
+                            <p className="text-yellow-400 text-sm">₹{cat.price}</p>
+                          </div>
+                          <p className="text-richblack-500 text-xs">
+                            {cat.available > 0 ? (
+                              <span className="text-green-400">{cat.available} seats available</span>
+                            ) : (
+                              <span className="text-red-400">Sold out</span>
+                            )}
+                          </p>
+                        </div>
+
+                        <div
+                          className="grid gap-2"
+                          style={{ gridTemplateColumns: `repeat(${cat.seatsPerRow}, minmax(0, 1fr))` }}
+                        >
+                          {cat.seats.map((seat) => {
+                            const isBooked = cat.bookedSeats.includes(seat)
+                            const isSelected = chosen.includes(seat)
+                            return (
+                              <button
+                                key={seat}
+                                type="button"
+                                title={seat}
+                                disabled={isBooked}
+                                onClick={() => toggleSeat(cat.categoryId, seat, isBooked)}
+                                className={`aspect-square rounded-md flex items-center justify-center text-[10px] font-medium transition
+                                ${
+                                  isBooked
+                                    ? "bg-richblack-700 text-richblack-500 cursor-not-allowed opacity-40"
+                                    : isSelected
+                                      ? "bg-yellow-400 text-black"
+                                      : "bg-richblack-700 text-richblack-200 hover:bg-richblack-600"
+                                }`}
+                              >
+                                <FaChair size={10} />
+                              </button>
+                            )
+                          })}
+                        </div>
+
+                        {chosen.length > 0 && (
+                          <p className="text-xs text-richblack-400 mt-3">
+                            Selected: <span className="text-yellow-400 font-medium">{chosen.join(", ")}</span>
+                          </p>
+                        )}
+                      </div>
+                    )
+                  })
+                )}
+
+                <div className="flex items-center gap-4 text-xs text-richblack-400">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded bg-richblack-700 inline-block" /> Available
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded bg-yellow-400 inline-block" /> Selected
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded bg-richblack-700 opacity-40 inline-block" /> Booked
+                  </span>
+                </div>
               </div>
 
               {/* Total Calculation */}

@@ -16,6 +16,46 @@ const paymentFailedTemplate = require('../../templates/userTemplates/paymentFail
 const ticket = require('../../models/ticket')
 const Coupon = require('../../models/Coupon')
 const { applyCouponLogic } = require('./ValidateCoupon')
+const { generateSeatLabels } = require('./Seats')
+const { generateTicketQrDataUrl } = require('../../utils/generateTicketQr')
+
+// Shared by MakePdf (download) and Verifypayment (email attachment)
+const buildTicketPdf = async (ticketData) => {
+    const [MovieFind, TheatreFind, qrCodeDataUrl] = await Promise.all([
+        CreateShow.findOne({ _id: ticketData.showid }),
+        Theatre.findOne({ _id: ticketData.theatreid }),
+        generateTicketQrDataUrl(ticketData._id)
+    ])
+
+    if (!MovieFind || !TheatreFind) {
+        throw new Error("Movie or theatre not found for this ticket")
+    }
+
+    const templateData = {
+        _id: ticketData._id,
+        movieName: MovieFind.title,
+        theatreName: TheatreFind.Theatrename,
+        theatreLocation: TheatreFind.locationname,
+        Showdate: ticketData.Showdate,
+        time: ticketData.time,
+        purchaseDate: ticketData.purchaseDate,
+        Payment_Status: ticketData.Payment_Status,
+        paymentMethod: ticketData.paymentMethod,
+        totalTicketpurchased: ticketData.totalTicketpurchased,
+        amount: ticketData.amount,
+        qrCodeDataUrl,
+        categoryDetails: ticketData.ticketCategorey.map(cat => ({
+            categoryName: cat.categoryName,
+            ticketCount: cat.ticketsPurchased,
+            price: cat.price,
+            seats: cat.seats || []
+        }))
+    }
+
+    const html = PdfTemplate(templateData)
+    const pdfBuffer = await generatePDF(html)
+    return pdfBuffer
+}
 
 // Student Features api kar ke ek page hain github main usko dekh lena agay payment ke isme kuch issue aaye to 
 
@@ -26,7 +66,7 @@ exports.MakePayment = async(req,res) => {
         const Theatreid = req.body.Theatreid
         const Ticketid = req.body.Ticketid
         const userId = req.USER?.id
-        const{Categories,totalTickets,time,couponCode} = req.body
+        const{Categories,totalTickets,time,couponCode,SelectedSeats} = req.body
 
         // Debug: Log what's received
         console.log("Payment request received:", { ShowId, Theatreid, Ticketid, userId, Categories, totalTickets, time })
@@ -197,6 +237,54 @@ exports.MakePayment = async(req,res) => {
             }
         }
 
+        // Validate selected seats (optional — falls back to unseated booking if omitted)
+        let seatsPerCategory = null
+        if (SelectedSeats) {
+            seatsPerCategory = {}
+            for (const [index, category] of results.entries()) {
+                const requestedTickets = parseInt(totalTickets[index]);
+                const chosenSeats = SelectedSeats[category._id.toString()] || SelectedSeats[index]
+
+                if (!Array.isArray(chosenSeats) || chosenSeats.length !== requestedTickets) {
+                    return res.status(400).json({
+                        message: `Please select exactly ${requestedTickets} seat(s) for ${category.category}`,
+                        success: false
+                    })
+                }
+
+                if (new Set(chosenSeats).size !== chosenSeats.length) {
+                    return res.status(400).json({
+                        message: `Duplicate seats selected for ${category.category}`,
+                        success: false
+                    })
+                }
+
+                const validLabels = new Set(generateSeatLabels(Number(category.ticketsCreated) || 0, category.seatsPerRow))
+                for (const seat of chosenSeats) {
+                    if (!validLabels.has(seat)) {
+                        return res.status(400).json({
+                            message: `Invalid seat "${seat}" for ${category.category}`,
+                            success: false
+                        })
+                    }
+                }
+
+                const bookedEntry = TheatreTicketsrearching.bookedSeats.find(
+                    (b) => b.time === time && b.category === category.category
+                )
+                const alreadyBooked = bookedEntry ? bookedEntry.seats : []
+                const clash = chosenSeats.find((seat) => alreadyBooked.includes(seat))
+                if (clash) {
+                    return res.status(409).json({
+                        message: `Seat ${clash} is already booked for ${category.category}. Please pick another seat.`,
+                        success: false
+                    })
+                }
+
+                seatsPerCategory[category._id.toString()] = chosenSeats
+            }
+        }
+
         // Fresh re-check right before Razorpay order creation
         // Reduces the race window: if another user just bought the last ticket,
         // this catches it before we create an order and charge this user
@@ -212,6 +300,21 @@ exports.MakePayment = async(req,res) => {
                     message: `Not enough tickets available${freshCat ? ` for ${freshCat.category}` : ''}. Please try again.`,
                     success: false
                 });
+            }
+
+            if (seatsPerCategory) {
+                const chosenSeats = seatsPerCategory[categoryId]
+                const bookedEntry = freshTicketDoc.bookedSeats.find(
+                    (b) => b.time === time && b.category === freshCat.category
+                )
+                const alreadyBooked = bookedEntry ? bookedEntry.seats : []
+                const clash = chosenSeats.find((seat) => alreadyBooked.includes(seat))
+                if (clash) {
+                    return res.status(409).json({
+                        message: `Seat ${clash} was just booked by someone else. Please pick another seat.`,
+                        success: false
+                    });
+                }
             }
         }
 
@@ -271,20 +374,10 @@ exports.MakePayment = async(req,res) => {
                 categoryid: category._id,
                 categoryName: category.category,
                 price: category.price,
-                ticketsPurchased: totalTickets[index]
+                ticketsPurchased: totalTickets[index],
+                seats: seatsPerCategory ? seatsPerCategory[category._id.toString()] : []
             }))
         });
-        // const yes = "222222"    o not delete this keeep it for the testing purpose
-
-        const twominutes =   50 * 1000; // 2 minutes in milliseconds
-
-        // console.log(UserFinders)
-        
-        // setTimeout(async () => {
-            const mailes = await mailSender(UserFinders.email,"Your Booking is Confirmed - Cine Circuit",TicketTemplate(PaymentStatus));
-            console.log("Email sent successfully:");
-        // },twominutes)
-
         return res.status(200).json({
             message: "Order created successfully",
             success: true,
@@ -383,6 +476,32 @@ exports.Verifypayment = async(req,res) => {
                     if (!updated) {
                         throw new Error(`Tickets sold out for ${category.categoryName}. Please try again.`);
                     }
+
+                    // Commit chosen seats for this showtime — clash re-check happens here too,
+                    // since this is the point where the booking becomes final.
+                    if (category.seats && category.seats.length > 0) {
+                        const existingEntry = updated.bookedSeats.find(
+                            (b) => b.time === PaymentVerifier.time && b.category === category.categoryName
+                        );
+
+                        if (existingEntry) {
+                            const clash = category.seats.find((seat) => existingEntry.seats.includes(seat));
+                            if (clash) {
+                                throw new Error(`Seat ${clash} was just booked by someone else. Please contact support.`);
+                            }
+                            await Theatrestickets.findOneAndUpdate(
+                                { _id: PaymentVerifier.ticketid, "bookedSeats.time": PaymentVerifier.time, "bookedSeats.category": category.categoryName },
+                                { $push: { "bookedSeats.$.seats": { $each: category.seats } } },
+                                { session }
+                            );
+                        } else {
+                            await Theatrestickets.findOneAndUpdate(
+                                { _id: PaymentVerifier.ticketid },
+                                { $push: { bookedSeats: { time: PaymentVerifier.time, category: category.categoryName, seats: category.seats } } },
+                                { session }
+                            );
+                        }
+                    }
                 }
 
                 await Theatrestickets.findOneAndUpdate(
@@ -425,6 +544,20 @@ exports.Verifypayment = async(req,res) => {
                 // console.log("Email sent successfully:", mailes);
 
                 await session.commitTransaction();
+
+                // Send confirmation email with the real ticket PDF (QR + seats) attached.
+                // Best-effort — a mail failure here should not fail the payment.
+                try {
+                    const pdfBuffer = await buildTicketPdf(updatedPayment)
+                    await mailSender(
+                        UserFinders.email,
+                        "Your Booking is Confirmed - Cine Circuit",
+                        TicketTemplate(updatedPayment),
+                        [{ filename: `ticket-${updatedPayment._id}.pdf`, content: pdfBuffer, contentType: 'application/pdf' }]
+                    )
+                } catch (mailError) {
+                    console.error("Failed to send confirmation email:", mailError)
+                }
 
                 return res.status(200).json({
                     message: "Payment verified successfully",
@@ -510,56 +643,15 @@ exports.MakePdf = async(req,res)=>{
             })
         }
 
-        const MovieFind = await CreateShow.findOne({_id:ticketData.showid})
-        if(!MovieFind){
-            return res.status(400).json({
-                message:"The movie is not present",
-                success:false
-            })
-        }
+        const pdfBuffer = await buildTicketPdf(ticketData)
 
-
-        const TheatreFind = await Theatre.findOne({_id:ticketData.theatreid})
-
-        if(!TheatreFind){
-            return res.status(400).json({
-                message:"The Theatre is not present",
-                success:false
-            })
-        }
-    console.log("This is the ticket data",ticketData)
-  // build exactly what the PDF template expects
-  const templateData = {
-    movieName:    MovieFind.title,
-    theatreName:  TheatreFind.Theatrename,
-    theatreLocation: TheatreFind.locationname,
-    Showdate:     ticketData.Showdate,
-    time:         ticketData.time,
-    purchaseDate: ticketData.purchaseDate,
-    Payment_Status: ticketData.Payment_Status,
-    paymentMethod:  ticketData.paymentMethod,
-    totalTicketpurchased: ticketData.totalTicketpurchased,
-    amount:          ticketData.amount,
-    categoryDetails: ticketData.ticketCategorey.map(cat => ({
-      categoryName:  cat.categoryName,
-      ticketCount:   cat.ticketsPurchased,
-      price:         cat.price
-    }))
-  };
-
-  console.log("templateData",templateData)
-
-  const html = PdfTemplate(templateData);
-
-  const pdfBuffer = await generatePDF(html);
-
-  res
-    .status(200)
-    .set({
-      'Content-Type':        'application/pdf',
-      'Content-Disposition': `attachment; filename="ticket-${ticketId}.pdf"`
-    })
-    .send(pdfBuffer);
+        res
+          .status(200)
+          .set({
+            'Content-Type':        'application/pdf',
+            'Content-Disposition': `attachment; filename="ticket-${ticketId}.pdf"`
+          })
+          .send(pdfBuffer);
     }catch(error){
         console.error('PDF generation error:', error);
         res.status(500).json({
