@@ -60,7 +60,81 @@ const buildTicketPdf = async (ticketData) => {
     return pdfBuffer
 }
 
-// Student Features api kar ke ek page hain github main usko dekh lena agay payment ke isme kuch issue aaye to 
+// Called when Razorpay has already captured a payment but the booking itself
+// couldn't be completed afterwards (e.g. someone else booked the same seat
+// first — the atomic re-check inside Verifypayment's transaction throws).
+// The user must get their money back automatically rather than being told
+// "payment failed" while Cine Circuit is still holding their charge.
+//
+// razorpayPaymentId is passed explicitly rather than read off paymentDoc —
+// at this point paymentDoc was fetched before the (now aborted) transaction
+// that would have written razorpay_payment_id onto it, so it's still empty there.
+const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, originalError) => {
+    const now = new Date();
+    const pattern = date.compile('ddd, DD/MM/YYYY HH:mm:ss');
+    const ps = date.format(now, pattern);
+
+    let refundId = null
+    let refundStatus = 'failed'
+
+    try {
+        const refund = await instance.payments.refund(razorpayPaymentId, {
+            amount: Math.round(paymentDoc.amount * 100),
+            speed: "normal"
+        })
+        refundId = refund.id
+        refundStatus = refund.status === "processed" ? "processed" : "pending"
+    } catch (refundError) {
+        console.error("Razorpay refund failed for lost-race charge, falling back to wallet credit:", refundError)
+        try {
+            await creditWallet(
+                userId,
+                paymentDoc.amount,
+                'admin_adjustment',
+                `Refund: booking failed after payment (${originalError.message || 'seat no longer available'})`,
+                paymentDoc._id
+            )
+            refundId = 'wallet'
+            refundStatus = 'processed'
+        } catch (walletError) {
+            console.error("Wallet fallback credit also failed for lost-race charge:", walletError)
+        }
+    }
+
+    await Payment.findOneAndUpdate(
+        { _id: paymentDoc._id },
+        {
+            Payment_Status: "failure",
+            razorpay_payment_id: razorpayPaymentId,
+            failureReason: originalError.message || "Booking could not be completed after payment",
+            cancelled: true,
+            cancelledAt: ps,
+            refundId,
+            refundStatus,
+            refundAmount: refundStatus !== 'failed' ? paymentDoc.amount : 0
+        }
+    )
+
+    try {
+        const userDoc = await USER.findById(userId)
+        if (userDoc) {
+            await mailSender(
+                userDoc.email,
+                "Booking Failed - Refund Initiated - Cine Circuit",
+                paymentFailedTemplate(
+                    userDoc.name || userDoc.userName || "User",
+                    paymentDoc.amount,
+                    `${originalError.message || 'The seat was booked by someone else moments before you.'} A refund has been ${refundStatus === 'processed' ? 'processed to your wallet/bank' : refundStatus === 'pending' ? 'initiated and will reflect within 5-7 business days' : 'attempted — please contact support if it does not reflect within a few days'}.`
+                )
+            )
+        }
+    } catch (mailError) {
+        console.error("Failed to send lost-race refund email:", mailError)
+    }
+}
+exports.refundLostRaceCharge = refundLostRaceCharge
+
+// Student Features api kar ke ek page hain github main usko dekh lena agay payment ke isme kuch issue aaye to
 
 // This is the function that is present in the route of payment on line no 6
 exports.MakePayment = async(req,res) => {
@@ -635,9 +709,20 @@ exports.Verifypayment = async(req,res) => {
 
             } catch (error) {
                 await session.abortTransaction();
-                throw error;
-            } finally {
                 session.endSession();
+
+                // Razorpay already captured this payment (that's why we got here
+                // with a valid signature) — if the booking itself failed after
+                // that, e.g. someone else grabbed the same seat first, the user
+                // must not be left out of pocket. Refund automatically instead
+                // of just marking the payment as a silent failure.
+                await refundLostRaceCharge(PaymentVerifier, userId, razorpay_payment_id, error)
+
+                return res.status(409).json({
+                    message: `${error.message || "Booking could not be completed"}. Your payment has been refunded.`,
+                    success: false,
+                    status: "refunded"
+                });
             }
         } else {
             // Payment verification failed - update status to failure
