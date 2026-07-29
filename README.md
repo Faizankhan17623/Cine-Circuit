@@ -257,18 +257,6 @@ npm run dev
 | Cron jobs | 2 |
 
 ---
-
-## Roadmap
-
-- [ ] WebSocket-based real-time seat locking (15-min TTL)
-- [ ] Refund & cancellation system
-- [ ] Redis caching for high-traffic endpoints
-- [ ] "Recommended For You" row using content-based filtering
-- [ ] Per-user rate limiting with Redis
-- [ ] Mobile app (React Native)
-
----
-
 ## License
 
 MIT — feel free to fork and use for learning or as a base project.
