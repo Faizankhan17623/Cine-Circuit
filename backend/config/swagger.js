@@ -1187,6 +1187,40 @@ Login via \`POST /api/v1/createAccount/Login\` to receive the cookie automatical
       },
 
       // ════════════════════════════════════════════════
+      // REFERRALS
+      // ════════════════════════════════════════════════
+      '/api/v1/createAccount/Validate-Referral-Code': {
+        post: {
+          tags: ['Referrals'],
+          summary: 'Check a referral code before signing up (public)',
+          description: 'Used by the signup form to confirm a code exists and show who invited the new user.',
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { type: 'object', required: ['referralCode'], properties: { referralCode: { type: 'string', example: 'FAIZAN4K7Q' } } } } },
+          },
+          responses: {
+            200: { description: 'Code is valid — referrer name and welcome reward returned' },
+            400: { description: 'Referral code missing' },
+            404: { description: 'Invalid referral code' },
+          },
+        },
+      },
+
+      '/api/v1/createAccount/My-Referral': {
+        get: {
+          tags: ['Referrals'],
+          summary: 'Get the viewer\'s referral code, stats and invite list',
+          description: 'Generates the referral code on first call. Rewards are credited to both wallets once an invited user completes their first paid booking.',
+          security: [{ cookieAuth: [] }],
+          responses: {
+            200: { description: 'Referral details returned' },
+            401: { description: 'Not authenticated' },
+            403: { description: 'Viewer role required' },
+          },
+        },
+      },
+
+      // ════════════════════════════════════════════════
       // FEEDBACK (Public)
       // ════════════════════════════════════════════════
       '/api/v1/createAccount/Submit-Feedback': {

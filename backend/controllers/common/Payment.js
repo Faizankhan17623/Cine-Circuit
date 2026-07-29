@@ -20,6 +20,7 @@ const { generateSeatLabels } = require('./Seats')
 const { generateTicketQrDataUrl } = require('../../utils/generateTicketQr')
 const { earnPoints } = require('./LoyaltyPoints')
 const { debitWallet, creditWallet } = require('./Wallet')
+const { completeReferral } = require('./Referral')
 const Wallet = require('../../models/Wallet')
 
 // Shared by MakePdf (download) and Verifypayment (email attachment)
@@ -665,6 +666,9 @@ exports.Verifypayment = async(req,res) => {
 
                 // Award loyalty points on the amount actually paid — best-effort within the same transaction
                 await earnPoints(userId, PaymentVerifier.amount, PaymentVerifier._id, session)
+
+                // First successful booking unlocks the signup referral reward for both sides
+                await completeReferral(userId, PaymentVerifier._id, session)
 
                 const paymentIds = await Payment.findOne({_id: paymentId})
                 if(!paymentIds){

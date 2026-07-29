@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import CountryCodee from '../../data/CountryCode.json';
 import { useForm } from 'react-hook-form';
 import { LiaEyeSolid, LiaEyeSlashSolid } from "react-icons/lia";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Loader from '../extra/Loading';
 import { FindUserName, NumberFinder, finduseremail,sendOtp } from '../../Services/operations/Auth';
+import { validateReferralCode } from '../../Services/operations/Referral';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import Join from './Join'
@@ -29,16 +30,43 @@ const User = () => {
   const [loading, setLoading] = useState(false)
   const [otp,setOTP] = useState('')
   const [Data,setData] = useState(null)
+  const [referralCode, setReferralCode] = useState('')
+  const [referralStatus, setReferralStatus] = useState(null) // { valid, message }
+
+  const [searchParams] = useSearchParams();
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
     trigger,
   } = useForm();
 
   const password = watch('Password');
+
+  // Invite links look like /SignUp?ref=FAIZAN4K7Q — prefill the field so the
+  // invited user never has to type the code manually
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+      setValue('Referral', ref.toUpperCase());
+      setReferralCode(ref.toUpperCase());
+    }
+  }, [searchParams, setValue]);
+
+  useEffect(() => {
+    if (!referralCode) {
+      setReferralStatus(null);
+      return;
+    }
+    const handler = setTimeout(async () => {
+      const result = await validateReferralCode(referralCode);
+      setReferralStatus({ valid: result.success, message: result.message });
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [referralCode]);
   const confirmPass = watch('ConfirmPass');
 
   useEffect(() => {
@@ -158,7 +186,8 @@ const User = () => {
       confirmPassword: data.ConfirmPass,
       countryCode: data.CountryCode,
       phoneNumber: data.Number,
-       usertype:"Viewer"
+       usertype:"Viewer",
+      referralCode: referralStatus?.valid ? referralCode.trim().toUpperCase() : ""
     };
        setData(finalData)
        setMail(data.Email)
@@ -376,6 +405,30 @@ setShowOtp(false)
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Referral Code — optional */}
+      <div>
+        <label className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-richblack-50 mb-1.5 font-medium">
+          Referral Code <span className="text-richblack-300 text-xs">(optional)</span>
+          {referralStatus && (
+            <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
+              referralStatus.valid
+                ? "bg-caribgreen-500/10 text-caribgreen-500"
+                : "bg-red-500/10 text-red-500"
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${referralStatus.valid ? "bg-caribgreen-500" : "bg-red-500"}`} />
+              {referralStatus.message}
+            </span>
+          )}
+        </label>
+        <input
+          type="text"
+          {...register("Referral")}
+          onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+          className="w-full px-4 py-2.5 bg-richblack-700 border border-richblack-600 rounded-lg text-white text-sm uppercase placeholder:normal-case placeholder:text-richblack-300 outline-none transition-all duration-200 focus:ring-2 focus:ring-yellow-200/50 focus:border-yellow-200/50"
+          placeholder="Have an invite code? Get ₹50 after your first booking"
+        />
       </div>
 
       {/* Submit Button */}

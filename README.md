@@ -34,6 +34,7 @@ Built as a solo full-stack project, it demonstrates end-to-end ownership of a co
 - Manage wishlist, view booking history, download tickets
 - Rate and review movies
 - AI-powered movie recommendations based on genre preferences
+- Refer & Earn — share a personal invite code/link and earn wallet credit when a friend completes their first booking
 
 ### For Organisers
 - Create and submit movies/shows for admin approval
@@ -129,7 +130,7 @@ cine-circuit/
 | **Theatres** | Theatres, TheatrerRequest |
 | **Creators** | Org_data, DirectorExperience, DirectorFresher, ProducerExperience, ProducerFresher |
 | **Social** | RatingAndReview, Comment, Feedback, Visitor |
-| **Platform** | Maintenance, BugReport |
+| **Platform** | Maintenance, BugReport, Referral |
 
 ---
 
@@ -228,6 +229,8 @@ npm run dev
 **Background movie status** — A cron job runs every 6 hours to transition movies from `Upcoming → Released → Expired` automatically. No manual intervention needed.
 
 **Maintenance mode** — Admin can flip a kill-switch that puts the entire platform into maintenance mode. A Redis-ready architecture separates the status fetch (public endpoint) from the toggle (admin-only), and admins themselves are never blocked.
+
+**Referral rewards after conversion** — a referral is recorded at signup but only pays out inside the booking transaction that confirms the invited user's first payment, so codes can't be farmed by creating empty accounts. Payout failures are swallowed rather than rolling back a paid booking.
 
 **Audit trail** — All admin actions are written to an `AuditLog` collection with actor ID, action type, target, and timestamp. Useful for compliance and debugging.
 

@@ -190,7 +190,7 @@ export function NumberFinder(number) {
 }
 
 
-export function UserCreation(name,password,email,number,otp,code){
+export function UserCreation(name,password,email,number,otp,code,referralCode){
     return async (dispatch)=>{
         const toastId = toast.loading('...loading')
         dispatch(setLoading(true))
@@ -205,7 +205,8 @@ export function UserCreation(name,password,email,number,otp,code){
                 email:email,
                 number:number,
                 otp:String(otp),
-                countrycode:code
+                countrycode:code,
+                referralCode:referralCode || undefined
             })
 
             //  console.log("This is the responsee data",response)

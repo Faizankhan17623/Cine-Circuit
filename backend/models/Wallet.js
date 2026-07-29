@@ -15,7 +15,7 @@ const walletTransactionSchema = new mongoose.Schema({
     },
     reason: {
         type: String,
-        enum: ['cancellation_refund', 'loyalty_redemption', 'booking_payment', 'admin_adjustment'],
+        enum: ['cancellation_refund', 'loyalty_redemption', 'booking_payment', 'referral_reward', 'admin_adjustment'],
         required: true
     },
     description: {

@@ -133,6 +133,11 @@ export const CouponApi = {
     ValidateCoupon: BASE_URL + "/Validate-Coupon",
 }
 
+export const ReferralApi = {
+    MyReferral:          BASE_URL + "/My-Referral",
+    ValidateReferralCode: BASE_URL + "/Validate-Referral-Code",
+}
+
 export const WalletLoyaltyApi = {
     WalletBalance:  BASE_URL + "/Wallet-Balance",
     LoyaltyBalance: BASE_URL + "/Loyalty-Balance",

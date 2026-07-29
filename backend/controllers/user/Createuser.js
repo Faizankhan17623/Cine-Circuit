@@ -10,6 +10,7 @@
     const updateUsername = require('../../templates/userTemplates/UpdateNametemplate')
     const updateNumber = require('../../templates/userTemplates/Updatenumbertemplate')
     const date = require('date-and-time')
+    const {attachReferral} = require('../common/Referral')
     // const validator = require("validator");
 
 // Done
@@ -17,7 +18,7 @@
     exports.Createuser = async(req,res)=>{
         try {
             // console.log("This is the https",http) please keep This line in the code base it is important like an extra requirement 
-            const {name,password,email,usertype="Viewer",number,countrycode,otp } = req.body
+            const {name,password,email,usertype="Viewer",number,countrycode,otp,referralCode } = req.body
             if(!name || !password || !email || !number || !countrycode || !otp  ){
                 return res.status(400).json({
                     message:"The input Fields are required",
@@ -96,13 +97,22 @@ if (!otpCreation || otpCreation.length === 0) {
             }) 
             
             await Creation.save()
+
+            // An invalid or already-used code must not fail the signup — the account is created
+            // either way and the outcome is only reported back in the response.
+            let referral = null
+            if(referralCode){
+                referral = await attachReferral(referralCode, Creation._id)
+            }
+
             const safeUser = Creation.toObject()
             delete safeUser.password
             delete safeUser.confirmpass
             return res.status(200).json({
                 message:"The data is been created please log in",
                 success:true,
-                data:safeUser
+                data:safeUser,
+                referral
             })
         } catch (error) {
             console.log(error)
