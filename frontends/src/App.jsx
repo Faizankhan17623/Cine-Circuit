@@ -78,6 +78,7 @@ const OrganizerTicketReport = lazy(() => import('./Components/Dashboard/Organize
 const CouponManager = lazy(() => import('./Components/Dashboard/CouponManager'))
 const VisitorStats = lazy(() => import('./Components/Dashboard/VisitorStats'))
 const UserDashboardHome = lazy(() => import('./Components/Dashboard/UserDashboardHome'))
+const Referrals = lazy(() => import('./Components/Dashboard/Referrals'))
 
 const PageLoader = () => (
   <div className="min-h-screen bg-richblack-900 flex items-center justify-center">
@@ -315,6 +316,7 @@ useEffect(() => {
       <Route path="/Dashboard/Tickets" element={<Tickets />} />
       <Route path="/Dashboard/Chats" element={<Chat/>} />
       <Route path="/Dashboard/My-Bug-Reports" element={<MyBugReports/>} />
+      <Route path="/Dashboard/Refer-And-Earn" element={<Referrals/>} />
     </>
   )}
 

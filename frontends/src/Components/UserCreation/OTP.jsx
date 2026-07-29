@@ -93,7 +93,7 @@ const OTP = ({ Style }) => {
           setLoading(true);
           const fullName = `${data.firstName} ${data.lastName}`;
           const response = await dispatch(
-            UserCreation(fullName, data.password, data.email, data.phoneNumber, otp, data.countryCode)
+            UserCreation(fullName, data.password, data.email, data.phoneNumber, otp, data.countryCode, data.referralCode)
           );
           if (response?.success) {
             toast.success('User Created');

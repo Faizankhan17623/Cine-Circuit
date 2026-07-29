@@ -17,7 +17,7 @@ import {UserDetails} from '../../Services/operations/Auth'
 import {GetMyOrgDetails} from '../../Services/operations/orgainezer'
 import { FaTheaterMasks } from 'react-icons/fa'
 import { MdAttachMoney, MdLocalMovies, MdAccessTime, MdConstruction, MdBugReport, MdDashboard, MdBarChart, MdLocalOffer, MdPeople } from 'react-icons/md'
-import { FaTicketSimple } from "react-icons/fa6";
+import { FaTicketSimple, FaGift } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 
 const LeftSide = ({direction}) => {
@@ -101,6 +101,7 @@ const LeftSide = ({direction}) => {
     { icon: FaCartShopping, label:'Purchase History', path: '/Dashboard/Purchase-History', id: 4 },
     { icon: MdBugReport, label:'My Bug Reports', path: '/Dashboard/My-Bug-Reports', id: 5 },
     { icon: CiChat1, label: 'Chat', path: '/Dashboard/Chats', id: 6 },
+    { icon: FaGift, label: 'Refer & Earn', path: '/Dashboard/Refer-And-Earn', id: 7 },
   ];
 
 

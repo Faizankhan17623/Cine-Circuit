@@ -33,6 +33,7 @@ const {GetGenresAndLanguages, EnhancedFinder} = require('../controllers/Dashboar
 const {ValidateCoupon} = require('../controllers/common/ValidateCoupon')
 const {GetWalletBalance, GetWalletHistory} = require('../controllers/common/Wallet')
 const {GetLoyaltyBalance, GetLoyaltyHistory, RedeemPoints} = require('../controllers/common/LoyaltyPoints')
+const {GetMyReferral, ValidateReferralCode} = require('../controllers/common/Referral')
 // DONE
 const {TheatreNavbar,MovieNavbar}  = require('../controllers/common/Comment')
 // This is the first route that will be used to create the user and all the things that the user will do releated to his personal info
@@ -218,6 +219,12 @@ route.get('/Loyalty-History', auth, IsUSER, GetLoyaltyHistory)
 route.post('/Redeem-Points', auth, IsUSER, [
     body('blocks').isInt({ min: 1 }).withMessage('blocks must be a positive integer'),
 ], validate, RedeemPoints)
+
+// Referrals — code lookup is public (used by the signup form), the rest is Viewer only
+route.post('/Validate-Referral-Code', [
+    body('referralCode').trim().notEmpty().withMessage('Referral code is required'),
+], validate, ValidateReferralCode)
+route.get('/My-Referral', auth, IsUSER, GetMyReferral)
 
 module.exports = route
 // memphis

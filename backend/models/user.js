@@ -128,6 +128,13 @@ const userSchema =  new mongoose.Schema({
     orgainezerdata:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"OrgainezerData"
+    },
+    referralCode:{
+        // Generated lazily the first time the user opens Refer & Earn
+        type:String,
+        unique:true,
+        sparse:true,
+        uppercase:true
     }
 },{timestamps:true})
 module.exports = mongoose.model('User',userSchema)
