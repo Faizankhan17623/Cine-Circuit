@@ -1,6 +1,5 @@
 const USER = require("../../models/user");
 const {Orgdata} = require("../../models/Org_data");
-const SendMessage = require("../../models/Createmessage");
 const mailSender = require("../../utils/mailsender");
 const sendingOtpTeemplate = require("../../templates/userTemplates/emailTemplate");
 const orgApprovedTemplate = require("../../templates/userTemplates/orgApprovedTemplate");
@@ -82,12 +81,6 @@ exports.VerifyOrgainezer = async (req, res) => {
         verified: true,
       }, { new: true });
 // console.log(u)
-      await SendMessage.create({
-        to: id,
-        message: ["Your account verification request was Accepted. Good Luck!"],
-        typeOfmessage: 'Chat'
-      });
-      
       await mailSender(
         user.email,
         "Your Organizer Account Has Been Approved - Cine Circuit",
@@ -194,12 +187,6 @@ exports.VerifyOrgainezer = async (req, res) => {
 
       await USER.findByIdAndUpdate(user._id, {
         verified: false,
-      });
-
-      await SendMessage.create({
-        to: id,
-        message: ["Your account verification request was Rejected"],
-        typeOfmessage: 'Chat'
       });
 
       // Format date for display (DD/MM/YYYY)

@@ -12,6 +12,7 @@ import castReducer from '../Slices/CastSlice'
 import maintenanceReducer from '../Slices/maintenanceSlice'
 import themeReducer from '../Slices/themeSlice'
 import watchlistReducer from '../Slices/watchlistSlice'
+import chatReducer from '../Slices/chatSlice'
 
 const rootReduers = combineReducers({
     auth:authReducer,
@@ -27,6 +28,7 @@ const rootReduers = combineReducers({
     maintenance:maintenanceReducer,
     theme:themeReducer,
     watchlist:watchlistReducer,
+    chat:chatReducer,
 })
 
 

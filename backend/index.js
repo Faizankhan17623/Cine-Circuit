@@ -1,6 +1,7 @@
 require('dotenv').config()
 const mongoose = require('mongoose')
 const express = require('express')
+const http = require('http')
 const cors = require('cors')
 const helmet = require('helmet')
 const cookieParser  = require('cookie-parser')
@@ -32,13 +33,17 @@ const Orgainezer = require('./routes/Organizaer')
 const Show = require('./routes/CreateShow')
 const Theatre = require('./routes/Theatrer')
 const payment = require('./routes/Payment')
+const Chat = require('./routes/Chat')
 // do not touch this above line because it is important for futur use
 const Visitor = require('./models/Visitor')
+
+const CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://mw-bay.vercel.app"
+]
+
 app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "https://mw-bay.vercel.app"
-    ],
+    origin: CORS_ALLOWED_ORIGINS,
     credentials: true
 }));
 
@@ -95,6 +100,7 @@ app.use('/api/v1/Org',Orgainezer)
 app.use('/api/v1/Show',Show)
 app.use('/api/v1/Theatre',Theatre)
 app.use('/api/v1/Payment',payment)
+app.use('/api/v1/Chat',Chat)
 
 // Swagger API Docs — http://localhost:4003/api/docs
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
@@ -115,7 +121,16 @@ app.use('/',(req,res)=>{
     })
 })
 
-app.listen(port,()=>{
+const server = http.createServer(app)
+const io = require('socket.io')(server, {
+    cors: {
+        origin: CORS_ALLOWED_ORIGINS,
+        credentials: true
+    }
+})
+require('./sockets/chat')(io)
+
+server.listen(port,()=>{
     console.log(`Running on the port number ${port}`.bgYellow)
 })
 

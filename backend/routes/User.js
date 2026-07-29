@@ -13,7 +13,6 @@ const validate = (req, res, next) => {
 }
 const {Createuser,CreateOtp,updateUserName,updatePassword,UpdateImage,updateNUmber,CurrentLoginUser} = require('../controllers/user/Createuser')
 const {login} = require('../controllers/user/auth')
-const {SendMessage,Updatemessage,getAllMessage} = require('../controllers/common/SendMessage')
 const {UserComments,getAllComment,deleteComment} = require('../controllers/common/Comment')
 const {PosterLike,BannerDisliked} = require('../controllers/Orgainezer/CreateTheatreShow')
 const {LinkSend,ResetPassword} = require('../controllers/user/Resetpassword')
@@ -130,17 +129,7 @@ route.post("/Comment-Banner", auth, IsUSER, [
 route.get("/Get-Comment",getAllComment)
 route.delete("/delte-Comment",auth,IsUSER,deleteComment)
 
-route.post("/Send-Message", auth, IsUSER, [
-    body('to').trim().notEmpty().withMessage('Recipient username is required'),
-    body('message').trim().notEmpty().withMessage('Message text is required'),
-    body('type').isIn(['Chat', 'enquiry', 'Personal']).withMessage('Type must be Chat, enquiry, or Personal'),
-], validate, SendMessage)
-
-route.put("/Update-Message", auth, IsUSER, [
-    body('message').trim().notEmpty().withMessage('Message text is required'),
-], validate, Updatemessage)
-
-route.get("/Get-AllMessages",auth, IsUSER,getAllMessage)
+// Real-time chat (Conversation/ChatMessage + Socket.IO) lives under /api/v1/Chat — see routes/Chat.js
 // This is the route that will be used to create the user dashboard and this is going to be used in the dashboard
 
 route.get("/Ticket-Purchased",auth, IsUSER,TicketPurchased)

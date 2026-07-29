@@ -3,9 +3,10 @@ import {apiConnector} from '../apiConnector.js'
 import {setUser,setLoading,setToken,setLogin,setUserImage} from '../../Slices/authSlice.js'
 import {setloading,setlikes,setdislikes,setuser,setverification} from '../../Slices/ProfileSlice.js'
 import {setStatus,setAttempts,setEditUntil,setRejectedData} from '../../Slices/orgainezerSlice.js'
-import {CreateUser,SendOtp,Login,ResetPassword,UpdatePersonalDetails,PersonalChoice,GetAllShows,SpecificShow,Comment,SendMessage,TicketData,Ratings,AllDetails,MovieStats,NavbarData} from '../Apis/UserApi.js'
+import {CreateUser,SendOtp,Login,ResetPassword,UpdatePersonalDetails,PersonalChoice,GetAllShows,SpecificShow,Comment,TicketData,Ratings,AllDetails,MovieStats,NavbarData} from '../Apis/UserApi.js'
 import {setShow,setlaoding,setallShow} from '../../Slices/ShowSlice.js'
 import Cookies from "js-cookie";
+import { disconnectSocket } from '../socket.js'
 // import {setuser} from '../../Slices/ProfileSlice.js'
 
 const {createuser} = CreateUser 
@@ -17,7 +18,6 @@ const {UpdateUsername,UpdatePassword,UpdateImage,UpdateNumber,CurrentUserDetails
 const {AllShows} = GetAllShows
 const {specificshow} = SpecificShow
 const {Comments,GetAllComment,deleteComent} = Comment
-const {SendMessages,UpdateMessage,GetAllMessages} = SendMessage
 const {TicketPurchase,TicketPurchasedFullDetail} = TicketData
 const {CreateRating,GetAverageRating,GetAllRatingReview,HasReviewed} = Ratings
 const {GetAllDetails,FindUserNames,FindloginEmail,FinduserEmail,FindNumber} = AllDetails
@@ -281,6 +281,7 @@ export function UserLogout(){
         const toastId = toast.loading("..loading")
         dispatch(setLoading(true))
         try{
+            disconnectSocket()
             dispatch(setToken(null))
             dispatch(setUser(null))
             localStorage.removeItem('token')
@@ -668,67 +669,6 @@ export function GetAllComments(id){
             dispatch(setShow(response.data.show))
         } catch (error) {
             toast.error(error?.response?.data?.message || "Error fetching comments")
-        }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
-    }
-}
-
-export function SendMessageFriends(to,message,type){
-    return async(dispatch)=>{
-        const toastId = toast.loading("..loading")
-        dispatch(setloading(true))
-        try {
-            const response = await apiConnector("POST",SendMessages,{
-                to:to,
-                message:message,
-                typeOfmessage:type
-            })
-            if (!response.data.success) {
-                throw new Error(response.data.message)
-            }
-            toast.success("Message Send Successfully")
-        } catch (error) {
-            toast.error(error?.response?.data?.message || "Error sending message")
-        }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
-    }
-}
-
-export function Updatemessage(id,message){
-    return async(dispatch)=>{
-        const toastId = toast.loading("..loading")
-        dispatch(setloading(true))
-        try {
-            const response = await apiConnector("PUT",UpdateMessage,{
-                id,
-                message:message
-            })
-            if (!response.data.success) {
-                throw new Error(response.data.message)
-            }
-            toast.success("Message Updated Successfully")
-        } catch (error) {
-            toast.error(error?.response?.data?.message || "Error updating message")
-        }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
-    }
-}
-
-export function GetallMessages(){
-    return async(dispatch)=>{
-        const toastId = toast.loading("..loading")
-        dispatch(setloading(true))
-        try {
-            const response = await apiConnector("GET",GetAllMessages)
-            if (!response.data.success) {
-                throw new Error(response.data.message)
-            }
-            dispatch(setShow(response.data.show))
-        } catch (error) {
-            toast.error(error?.response?.data?.message || "Error fetching messages")
         }
         dispatch(setloading(false))
         toast.dismiss(toastId)

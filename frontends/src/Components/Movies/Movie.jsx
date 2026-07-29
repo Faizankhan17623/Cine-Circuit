@@ -7,7 +7,8 @@ import { MovieDetailsFinding } from "../../Services/operations/User"
 import { createRating, getAverageRating, bannerLike, bannerDislike, createComment, getAllComments, deleteComment } from "../../Services/operations/Auth"
 import { PurcahsedTickets } from "../../Services/operations/User"
 import { addMovieToWatchlist, removeMovieFromWatchlist, fetchMyWatchlist } from "../../Services/operations/Watchlist"
-import { FaArrowLeft } from "react-icons/fa"
+import { startConversation } from "../../Services/operations/Chat"
+import { FaArrowLeft, FaCommentDots } from "react-icons/fa"
 import {
   FaPlay,
   FaMapMarkerAlt,
@@ -45,6 +46,7 @@ const Movie = () => {
   const [likeCount, setLikeCount] = useState(0)
   const [dislikeCount, setDislikeCount] = useState(0)
   const [hasPurchased, setHasPurchased] = useState(false)
+  const [messagingOrganizer, setMessagingOrganizer] = useState(false)
 
   // Comments state
   const [comments, setComments] = useState([])
@@ -160,6 +162,16 @@ const previousTag = location.state?.tag
       console.log("Review submit error:", error)
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleMessageOrganizer = async () => {
+    if (!isLoggedIn || !token || user?.usertype !== "Viewer") return
+    setMessagingOrganizer(true)
+    const result = await dispatch(startConversation("Organizer", id, token))
+    setMessagingOrganizer(false)
+    if (result?.success && result.data?._id) {
+      navigate(`/Dashboard/Chats?conversation=${result.data._id}`)
     }
   }
 
@@ -630,6 +642,20 @@ const previousTag = location.state?.tag
                 })}
               </div>
             </div>
+
+            {/* Message Organizer */}
+            {isLoggedIn && user?.usertype === "Viewer" && hasPurchased && (
+              <div className="glass-card rounded-2xl p-4 flex items-center justify-between gap-3">
+                <p className="text-sm text-richblack-300">Have a question about this show?</p>
+                <button
+                  onClick={handleMessageOrganizer}
+                  disabled={messagingOrganizer}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-200/90 to-yellow-100/90 text-richblack-900 text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  <FaCommentDots /> Message Organizer
+                </button>
+              </div>
+            )}
 
             {/* Write Review Form */}
             {isLoggedIn && user?.usertype === "Viewer" && hasPurchased && !reviewSubmitted ? (

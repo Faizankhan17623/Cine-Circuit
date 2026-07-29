@@ -2,13 +2,37 @@ import Left from './LeftSide'
 import Navbar from '../Home/Navbar'
 import { Outlet, useLocation, Navigate } from 'react-router-dom'
 import { FaChevronRight,FaChevronLeft } from "react-icons/fa";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Org from './OrganizerVerificationForm'
+import { connectSocket, disconnectSocket, getSocket } from '../../Services/socket'
+import { fetchConversations } from '../../Services/operations/Chat'
+import { upsertConversation, appendMessage } from '../../Slices/chatSlice'
 const Connector = () => {
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth);
 
   const location = useLocation();
   const isBaseDashboard = location.pathname === '/Dashboard' || location.pathname === '/Dashboard/';
   const [direction,Setdirection] = useState(false)
+
+  useEffect(() => {
+    if (!token) return
+    connectSocket()
+    dispatch(fetchConversations(token))
+
+    const socket = getSocket()
+    const onConversationUpdated = (conversation) => dispatch(upsertConversation(conversation))
+    const onNewMessage = (message) => dispatch(appendMessage(message))
+    socket?.on('conversation_updated', onConversationUpdated)
+    socket?.on('new_message', onNewMessage)
+
+    return () => {
+      socket?.off('conversation_updated', onConversationUpdated)
+      socket?.off('new_message', onNewMessage)
+      disconnectSocket()
+    }
+  }, [token, dispatch])
 
   if (isBaseDashboard) {
     return <Navigate to="/Dashboard/My-Profile" replace />

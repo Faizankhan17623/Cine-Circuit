@@ -7,7 +7,6 @@ const TheatreCreation = require('../../models/TheatrerRequest')
 const Theatres = require('../../models/Theatres')
 const Theatrestickets = require('../../models/TheatresTicket')
 const bcrypt = require('bcrypt')
-const SendMessage = require("../../models/Createmessage");
 const mailSender = require("../../utils/mailsender");
 const sendingOtpTeemplate = require("../../templates/userTemplates/emailTemplate");
 const theatreApprovedTemplate = require("../../templates/userTemplates/theatreApprovedTemplate");
@@ -690,12 +689,6 @@ exports.VerifyTheatrer = async (req, res) => {
         verified: true,
       }, { new: true });
 // console.log(u)
-      await SendMessage.create({
-        to: id,
-        message: ["Your account verification request was Accepted. Good Luck!"],
-        typeOfmessage: 'Chat'
-      });
-      
       await mailSender(
         user.email,
         "Your Theatre Has Been Approved - Cine Circuit",
@@ -723,11 +716,6 @@ exports.VerifyTheatrer = async (req, res) => {
         verified: false,
       }, { new: true });
 // console.log(userReject)
-      await SendMessage.create({
-        to: id,
-        message: ["Your account verification request was Rejected"],
-        typeOfmessage: 'Chat'
-      });
       
       await mailSender(
         user.email,

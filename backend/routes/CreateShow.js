@@ -4,7 +4,7 @@ const route = express.Router()
 const {Createtags,updateTagsname,DeleteTagsname,getAlltags,SearchTags} = require('../controllers/Orgainezer/CreateHashtags')
 const {auth,IsOrganizer} = require('../middlewares/verification')
 const {Getalllanguage,GetSingleLanguage} = require('../controllers/Orgainezer/CreateLanguage')
-const {CreateShow,UpdateShowtitle,UpdateShowtagline,UpdateTitleImage,UpdateTitletrailer,deleteShow,DeleteAllShow,SendCustomMessage} = require('../controllers/Orgainezer/CreateTheatreShow')
+const {CreateShow,UpdateShowtitle,UpdateShowtagline,UpdateTitleImage,UpdateTitletrailer,deleteShow,DeleteAllShow} = require('../controllers/Orgainezer/CreateTheatreShow')
 const {CreateCast,updateCastname,updatecastimage,deletecast,getwholecastlist,FindSingleCast} = require('../controllers/Orgainezer/CreateCast')
 const {uploadtheshow} = require('../controllers/Orgainezer/upload')
 const {getAllGenres} = require('../controllers/Administrator/CreateGenre')
@@ -54,9 +54,6 @@ route.delete("/delete-Allshow",auth,IsOrganizer,DeleteAllShow)
 // DONE
 // THis is the route that is going to upload the show
 route.put("/Upload",auth,IsOrganizer,uploadtheshow)
-
-// Send custom message related to shows
-route.post("/Send-Custom-Message",auth,IsOrganizer,SendCustomMessage)
 
 module.exports = route
 

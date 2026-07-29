@@ -1,6 +1,5 @@
 const USER = require('../../models/user')
 const CreateShow = require('../../models/CreateShow')
-const SendMessage = require('../../models/Createmessage')
 // This is the function that is present in the admin route on line no 54
 exports.VerifyShow = async (req, res) => {
     try {

@@ -27,6 +27,12 @@ const LeftSide = ({direction}) => {
   const { user } = useSelector((state) => state.profile);
   const {token} = useSelector((state)=>state.auth)
   const {status,editUntil,attempts} = useSelector((state)=>state.orgainezer)
+  const { conversations } = useSelector((state) => state.chat)
+  const isViewerRole = user?.usertype === ACCOUNT_TYPE.USER
+  const totalUnread = conversations.reduce(
+    (sum, c) => sum + (isViewerRole ? (c.unreadForViewer || 0) : (c.unreadForStaff || 0)),
+    0
+  )
 // console.log(status)
     const endTime = new Date(editUntil);
     const now = new Date();
@@ -94,6 +100,7 @@ const LeftSide = ({direction}) => {
     { icon: CiBookmark, label:'Wishlist', path: '/Dashboard/Wishlist', id: 3 },
     { icon: FaCartShopping, label:'Purchase History', path: '/Dashboard/Purchase-History', id: 4 },
     { icon: MdBugReport, label:'My Bug Reports', path: '/Dashboard/My-Bug-Reports', id: 5 },
+    { icon: CiChat1, label: 'Chat', path: '/Dashboard/Chats', id: 6 },
   ];
 
 
@@ -316,6 +323,11 @@ const LeftSide = ({direction}) => {
                 >
                   {disabled && <FaLock className="text-xs" />}
                   <Icon className="text-base" /> {label}
+                  {label === 'Chat' && totalUnread > 0 && (
+                    <span className="ml-auto bg-yellow-200 text-richblack-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                      {totalUnread}
+                    </span>
+                  )}
                 </button>
               </Link>
             )}

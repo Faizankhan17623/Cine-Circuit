@@ -123,7 +123,6 @@ exports.OrgaineserLogin = async(req,res)=>{
                 .populate({path:'showsCreated',model:'Show'})
                 .populate({path:'UserBannerliked',model:'Show'})
                 .populate({path:'UserBannerhated',model:'Show'})
-                .populate({path:'messageReceived',model:'Message'})
                 .populate({path:'comment',model:'Comment'})
                 .exec()
 

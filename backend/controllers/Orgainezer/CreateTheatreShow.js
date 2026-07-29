@@ -6,7 +6,6 @@ const language = require('../../models/CreateLanguage')
 const hashtags = require('../../models/CreateHashtags')
 const cast = require('../../models/Createcast')
 const USER = require('../../models/user')
-const message = require('../../models/Createmessage')
 const mongoose = require('mongoose')
 const date = require('date-and-time')
 const cookie = require('cookie-parser')
@@ -683,37 +682,6 @@ exports.updateReleasedToExpired = async () => {
     }
 }
 
-
-exports.SendCustomMessage = async(req,res)=>{
-    try {
-        const id = req.query.id
-        const messages = req.body
-        const Finding = await USER.findOne({_id:id})
-        if(!Finding){
-            return res.status(400).json({
-                message:"This user is not present please recheck your id",
-                success:false
-            })
-        }
-
-        const updatin = await message.create({
-            to:id,
-            message:messages
-        })
-        await CreateShow.updateOne({customeMessage:updatin.id})
-        return res.status(200).json({
-            message:"The message is been send",
-            success:false
-        })
-    } catch (error) {
-        console.log(error)
-        console.log(error.message)
-        return res.status(500).json({
-            message:"There is an error in the update show title code",
-            success:false
-        })
-    }
-}
 
 // Done
 // tHIS IS THE FUNCTION THAT WILL HELP US SO THAT THE ROUTE IS THE USE ROUTE AND IT IS PRESENTED ON LINIE NO 42

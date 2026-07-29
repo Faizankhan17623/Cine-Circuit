@@ -100,10 +100,6 @@ const userSchema =  new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'Show'
     }],
-    messageReceived:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Message"
-    }],
     comment:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Comment"

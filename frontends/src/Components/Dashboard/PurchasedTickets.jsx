@@ -5,7 +5,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PurchasedTicketsFullDetails } from "../../Services/operations/User";
 import { MakePdf, CancelTicket } from "../../Services/operations/Payment";
-import { FaTicketAlt, FaDownload, FaChevronDown, FaChevronUp, FaPrint, FaBan } from "react-icons/fa";
+import { startConversation } from "../../Services/operations/Chat";
+import { FaTicketAlt, FaDownload, FaChevronDown, FaChevronUp, FaPrint, FaBan, FaCommentDots } from "react-icons/fa";
 
 const formatTime12hr = (time) => {
   if (!time) return "";
@@ -30,6 +31,7 @@ const PurchasedTickets = () => {
   const [expandedCard, setExpandedCard] = useState(null);
   const [printTicketIndex, setPrintTicketIndex] = useState(null);
   const [cancellingId, setCancellingId] = useState(null);
+  const [messagingTheatreId, setMessagingTheatreId] = useState(null);
 
   const postsPerPage = 5;
 
@@ -124,6 +126,16 @@ const PurchasedTickets = () => {
       );
     }
     setCancellingId(null);
+  };
+
+  const handleMessageTheatre = async (theatreId) => {
+    if (!theatreId) return;
+    setMessagingTheatreId(theatreId);
+    const result = await dispatch(startConversation("Theatre", theatreId, token));
+    setMessagingTheatreId(null);
+    if (result?.success && result.data?._id) {
+      navigate(`/Dashboard/Chats?conversation=${result.data._id}`);
+    }
   };
 
   const handlePrint = (index) => {
@@ -319,6 +331,16 @@ const PurchasedTickets = () => {
                             title="Cancel Ticket"
                           >
                             <FaBan size={12} />
+                          </button>
+                        )}
+                        {payment?.theatreid && (
+                          <button
+                            onClick={() => handleMessageTheatre(payment.theatreid)}
+                            disabled={messagingTheatreId === payment.theatreid}
+                            className="p-2 rounded-lg bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 transition-colors no-print disabled:opacity-40"
+                            title="Message Theatre"
+                          >
+                            <FaCommentDots size={12} />
                           </button>
                         )}
                       </>

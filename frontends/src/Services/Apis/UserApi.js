@@ -52,12 +52,6 @@ export const PersonalChoice = {
     DislikeBanner:BASE_URL+"/Dislike-Banner",
 }
 
-export const SendMessage = {
-    SendMessages:BASE_URL+"/Send-Message",
-    UpdateMessage:BASE_URL+"/Update-Message",
-    GetAllMessages:BASE_URL+"/Get-AllMessages",
-}
-
 export const TicketData = {
     TicketPurchase:BASE_URL+"/Ticket-Purchased",
     TicketPurchasedFullDetail:BASE_URL+"/Ticket-Purchased-FullDetails",
