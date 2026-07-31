@@ -21,6 +21,8 @@ this API.
 | Payments | Razorpay |
 | Email | Nodemailer (OTP verification, maintenance blasts) |
 | Scheduled jobs | `node-cron` / `node-schedule` |
+| Real-time | `socket.io` (chat) |
+| Ticket generation | `puppeteer` (PDF tickets), `qrcode` (HMAC-signed check-in QR) |
 | Security | `helmet`, `cors`, `express-rate-limit`, `mongo-sanitize` |
 | API docs | Swagger (`swagger-jsdoc` + `swagger-ui-express`) |
 
@@ -40,11 +42,23 @@ this API.
 - **Theatres & tickets** — theatre registration/approval, two ticket layers:
   `Ticket` (org‑level batch allotted to theatres) and `CreateTicket` (per‑theatre
   inventory with category pricing — Standard/Premium/VIP/Family/Loyalty).
+- **PDF tickets & QR check‑in** — Puppeteer renders a PDF ticket (downloadable
+  or emailed as an attachment) embedding a QR code whose payload is HMAC‑signed
+  (`utils/generateTicketQr.js`); theatre staff scan it at the door and
+  `controllers/Theatrer/CheckIn.js` verifies the signature and marks the
+  ticket checked‑in (rejecting already‑used, cancelled, or unpaid tickets).
 - **Payments** — Razorpay order creation + signature verification, coupon
   discounts (`Coupon`), and per‑payment records.
 - **Wallet & loyalty** — in‑app wallet for instant cancellation refunds and
   pay‑with‑wallet at checkout, plus loyalty points earned on bookings and
   redeemable for wallet credit (`Wallet`, `LoyaltyPoints`).
+- **Referrals** — invite codes recorded at signup, payout only fires from
+  inside the transaction confirming the invited user's first booking
+  (`Referral`).
+- **Real‑time chat** — Socket.IO (`sockets/chat.js`) delivers live messages
+  between any two roles; REST endpoints (`routes/Chat.js`) handle starting a
+  conversation, listing the inbox, loading history, and marking read
+  (`Conversation`, `ChatMessage`).
 - **Engagement** — comments, banner likes/dislikes, watchlists, ratings & reviews.
 - **Admin / ops** — audit logging (`AuditLog`), bug reports, maintenance mode
   (with optional email blast), coupon management, and visitor counting.
@@ -68,23 +82,26 @@ backend/
 │   ├── razorpay.js          # Razorpay client
 │   ├── nodemailer.js        # Mail transport
 │   └── swagger.js           # Swagger spec
-├── models/                  # Mongoose schemas (30 models)
-├── routes/                  # User, Admin, Organizaer, CreateShow, Theatrer, Payment
+├── models/                  # Mongoose schemas (34 models)
+├── routes/                  # User, Admin, Organizaer, CreateShow, Theatrer, Payment, Chat
 ├── controllers/
-│   ├── user/                # account creation, auth
+│   ├── user/                # account creation, auth, watchlist
 │   ├── Orgainezer/          # organizer onboarding, shows, tickets
-│   ├── Theatrer/            # theatre + ticket distribution
+│   ├── Theatrer/            # theatre + ticket distribution + QR check-in
 │   ├── Administrator/       # verification, coupons, maintenance, theatres
 │   ├── Dashboard/           # stats & dashboard endpoints
-│   └── common/              # comments, payments, messages, sitemap, etc.
+│   └── common/              # comments, chat, wallet, loyalty, referrals, payments, sitemap, etc.
 ├── middlewares/
 │   └── verification.js      # JWT / role checks
+├── sockets/
+│   └── chat.js              # Socket.IO real-time chat
 ├── utils/
 │   ├── imageUploader.js     # Cloudinary upload helper
 │   ├── mailsender.js        # email helper
+│   ├── generateTicketQr.js  # HMAC-signed ticket QR generation
 │   └── logAudit.js          # audit‑log helper
 ├── Background_Process/      # cron jobs (movie status, tickets, unsold tickets)
-└── templates/               # email templates
+└── templates/               # email templates + PDF ticket template (Puppeteer)
 ```
 
 ---
@@ -160,8 +177,9 @@ All routes are mounted under `/api/v1`:
 | `/Admin` | `routes/Admin.js` | admin: verification, coupons, maintenance, theatres |
 | `/Org` | `routes/Organizaer.js` | organizer onboarding & shows |
 | `/Show` | `routes/CreateShow.js` | show creation / listing |
-| `/Theatre` | `routes/Theatrer.js` | theatre & ticket distribution |
+| `/Theatre` | `routes/Theatrer.js` | theatre & ticket distribution, QR check-in |
 | `/Payment` | `routes/Payment.js` | Razorpay orders & verification |
+| `/Chat` | `routes/Chat.js` | conversations, message history (live delivery over Socket.IO) |
 
 A `GET /sitemap.xml` endpoint serves a dynamic sitemap of verified movies.
 
@@ -190,4 +208,4 @@ Applied globally in `index.js`:
 
 ---
 
-*Author: Faizan Khan · License: ISC*
+*Author: Faizan Khan*
