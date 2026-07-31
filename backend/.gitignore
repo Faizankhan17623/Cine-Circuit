@@ -12,6 +12,9 @@ package-lock.json
 # Seeder / dev-only scripts
 seeder.js
 
+# Scratch/debug test scripts (never push — may contain throwaway keys)
+Testing/
+
 # Private planning files (root-level — handled by root .gitignore)
 # ../BUGS_AND_ISSUES.md  ← ../ patterns don't work in git, removed
 
