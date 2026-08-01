@@ -11,7 +11,7 @@
 [![Redux](https://img.shields.io/badge/Redux_Toolkit-2-764ABC?logo=redux&logoColor=white)](https://redux-toolkit.js.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 
-[Live Demo](https://mw-mocha.vercel.app) · [API Docs](https://mw-9z0s.onrender.com/api/docs) · [Report Bug](#)
+[API Docs](https://mw-9z0s.onrender.com/api/docs) · [Report Bug](#)
 
 </div>
 
@@ -236,7 +236,7 @@ npm run dev
 
 **Atomic seat reservation** — `findOneAndUpdate` with `$inc` and a condition check prevents double-booking under concurrent requests. A fresh DB re-check runs before Razorpay order creation so sold-out shows return 409 before any payment is initiated.
 
-**Role-based middleware** — Each route group has its own auth middleware (`verifyUserToken`, `verifyAdminToken`, `verifyTheatrerToken`, `verifyOrgToken`) so role boundaries are enforced at the router level, not scattered across controllers.
+**Role-based middleware** — A shared `auth` middleware verifies the JWT, then per-role guards (`IsAdmin`, `IsOrganizer`, `IsUSER`, `IsTheatrer`, plus `DF`/`DE`/`PF`/`PE` for organizer sub-roles) check `usertype` before the request reaches a controller, so role boundaries are enforced at the router level, not scattered across controllers.
 
 **Background movie status** — A cron job runs every 6 hours to transition movies from `Upcoming → Released → Expired` automatically. No manual intervention needed.
 
