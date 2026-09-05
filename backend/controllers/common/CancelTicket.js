@@ -7,6 +7,7 @@ const instance = require('../../config/razorpay')
 const mailSender = require('../../utils/mailsender')
 const cancellationTemplate = require('../../templates/userTemplates/cancellationTemplate')
 const { creditWallet } = require('./Wallet')
+const { notifyUser } = require('../../utils/notificationSender')
 
 const CANCELLATION_CUTOFF_HOURS = 2
 
@@ -48,7 +49,7 @@ exports.CancelTicket = async (req, res) => {
             return res.status(400).json({ message: "Only successfully paid tickets can be cancelled", success: false })
         }
 
-        if (paymentDoc.cancelled) {
+        if (paymentDoc.cancelled && !['pending', 'failed'].includes(paymentDoc.refundStatus)) {
             return res.status(400).json({ message: "This ticket is already cancelled", success: false })
         }
 
@@ -71,6 +72,12 @@ exports.CancelTicket = async (req, res) => {
             return res.status(400).json({ message: "No payment record to refund", success: false })
         }
 
+        // Mark cancellation before calling the gateway so a crash cannot leave
+        // a refunded ticket admissible. Pending/failed requests can be retried.
+        paymentDoc.cancelled = true
+        paymentDoc.refundStatus = 'pending'
+        await paymentDoc.save()
+
         // Two refund paths: instant wallet credit, or the original Razorpay refund (5-7 business days).
         let refund = null
         if (!refundToWallet) {
@@ -82,6 +89,7 @@ exports.CancelTicket = async (req, res) => {
                 })
             } catch (refundError) {
                 console.error("Razorpay refund error:", refundError)
+                await Payment.findByIdAndUpdate(paymentDoc._id, { refundStatus: 'failed', failureReason: refundError.message })
                 return res.status(502).json({
                     message: "Refund could not be processed right now. Please try again later.",
                     success: false
@@ -99,12 +107,13 @@ exports.CancelTicket = async (req, res) => {
 
             paymentDoc.cancelled = true
             paymentDoc.cancelledAt = ps
-            paymentDoc.refundAmount = paymentDoc.amount
+            const totalRefund = paymentDoc.amount + (paymentDoc.walletAmountUsed || 0)
+            paymentDoc.refundAmount = totalRefund
 
             if (refundToWallet) {
                 await creditWallet(
                     userId,
-                    paymentDoc.amount,
+                    totalRefund,
                     'cancellation_refund',
                     `Refund for cancelled booking on ${paymentDoc.Showdate}`,
                     paymentDoc._id,
@@ -115,6 +124,16 @@ exports.CancelTicket = async (req, res) => {
             } else {
                 paymentDoc.refundId = refund.id
                 paymentDoc.refundStatus = refund.status === "processed" ? "processed" : "pending"
+                if (paymentDoc.walletAmountUsed > 0) {
+                    await creditWallet(
+                        userId,
+                        paymentDoc.walletAmountUsed,
+                        'cancellation_refund',
+                        `Wallet portion refund for cancelled booking on ${paymentDoc.Showdate}`,
+                        paymentDoc._id,
+                        session
+                    )
+                }
             }
             await paymentDoc.save({ session })
 
@@ -149,6 +168,13 @@ exports.CancelTicket = async (req, res) => {
         }
 
         try {
+            await notifyUser(userId, {
+                type: 'payment',
+                title: 'Booking cancelled',
+                message: `Your booking was cancelled. Refund of ₹${paymentDoc.refundAmount} is ${paymentDoc.refundStatus}.`,
+                link: '/Dashboard/Purchase-History',
+                metadata: { paymentId: String(paymentDoc._id) }
+            })
             const userDoc = await USER.findById(userId)
             if (userDoc) {
                 await mailSender(

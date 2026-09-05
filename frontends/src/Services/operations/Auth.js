@@ -423,13 +423,14 @@ export function Updateimage(image){
     }
 }
 
-export function Updatenumber(newnumber){
+export function Updatenumber(newnumber, countrycode = "+91"){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setloading(true))
         try {
             const response = await apiConnector("PUT",UpdateNumber,{
-                number:newnumber
+                number:newnumber,
+                countrycode
             })
             if (!response.data.success) {
                 throw new Error(response.data.message)

@@ -11,6 +11,7 @@ const mailSender = require("../../utils/mailsender");
 const sendingOtpTeemplate = require("../../templates/userTemplates/emailTemplate");
 const theatreApprovedTemplate = require("../../templates/userTemplates/theatreApprovedTemplate");
 const theatreRejectedTemplate = require("../../templates/userTemplates/theatreRejectedTemplate");
+const { notifyUser } = require('../../utils/notificationSender')
 // const date = require('date-and-time')
 
 
@@ -127,7 +128,7 @@ exports.GetAllTheatres = async(req,res)=>{
     try {
         const Finding = await Theatre.find()
         if(!Finding){
-            return res.status(400),json({
+            return res.status(400).json({
                 message:"no theatre are created"
             })
         }
@@ -668,7 +669,7 @@ exports.VerifyTheatrer = async (req, res) => {
         let ps = date.format(now, pattern);
 
 
-        if(org.status === "Approved" && Verified === true){
+        if(org.status === "Approved" && org.Verified === true && verify === true){
             return res.status(400).json({
                 message:"This Theatrere is already verified you cannot verify him again",
                 success:false
@@ -694,6 +695,13 @@ exports.VerifyTheatrer = async (req, res) => {
         "Your Theatre Has Been Approved - Cine Circuit",
         theatreApprovedTemplate(org.Theatrename, user.name || user.userName || "User")
       );
+      await notifyUser(user._id, {
+        type: 'theatre',
+        title: 'Theatre approved',
+        message: `Your theatre ${org.Theatrename} has been approved.`,
+        link: '/Dashboard/Home',
+        metadata: { theatreId: String(org._id) }
+      })
 
       return res.status(200).json({
         success: true,
@@ -722,6 +730,13 @@ exports.VerifyTheatrer = async (req, res) => {
         "Your Theatre Application Needs Revision - Cine Circuit",
         theatreRejectedTemplate(org.Theatrename, user.name || user.userName || "User", rejectionReason)
       );
+      await notifyUser(user._id, {
+        type: 'theatre',
+        title: 'Theatre application needs revision',
+        message: rejectionReason || 'Your theatre application needs changes before approval.',
+        link: '/Dashboard/Theatre-Details',
+        metadata: { theatreId: String(org._id) }
+      })
 
       return res.status(200).json({
         success: true,

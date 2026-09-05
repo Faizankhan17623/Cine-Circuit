@@ -8,6 +8,7 @@ const directorfresher = require('../../models/DirectorFresher')
 const directorexperience = require('../../models/DirectorExperience')
 const producerexperience = require("../../models/ProducerExperience")
 const producerfresher = require('../../models/ProducerFresher')
+const { notifyUser } = require('../../utils/notificationSender')
 
 
 // ================= CLEAN REPLACEMENT FOR VerifyOrgainezer ================
@@ -86,6 +87,12 @@ exports.VerifyOrgainezer = async (req, res) => {
         "Your Organizer Account Has Been Approved - Cine Circuit",
         orgApprovedTemplate(user.name || user.userName || "User")
       );
+      await notifyUser(user._id, {
+        type: 'account',
+        title: 'Organizer account approved',
+        message: 'Your organizer verification is complete. You can now manage your shows.',
+        link: '/Dashboard/Home'
+      })
 
       return res.status(200).json({
         success: true,

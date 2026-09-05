@@ -9,8 +9,8 @@ const passwordChangedTemplate = require("../../templates/userTemplates/passwordC
 // tHIS IS THE FUNCTION THAT WILL HELP US SO THAT THE ROUTE IS THE USE ROUTE AND IT IS PRESENTED ON LINIE NO 32
 exports.LinkSend = async(req,res)=>{
     try {
-        const email = req.body.email
-        const Finding = await USER.findOne({email:email.toLowerCase()})
+        const email = req.body.email.toLowerCase()
+        const Finding = await USER.findOne({email})
         if(!Finding){
             return res.status(400).json({
                 message:`This email id ${email} is not present please is create it`,
@@ -21,7 +21,7 @@ exports.LinkSend = async(req,res)=>{
         const token = crypto.randomBytes(20).toString('hex')
         // console.log("This is the crypto token generatdd",cryptoToken)
         const updateDetails = await USER.findOneAndUpdate(
-            {email:email},
+            {email},
             {
                 token:token,
                 resetPasswordExpires:Date.now() +  300000,

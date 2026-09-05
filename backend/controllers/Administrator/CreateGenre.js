@@ -48,7 +48,7 @@ exports.Creategenre = async(req,res)=>{
 exports.Updategenre = async(req,res)=>{
     try {
         const {newName,id} = req.body
-        if(!newName || id){
+        if(!newName || !id){
             return res.status(400).json({
                 message:"The input name is been required",
                 success:false

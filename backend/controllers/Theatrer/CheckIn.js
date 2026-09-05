@@ -63,29 +63,27 @@ exports.CheckInTicket = async (req, res) => {
             })
         }
 
-        if (paymentDoc.checkedIn) {
-            return res.status(409).json({
-                message: `Ticket already checked in at ${paymentDoc.checkedInAt}`,
-                success: false
-            })
-        }
-
         const now = new Date()
         const pattern = date.compile('ddd, DD/MM/YYYY HH:mm:ss')
         const ps = date.format(now, pattern)
 
-        paymentDoc.checkedIn = true
-        paymentDoc.checkedInAt = ps
-        await paymentDoc.save()
+        const checkedIn = await Payment.findOneAndUpdate(
+            { _id: paymentId, theatreid: staffUser.theatresCreated, Payment_Status: 'success', cancelled: { $ne: true }, checkedIn: { $ne: true } },
+            { $set: { checkedIn: true, checkedInAt: ps } },
+            { new: true }
+        )
+        if (!checkedIn) {
+            return res.status(409).json({ message: "Ticket was already checked in or is no longer valid", success: false })
+        }
 
         return res.status(200).json({
             message: "Ticket checked in successfully",
             success: true,
             data: {
-                totalTicketpurchased: paymentDoc.totalTicketpurchased,
-                showid: paymentDoc.showid,
-                Showdate: paymentDoc.Showdate,
-                time: paymentDoc.time,
+                totalTicketpurchased: checkedIn.totalTicketpurchased,
+                showid: checkedIn.showid,
+                Showdate: checkedIn.Showdate,
+                time: checkedIn.time,
                 checkedInAt: ps
             }
         })

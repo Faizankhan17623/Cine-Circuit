@@ -13,6 +13,7 @@ import maintenanceReducer from '../Slices/maintenanceSlice'
 import themeReducer from '../Slices/themeSlice'
 import watchlistReducer from '../Slices/watchlistSlice'
 import chatReducer from '../Slices/chatSlice'
+import notificationReducer from '../Slices/notificationSlice'
 
 const rootReduers = combineReducers({
     auth:authReducer,
@@ -29,6 +30,7 @@ const rootReduers = combineReducers({
     theme:themeReducer,
     watchlist:watchlistReducer,
     chat:chatReducer,
+    notifications:notificationReducer,
 })
 
 

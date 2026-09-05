@@ -266,7 +266,7 @@ const AIAgent = ({ onClose, onBack }) => {
                       <button
                         onClick={() => {
                           navigate(`/Movie/${movie._id}`);
-                          setOpen(false);
+                          onClose?.();
                         }}
                         className="shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-500 hover:to-pink-500 transition-all active:scale-95"
                       >

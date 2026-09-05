@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const USER = require('../models/user')
 const Conversation = require('../models/Conversation')
 const ChatMessage = require('../models/ChatMessage')
+const { notifyUser } = require('../utils/notificationSender')
 
 // Maps a User.usertype value to the role that participates in a conversation
 const STAFF_CATEGORY_BY_USERTYPE = {
@@ -135,11 +136,14 @@ module.exports = function attachChatSocket(io) {
                     if (conversation.category === 'Admin') {
                         const admins = await USER.find({ usertype: 'Administrator' }).select('_id')
                         admins.forEach(admin => io.to(userRoom(String(admin._id))).emit('conversation_updated', conversation))
+                        await Promise.all(admins.map(admin => notifyUser(admin._id, { type: 'chat', title: 'New support message', message: text, link: `/Dashboard/Chats?conversation=${conversation._id}` })))
                     } else if (conversation.staff) {
                         io.to(userRoom(String(conversation.staff))).emit('conversation_updated', conversation)
+                        await notifyUser(conversation.staff, { type: 'chat', title: 'New customer message', message: text, link: `/Dashboard/Chats?conversation=${conversation._id}` })
                     }
                 } else {
                     io.to(userRoom(String(conversation.viewer))).emit('conversation_updated', conversation)
+                    await notifyUser(conversation.viewer, { type: 'chat', title: 'New reply', message: text, link: `/Dashboard/Chats?conversation=${conversation._id}` })
                 }
             } catch (error) {
                 console.log(error)

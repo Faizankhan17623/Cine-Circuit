@@ -47,7 +47,7 @@ exports.updateLanguage = async(req,res)=>{
             })
         }
         const Ides = new ObjectId(id);
-        const updation = await language.findOneAndUpdate(Ides,{name:newname},{new:true})
+        const updation = await language.findOneAndUpdate({_id: Ides},{name:newname},{new:true})
         return res.status(200).json({
             message:"The new language is been created",
             success:true,
@@ -67,7 +67,7 @@ exports.deleteLanguage = async(req,res)=>{
     try {
         const {id} = req.body
         const Finding = await language.findOne({_id:id})
-        if(Finding){
+        if(!Finding){
             return res.status(400).json({
                 message:"This language name is not present please recheck",
                 success:false

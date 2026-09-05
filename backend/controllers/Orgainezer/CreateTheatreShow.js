@@ -280,7 +280,8 @@ exports.UpdateShowtitle = async(req,res)=>{
             })
         }
 
-        const Finding = await CreateShow.findOne({_id:id})
+        const owner = await USER.findById(req.USER.id).select('showsCreated')
+        const Finding = await CreateShow.findOne({_id:id, _id: { $in: owner?.showsCreated || [] }})
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not presentplease rechek the id",
@@ -329,7 +330,8 @@ exports.UpdateShowtagline = async(req,res)=>{
         }
 
         // console.log("This is the id",s)
-        const Finding = await CreateShow.findOne({_id:Showid})
+        const owner = await USER.findById(req.USER.id).select('showsCreated')
+        const Finding = await CreateShow.findOne({_id:Showid, _id: { $in: owner?.showsCreated || [] }})
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not present please recheck the id",
@@ -405,7 +407,8 @@ exports.UpdateTitleImage = async(req,res)=>{
         }
 
         
-        const Finding = await CreateShow.findOne({_id:id})
+        const owner = await USER.findById(req.USER.id).select('showsCreated')
+        const Finding = await CreateShow.findOne({_id:id, _id: { $in: owner?.showsCreated || [] }})
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not present please rechek the id",
@@ -486,7 +489,8 @@ exports.UpdateTitletrailer = async(req,res)=>{
         }
 
         
-        const Finding = await CreateShow.findOne({_id:id})
+        const owner = await USER.findById(req.USER.id).select('showsCreated')
+        const Finding = await CreateShow.findOne({_id:id, _id: { $in: owner?.showsCreated || [] }})
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not present please rechek the id",
@@ -541,7 +545,8 @@ exports.deleteShow = async(req,res)=>{
             })
         }
 
-        const Deetion = await CreateShow.findByIdAndDelete(showId)
+        const owner = await USER.findById(req.USER.id).select('showsCreated')
+        const Deetion = await CreateShow.findOneAndDelete({_id: showId, _id: { $in: owner?.showsCreated || [] }})
         if(!Deetion){
             return res.status(400).json({
                 message:"The show is not been found",
@@ -575,7 +580,8 @@ exports.DeleteAllShow = async(req,res)=>{
             })
         }
         
-        const Deletion = await CreateShow.deleteMany({_id:{$in:userId.showsCreated}})    
+        const owner = await USER.findById(userId).select('showsCreated')
+        const Deletion = await CreateShow.deleteMany({_id:{$in: owner?.showsCreated || []}})
         if(!Deletion){
             return res.status(400).json({
                 message:"There are no shows to  deleted",

@@ -34,7 +34,7 @@ const validate = (req, res, next) => {
 route.put("/Org-Verification",auth,IsAdmin,VerifyOrgainezer)
 route.delete("/delete-Org",auth,IsAdmin,deleteOrgainezer)
 route.delete("/delete-allOrg",auth,IsAdmin,DeleteAllOrgainezers)
-route.get("/Get-All-Orgs",auth,IsOrganizer,GetAllorg)
+route.get("/Get-All-Orgs",auth,IsAdmin,GetAllorg)
 
 route.get("/Orgainezer-Details",auth,IsAdmin,OrgDetails)
 

@@ -33,6 +33,7 @@ const Orgainezer = require('./routes/Organizaer')
 const Show = require('./routes/CreateShow')
 const Theatre = require('./routes/Theatrer')
 const payment = require('./routes/Payment')
+const { HandlePaymentWebhook } = require('./controllers/common/PaymentWebhook')
 const Chat = require('./routes/Chat')
 // do not touch this above line because it is important for futur use
 const Visitor = require('./models/Visitor')
@@ -81,6 +82,10 @@ app.use(fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 },
 }))
 
+// Must be registered before express.json() so Razorpay's raw-body signature
+// can be verified exactly as received.
+app.post('/api/v1/Payment/Webhook', express.raw({ type: 'application/json', limit: '1mb' }), HandlePaymentWebhook)
+
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
@@ -128,6 +133,8 @@ const io = require('socket.io')(server, {
         credentials: true
     }
 })
+const { setNotificationIo } = require('./utils/notificationSender')
+setNotificationIo(io)
 require('./sockets/chat')(io)
 
 server.listen(port,()=>{

@@ -29,6 +29,9 @@ exports.AllotTheatre = async (req, res) => {
                 success: false,
             });
         }
+        if (!(await USER.exists({ _id: userId, showsCreated: ShowId }))) {
+            return res.status(403).json({ message: "You can only allot your own shows", success: false })
+        }
 
         const TicketsCheckers = await Ticket.findOne({showid: ShowId})
         if (!TicketsCheckers) {
@@ -80,6 +83,9 @@ exports.AllotTheatre = async (req, res) => {
                 success: false,
             });
         }
+        if (!Number.isInteger(ticketsToAllot) || ticketsToAllot <= 0) {
+            return res.status(400).json({ message: "Total tickets must be a positive integer", success: false })
+        }
 
         const TotalRemaining = ticketsRemaining - ticketsToAllot;
 
@@ -92,11 +98,11 @@ exports.AllotTheatre = async (req, res) => {
         // its allotment (or vice versa).
         session.startTransaction()
 
-        await Ticket.updateOne(
-            { showid: ShowId },
+        const decremented = await Ticket.updateOne(
+            { showid: ShowId, TicketsRemaining: { $gte: ticketsToAllot } },
             {
                 timeofAllotmentofTicket: AllotmentTime,
-                TicketsRemaining: TotalRemaining,
+                $inc: { TicketsRemaining: -ticketsToAllot },
                 $push: {
                     allotedToTheatres: TheatreId,
                     totalTicketsAlloted: ticketsToAllot
@@ -104,6 +110,7 @@ exports.AllotTheatre = async (req, res) => {
             },
             { session }
         );
+        if (!decremented.modifiedCount) throw new Error('Ticket inventory changed; please retry')
 
         await Theatre.updateOne(
             { _id: TheatreId },

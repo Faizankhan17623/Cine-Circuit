@@ -136,5 +136,11 @@ const userSchema =  new mongoose.Schema({
         sparse:true,
         uppercase:true
     }
-},{timestamps:true})
+},{timestamps:true, toJSON: { transform(_doc, ret) {
+    delete ret.password
+    delete ret.confirmpass
+    delete ret.token
+    delete ret.resetPasswordExpires
+    return ret
+} }})
 module.exports = mongoose.model('User',userSchema)

@@ -3,6 +3,7 @@ const User = require('../../models/user')
 const mailSenders = require('../../utils/mailsender')
 const maintenanceTemplate = require('../../templates/userTemplates/maintenanceTemplate')
 const logAudit = require('../../utils/logAudit')
+const { notifyUsers: sendNotifications } = require('../../utils/notificationSender')
 
 // GET /Maintenance-Status — public, no auth needed
 const GetMaintenance = async (req, res) => {
@@ -55,6 +56,15 @@ const SetMaintenance = async (req, res) => {
                 ).catch(err => console.log(`Failed to send to ${u.email}:`, err.message))
             )
             await Promise.all(emailPromises)
+        }
+        if (notifyUsers && isActive) {
+            const allUsers = await User.find({}, '_id').lean()
+            await sendNotifications(allUsers.map(user => user._id), {
+                type: 'system',
+                title: 'Scheduled maintenance',
+                message: record.message || 'Cine Circuit will be temporarily unavailable during scheduled maintenance.',
+                link: '/'
+            })
         }
 
         await logAudit(req, {

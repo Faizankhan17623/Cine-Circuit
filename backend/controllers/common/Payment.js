@@ -22,6 +22,53 @@ const { earnPoints } = require('./LoyaltyPoints')
 const { debitWallet, creditWallet } = require('./Wallet')
 const { completeReferral } = require('./Referral')
 const Wallet = require('../../models/Wallet')
+const { notifyUser } = require('../../utils/notificationSender')
+
+// Finalize an entirely wallet-funded booking with the same atomic inventory
+// operations used by Razorpay verification. This function is intentionally
+// idempotent: only a `created` payment may transition to `success`.
+const finalizeWalletPayment = async (paymentId, userId) => {
+    const session = await mongoose.startSession()
+    try {
+        session.startTransaction()
+        const paymentDoc = await Payment.findOneAndUpdate(
+            { _id: paymentId, userid: userId, Payment_Status: 'created', razorpay_order_id: { $regex: /^wallet_/ } },
+            { $set: { Payment_Status: 'success', paymentMethod: 'wallet', paymentDate: new Date().toISOString() } },
+            { new: true, session }
+        )
+        if (!paymentDoc) {
+            const existing = await Payment.findOne({ _id: paymentId, userid: userId }).session(session)
+            if (existing?.Payment_Status === 'success') { await session.commitTransaction(); return existing }
+            throw new Error('Wallet payment is no longer payable')
+        }
+        for (const category of paymentDoc.ticketCategorey) {
+            const requested = parseInt(category.ticketsPurchased, 10)
+            const updated = await Theatrestickets.findOneAndUpdate(
+                { _id: paymentDoc.ticketid, ticketsCategory: { $elemMatch: { category: category.categoryName, ticketsPurchaseafterRemaining: { $gte: requested } } } },
+                { $inc: { 'ticketsCategory.$.ticketsPurchaseafterRemaining': -requested } },
+                { new: true, session }
+            )
+            if (!updated) throw new Error(`Tickets sold out for ${category.categoryName}`)
+            if (category.seats?.length) {
+                const entry = updated.bookedSeats.find(item => item.time === paymentDoc.time && item.category === category.categoryName)
+                if (entry && category.seats.some(seat => entry.seats.includes(seat))) throw new Error('One or more selected seats are no longer available')
+                if (entry) await Theatrestickets.updateOne({ _id: paymentDoc.ticketid, 'bookedSeats.time': paymentDoc.time, 'bookedSeats.category': category.categoryName }, { $push: { 'bookedSeats.$.seats': { $each: category.seats } } }, { session })
+                else await Theatrestickets.updateOne({ _id: paymentDoc.ticketid }, { $push: { bookedSeats: { time: paymentDoc.time, category: category.categoryName, seats: category.seats } } }, { session })
+            }
+        }
+        await Theatrestickets.updateOne({ _id: paymentDoc.ticketid }, { $push: { ticketsPurchased: paymentDoc._id } }, { session })
+        await USER.findByIdAndUpdate(userId, { $push: { PaymentId: paymentDoc._id } }, { session })
+        if (paymentDoc.couponCode) await Coupon.findOneAndUpdate({ code: paymentDoc.couponCode }, { $inc: { usedCount: 1 }, $push: { usedBy: userId } }, { session })
+        await earnPoints(userId, paymentDoc.walletAmountUsed, paymentDoc._id, session)
+        await session.commitTransaction()
+        await notifyUser(userId, { type: 'booking', title: 'Wallet booking confirmed', message: 'Your wallet payment and movie tickets are confirmed.', link: '/Dashboard/Purchased-Tickets', metadata: { paymentId: String(paymentDoc._id) } }).catch(() => {})
+        return paymentDoc
+    } catch (error) {
+        await session.abortTransaction()
+        throw error
+    } finally { await session.endSession() }
+}
+exports.finalizeWalletPayment = finalizeWalletPayment
 
 // Shared by MakePdf (download) and Verifypayment (email attachment)
 const buildTicketPdf = async (ticketData) => {
@@ -85,12 +132,15 @@ const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, origi
         })
         refundId = refund.id
         refundStatus = refund.status === "processed" ? "processed" : "pending"
+        if (paymentDoc.walletAmountUsed > 0) {
+            await creditWallet(userId, paymentDoc.walletAmountUsed, 'cancellation_refund', 'Refund of wallet portion after booking failure', paymentDoc._id)
+        }
     } catch (refundError) {
         console.error("Razorpay refund failed for lost-race charge, falling back to wallet credit:", refundError)
         try {
             await creditWallet(
                 userId,
-                paymentDoc.amount,
+                paymentDoc.amount + (paymentDoc.walletAmountUsed || 0),
                 'admin_adjustment',
                 `Refund: booking failed after payment (${originalError.message || 'seat no longer available'})`,
                 paymentDoc._id
@@ -112,7 +162,7 @@ const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, origi
             cancelledAt: ps,
             refundId,
             refundStatus,
-            refundAmount: refundStatus !== 'failed' ? paymentDoc.amount : 0
+            refundAmount: refundStatus !== 'failed' ? paymentDoc.amount + (paymentDoc.walletAmountUsed || 0) : 0
         }
     )
 
@@ -225,6 +275,9 @@ exports.MakePayment = async(req,res) => {
                 success:false
             })
         }
+        if (String(TheatreTicketsrearching.showId) !== String(ShowId) || String(TheatreTicketsrearching.theatreId) !== String(Theatreid)) {
+            return res.status(400).json({ message: "Show, theatre, and ticket do not match", success: false })
+        }
 
         const Theatreticketsdata = TheatreTicketsrearching
 
@@ -289,6 +342,9 @@ exports.MakePayment = async(req,res) => {
             theatreid: Theatreid,
             showid: ShowId,
             time: time,
+            Showdate: Theatreticketsdata.Date,
+            Payment_Status: 'success',
+            cancelled: { $ne: true },
         })
         // console.log("SameTimeFinding",SameTimeFinding)
         if(SameTimeFinding){
@@ -436,7 +492,9 @@ exports.MakePayment = async(req,res) => {
             const pattern = date.compile('ddd, DD/MM/YYYY HH:mm:ss');
             const ps = date.format(now, pattern);
 
-            const PaymentStatus = await Payment.create({
+            let PaymentStatus
+            try {
+                PaymentStatus = await Payment.create({
                 userid: userId,
                 Showdate: Theatreticketsdata.Date,
                 theatreid: Theatreid,
@@ -459,14 +517,20 @@ exports.MakePayment = async(req,res) => {
                     ticketsPurchased: totalTickets[index],
                     seats: seatsPerCategory ? seatsPerCategory[category._id.toString()] : []
                 }))
-            });
+                })
+            } catch (createError) {
+                await creditWallet(userId, walletAmountUsed, 'admin_adjustment', 'Refund: wallet payment record creation failed').catch(() => {})
+                throw createError
+            }
 
-            return res.status(200).json({
-                message: "Order fully paid using wallet balance",
-                success: true,
-                walletFullyPaid: true,
-                data: PaymentStatus
-            })
+            try {
+                const finalized = await finalizeWalletPayment(PaymentStatus._id, userId)
+                return res.status(200).json({ message: "Order fully paid using wallet balance", success: true, walletFullyPaid: true, data: finalized })
+            } catch (walletError) {
+                await creditWallet(userId, walletAmountUsed, 'admin_adjustment', 'Refund: wallet booking finalization failed').catch(() => {})
+                await Payment.findByIdAndUpdate(PaymentStatus._id, { Payment_Status: 'failure', failureReason: walletError.message })
+                return res.status(409).json({ success: false, message: 'Wallet booking could not be completed; your wallet was refunded.' })
+            }
         }
 
         // Create Razorpay order
@@ -539,7 +603,8 @@ exports.MakePayment = async(req,res) => {
 // This is the function that is present in the route of payment on line no 7
 exports.Verifypayment = async(req,res) => {
     try {
-        const {razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, paymentId} = req.body;
+        const {razorpay_order_id, razorpay_payment_id, razorpay_signature, paymentId} = req.body;
+        const userId = req.USER?.id
         // console.log("loggin the order id",razorpay_order_id)
         if(!userId || !razorpay_order_id || !razorpay_signature || !razorpay_payment_id || !paymentId){
             return res.status(400).json({
@@ -550,7 +615,7 @@ exports.Verifypayment = async(req,res) => {
 
         const [UserFinders, PaymentVerifier] = await Promise.all([
             USER.findOne({_id: userId}),
-            Payment.findOne({_id: paymentId})
+            Payment.findOne({_id: paymentId, userid: userId, razorpay_order_id})
         ]);
 
         if(!UserFinders || !PaymentVerifier) {
@@ -558,6 +623,12 @@ exports.Verifypayment = async(req,res) => {
                 message: "User or payment not found",
                 success: false
             });
+        }
+        if (PaymentVerifier.Payment_Status === 'success') {
+            return res.status(200).json({ message: "Payment was already verified", success: true, idempotent: true })
+        }
+        if (PaymentVerifier.Payment_Status !== 'created' || PaymentVerifier.cancelled) {
+            return res.status(409).json({ message: "This payment is no longer payable", success: false })
         }
 
         // Verify signature
@@ -572,6 +643,9 @@ exports.Verifypayment = async(req,res) => {
             try {
                 session.startTransaction();
                 const paymentDetails = await instance.payments.fetch(razorpay_payment_id);
+                if (String(paymentDetails.order_id) !== String(PaymentVerifier.razorpay_order_id) || paymentDetails.status !== 'captured' || Math.round(Number(paymentDetails.amount)) !== Math.round(Number(PaymentVerifier.amount) * 100)) {
+                    throw new Error('Gateway payment does not match this order')
+                }
                 // console.log("Payment details:", paymentDetails);
 
                 const now = new Date();
@@ -580,7 +654,7 @@ exports.Verifypayment = async(req,res) => {
 
                 // Update payment status
                 const updatedPayment = await Payment.findOneAndUpdate(
-                    { razorpay_order_id },
+                    { _id: paymentId, userid: userId, razorpay_order_id, Payment_Status: 'created' },
                     { 
                         Payment_Status: "success",
                         razorpay_payment_id,
@@ -591,6 +665,9 @@ exports.Verifypayment = async(req,res) => {
                     },
                     { new: true, session }
                 );
+                if (!updatedPayment) {
+                    throw new Error('Payment was already finalized; please refresh your tickets')
+                }
 
                 // Update ticket quantities atomically — single DB op per category
                 // BUG-3 FIX: findOneAndUpdate with $elemMatch + $gte condition is atomic,
@@ -665,7 +742,7 @@ exports.Verifypayment = async(req,res) => {
                 }
 
                 // Award loyalty points on the amount actually paid — best-effort within the same transaction
-                await earnPoints(userId, PaymentVerifier.amount, PaymentVerifier._id, session)
+                await earnPoints(userId, PaymentVerifier.amount + (PaymentVerifier.walletAmountUsed || 0), PaymentVerifier._id, session)
 
                 // First successful booking unlocks the signup referral reward for both sides
                 await completeReferral(userId, PaymentVerifier._id, session)
@@ -691,6 +768,14 @@ exports.Verifypayment = async(req,res) => {
                 // console.log("Email sent successfully:", mailes);
 
                 await session.commitTransaction();
+
+                await notifyUser(userId, {
+                    type: 'booking',
+                    title: 'Booking confirmed',
+                    message: 'Your movie tickets are confirmed and ready to view.',
+                    link: `/Dashboard/Purchased-Tickets`,
+                    metadata: { paymentId: String(paymentId), showId: String(PaymentVerifier.showid) }
+                }).catch(error => console.error('Booking notification failed:', error.message))
 
                 // Send confirmation email with the real ticket PDF (QR + seats) attached.
                 // Best-effort — a mail failure here should not fail the payment.
@@ -793,7 +878,7 @@ exports.MakePdf = async(req,res)=>{
         const { ticketId } = req.params;
 
         // Find ticket in database
-        const ticketData = await Payment.findOne({_id:ticketId})
+        const ticketData = await Payment.findOne({_id:ticketId, userid: req.USER.id, Payment_Status: 'success', cancelled: { $ne: true }})
         if(!ticketData){
             return res.status(400).json({
                 message:"The Ticket data is not present",

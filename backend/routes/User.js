@@ -1,4 +1,5 @@
 const express = require('express')
+const rateLimit = require('express-rate-limit')
 const route = express.Router()
 const { body, query, validationResult } = require('express-validator')
 const {auth,IsUSER} = require('../middlewares/verification')
@@ -11,6 +12,7 @@ const validate = (req, res, next) => {
     }
     next()
 }
+const resetLinkLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 5, standardHeaders: 'draft-8', legacyHeaders: false })
 const {Createuser,CreateOtp,updateUserName,updatePassword,UpdateImage,updateNUmber,CurrentLoginUser} = require('../controllers/user/Createuser')
 const {login} = require('../controllers/user/auth')
 const {UserComments,getAllComment,deleteComment} = require('../controllers/common/Comment')
@@ -34,6 +36,7 @@ const {ValidateCoupon} = require('../controllers/common/ValidateCoupon')
 const {GetWalletBalance, GetWalletHistory} = require('../controllers/common/Wallet')
 const {GetLoyaltyBalance, GetLoyaltyHistory, RedeemPoints} = require('../controllers/common/LoyaltyPoints')
 const {GetMyReferral, ValidateReferralCode} = require('../controllers/common/Referral')
+const {GetNotifications, MarkNotificationRead, MarkAllNotificationsRead} = require('../controllers/common/Notifications')
 // DONE
 const {TheatreNavbar,MovieNavbar}  = require('../controllers/common/Comment')
 // This is the first route that will be used to create the user and all the things that the user will do releated to his personal info
@@ -66,7 +69,8 @@ route.put("/Update-Password", auth, [
 route.put("/Update-Image",auth,UpdateImage)
 
 route.put("/Update-Number", auth, [
-    body('number').notEmpty().withMessage('Phone number is required'),
+    body('number').isString().matches(/^\d{10}$/).withMessage('Phone number must be 10 digits'),
+    body('countrycode').isString().matches(/^\+?\d{1,4}$/).withMessage('Country code is required'),
 ], validate, updateNUmber)
 
 route.get("/Current-UserDetails",auth,CurrentLoginUser)
@@ -87,7 +91,7 @@ route.post("/Login", [
 // 1 Before resetting the password you neeed to send the link of the password via the email
 route.post("/Send-Link", [
     body('email').isEmail().withMessage('Valid email is required'),
-], validate, LinkSend)
+], resetLinkLimiter, validate, LinkSend)
 
 // 2 The second step is the reset the password once the link is been send
 route.put("/Change-Password", [
@@ -225,6 +229,11 @@ route.post('/Validate-Referral-Code', [
     body('referralCode').trim().notEmpty().withMessage('Referral code is required'),
 ], validate, ValidateReferralCode)
 route.get('/My-Referral', auth, IsUSER, GetMyReferral)
+
+// In-app notifications for every authenticated role
+route.get('/Notifications', auth, GetNotifications)
+route.patch('/Notifications/:id/read', auth, MarkNotificationRead)
+route.patch('/Notifications/read-all', auth, MarkAllNotificationsRead)
 
 module.exports = route
 // memphis

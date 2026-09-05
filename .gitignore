@@ -17,6 +17,11 @@ FEATURES_TO_ADD.md
 AI_FEATURES_TO_ADD.md
 CURRENT_PROJECT_ENHANCEMENTS.md
 PROJECT_RECOMMENDATIONS.md
+review/CODE_REVIEW.md
+# Local review diagnostics
+review/*-results.json
+
+# Backend tests are part of the test command and should be versioned.
 
 # Claude local config
 .claude/

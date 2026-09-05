@@ -120,8 +120,8 @@ const RedeemPoints = async (req, res) => {
 
         const pointsAfter = record.points - pointsToRedeem
 
-        await LoyaltyPoints.findOneAndUpdate(
-            { userId },
+        const debited = await LoyaltyPoints.findOneAndUpdate(
+            { userId, points: { $gte: pointsToRedeem } },
             {
                 $inc: { points: -pointsToRedeem },
                 $push: {
@@ -136,6 +136,7 @@ const RedeemPoints = async (req, res) => {
                 }
             }
         )
+        if (!debited) return res.status(409).json({ success: false, message: 'Points changed; please try again' })
 
         const wallet = await creditWallet(
             userId,

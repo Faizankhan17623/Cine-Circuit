@@ -9,6 +9,7 @@ import { UserLogout, getNavbarMovieData, getNavbarTheatreData } from '../../Serv
 import { toast } from 'react-hot-toast'
 import SearchPopup from '../extra/SearchPopup'
 import { toggleTheme } from '../../Slices/themeSlice'
+import NotificationBell from '../extra/NotificationBell'
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
@@ -153,6 +154,7 @@ const Navbar = () => {
             : <BsSunFill className='text-base text-yellow-50' />
           }
         </button>
+        {isLoggedIn && <NotificationBell />}
 
         <button
           onClick={() => setSearchOpen(true)}

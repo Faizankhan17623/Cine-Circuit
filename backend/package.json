@@ -4,7 +4,8 @@
   "description": "This is the backend of my personal project of the resume ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "node ./scripts/backend-lint.cjs",
+    "test": "npm run lint && node ./scripts/run-tests.cjs",
     "dev": "nodemon ./index.js",
     "start": "node ./index.js"
   },

@@ -897,7 +897,7 @@ useEffect(() => {
 
   if (media === "No" && socials.length > 0) {
     // clear socials when user selects No
-    socials.forEach((_, i) => removeSocial(i));
+      removeSocial();
   }
 }, [media, socials, appendSocial, removeSocial]);
 
@@ -913,7 +913,7 @@ useEffect(() => {
   }
 
   if (ongoing === "No" && ongoingProjects.length > 0) {
-    ongoingProjects.forEach((_, i) => removeOngoing(i));
+      removeOngoing();
   }
 }, [ongoing, ongoingProjects, appendOngoing, removeOngoing]);
 
@@ -947,7 +947,7 @@ useEffect(() => {
   }
 
   if (planned === "No" && plannedProjects.length > 0) {
-    plannedProjects.forEach((_, i) => removePlanned(i));
+      removePlanned();
   }
 }, [planned, plannedProjects, appendPlanned, removePlanned]);
 
@@ -962,7 +962,7 @@ useEffect(() => {
   }
 
   if (distribution === "No" && distributionsEntries.length > 0) {
-    distributionsEntries.forEach((_, i) => removeDistribution(i));
+      removeDistribution();
   }
 }, [distribution, distributionsEntries, appendDistribution, removeDistribution]);
 
@@ -977,7 +977,7 @@ useEffect(() => {
   }
 
   if (certified === "No" && certifications.length > 0) {
-    certifications.forEach((_, i) => removeCert(i));
+      removeCert();
   }
 }, [certified, certifications, appendCert, removeCert]);
 
@@ -1049,7 +1049,7 @@ const yearsExperienceValue = watch("yearsexperience");
 useEffect(() => {
   if (notableValue === "No") {
     setValue("Notable", []); // remove key from form
-    while (filmEntries.length > 0) removeprojects(0);
+    removeprojects();
   }
 }, [notableValue, Notable.length, removeprojects, setValue]);
 
@@ -1057,7 +1057,7 @@ useEffect(() => {
 useEffect(() => {
   if (socialsValue === "No") {
     setValue("socials", []);
-    while (socials.length > 0) removeSocial(0);
+    removeSocial();
   }
 }, [socialsValue, socials.length, removeSocial, setValue]);
 
@@ -1065,7 +1065,7 @@ useEffect(() => {
 useEffect(() => {
   if (ongoingValue === "No") {
     setValue("ongoingProjects", []);
-    while (ongoingProjects.length > 0) removeOngoing(0);
+    removeOngoing();
   }
 }, [ongoingValue, ongoingProjects.length, removeOngoing, setValue]);
 
@@ -1073,7 +1073,7 @@ useEffect(() => {
 useEffect(() => {
   if (plannedValue === "No") {
     setValue("plannedProjects", []);
-    while (plannedProjects.length > 0) removePlanned(0);
+    removePlanned();
   }
 }, [plannedValue, plannedProjects.length, removePlanned, setValue]);
 
@@ -1081,7 +1081,7 @@ useEffect(() => {
 useEffect(() => {
   if (distributionsValue === "No") {
     setValue("distributionsEntries", []);
-    while (distributionsEntries.length > 0) removeDistribution(0);
+    removeDistribution();
   }
 }, [distributionsValue, distributionsEntries.length, removeDistribution, setValue]);
 
@@ -1089,7 +1089,7 @@ useEffect(() => {
 useEffect(() => {
   if (certifiedValue === "No") {
     setValue("certifications", []);
-    while (certifications.length > 0) removeCert(0);
+    removeCert();
   }
 }, [certifiedValue, certifications.length, removeCert, setValue]);
 

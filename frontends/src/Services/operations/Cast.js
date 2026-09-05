@@ -194,9 +194,9 @@ export function FindCastByName(token, CastName, navigate) {
         }
 
         try {
-            const response = await apiConnector("GET", FindSingleCast, { CastName }, {
+            const response = await apiConnector("GET", FindSingleCast, null, {
                 Authorization: `Bearer ${token}`
-            })
+            }, { CastName })
 
             if (!response.data.success) {
                 throw new Error(response.data.message || "Cast member not found")

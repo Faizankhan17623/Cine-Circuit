@@ -19,6 +19,9 @@
         try {
             // console.log("This is the https",http) please keep This line in the code base it is important like an extra requirement 
             const {name,password,email,usertype="Viewer",number,countrycode,otp,referralCode } = req.body
+            if (usertype !== 'Viewer') {
+                return res.status(403).json({ success: false, message: 'This account role cannot be registered publicly' })
+            }
             if(!name || !password || !email || !number || !countrycode || !otp  ){
                 return res.status(400).json({
                     message:"The input Fields are required",
@@ -410,7 +413,7 @@ exports.UpdateImage= async(req,res)=>{
 // tHIS IS THE FUNCTION THAT WILL HELP US SO THAT THE ROUTE IS THE USE ROUTE AND IT IS PRESENTED ON LINIE NO 20
 exports.updateNUmber= async(req,res)=>{
     try {
-        const {newNumber,code} = req.body
+        const {number: newNumber, countrycode: code} = req.body
         const Finding = await USER.findOne({number:newNumber})
         const user = req.USER
         if(!newNumber || !code){
@@ -424,7 +427,6 @@ exports.updateNUmber= async(req,res)=>{
             return res.status(400).json({
                 message:"The number is already present pleasee pick another number",
                 success:false,
-                data:Finding
             })
         }
 
@@ -457,7 +459,7 @@ exports.updateNUmber= async(req,res)=>{
 
         const UPdatingNumber = await USER.findByIdAndUpdate(req.USER.id,{number:newNumber,lastNumberUpdate:ps,countrycode:code},{new:true})
         console.log("THis is the new updated number",UPdatingNumber)
-        await mailSender(user.email,"Your Phone Number Has Been Updated - Cine Circuit",updateNumber(userFindgin ? userFindgin.userName : "User",newNumber))
+        await mailSender(userFindgin.email,"Your Phone Number Has Been Updated - Cine Circuit",updateNumber(userFindgin.userName,newNumber))
         return res.status(200).json({
             message:"The new number is been updated",
             success:true

@@ -231,9 +231,9 @@ exports.getwholecastlist = async (req,res)=>{
 // This is the function that is present in the create show file route on line no 34
 exports.FindSingleCast = async (req,res)=>{
     try{
-        const {CastName} = req.body
+        const {CastName} = req.query
 
-        if(!id){
+        if(typeof CastName !== 'string' || !CastName.trim()){
             return res.status(400).json({
                 message:"the input field is been required",
                 success:false

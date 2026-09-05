@@ -142,3 +142,9 @@ export const WalletLoyaltyApi = {
     WalletBalance:  BASE_URL + "/Wallet-Balance",
     LoyaltyBalance: BASE_URL + "/Loyalty-Balance",
 }
+
+export const NotificationApi = {
+    list: BASE_URL + "/Notifications",
+    markRead: (id) => `${BASE_URL}/Notifications/${id}/read`,
+    markAllRead: BASE_URL + "/Notifications/read-all",
+}

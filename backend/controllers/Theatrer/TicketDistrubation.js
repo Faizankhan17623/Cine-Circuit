@@ -329,6 +329,9 @@ exports.UpdateTime = async (req, res) => {
                 success: false,
             });
         }
+        if (String(TicketFinding.theatreId) !== String(TheatreFinding._id) || String(TicketFinding.showId) !== String(ShowId) || String(TheatreFinding.Owner || '') !== String(userId)) {
+            return res.status(403).json({ message: "This ticket does not belong to your theatre/show", success: false })
+        }
 
         // ✅ Convert duration
         const movieDurationMinutes = Number(ShowFinding.movieDuration);
@@ -447,9 +450,8 @@ exports.UpcomigTickets = async () => {
 exports.ExpireTickets = async () => {
     try {
 
-        const  Yesterday = new Date()
-        Yesterday.setDate(Yesterday.getDate() - 1 )
-        const YesterdayDate = date.format(Yesterday, "DD/MM/YYYY");
+        const Today = new Date()
+        Today.setHours(0, 0, 0, 0)
         // console.log("Yesterday date",YesterdayDate)
 
         const allTickets = await Theatrestickets.find();
@@ -467,7 +469,8 @@ exports.ExpireTickets = async () => {
             } else {
                 ticketDate = date.format(new Date(ticket.Date), "DD/MM/YYYY")
             }
-            return ticketDate === YesterdayDate
+            const parsed = date.parse(ticketDate, "DD/MM/YYYY")
+            return parsed && parsed < Today
         });
         // console.log("This is the tickets to update array",TicketsToexpiry)
 

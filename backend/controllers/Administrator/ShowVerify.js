@@ -1,5 +1,6 @@
 const USER = require('../../models/user')
 const CreateShow = require('../../models/CreateShow')
+const { notifyUser } = require('../../utils/notificationSender')
 // This is the function that is present in the admin route on line no 54
 exports.VerifyShow = async (req, res) => {
     try {
@@ -26,6 +27,14 @@ exports.VerifyShow = async (req, res) => {
                 { VerifiedByTheAdmin: Validation ,VerificationTime:date}, 
                 { new: true }
             );
+            const owner = await USER.findOne({ showsCreated: id }).select('_id')
+            if (owner) await notifyUser(owner._id, {
+                type: 'show',
+                title: Validation ? 'Show approved' : 'Show review updated',
+                message: Validation ? 'Your show has been approved by an administrator.' : 'Your show verification status was updated.',
+                link: '/Dashboard/Shows',
+                metadata: { showId: String(id), approved: Validation }
+            })
     
             // console.log(updating);
             return res.status(200).json({
