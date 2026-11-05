@@ -1,6 +1,6 @@
 const crypto = require('crypto')
 const Payment = require('../../models/payment')
-const { Verifypayment } = require('./Payment')
+const { Verifypayment, refundCapturedCharge } = require('./Payment')
 
 // Razorpay sends a signature over the exact raw request body. Keep this route
 // before express.json() in index.js and never verify a re-serialized object.
@@ -19,6 +19,13 @@ exports.HandlePaymentWebhook = async (req, res) => {
         const payment = await Payment.findOne({ razorpay_order_id: paymentEntity.order_id })
         if (!payment) return res.status(200).json({ success: true, ignored: true })
         if (payment.Payment_Status === 'success') return res.status(200).json({ success: true, idempotent: true })
+        // The expiry cron closes abandoned orders and returns their wallet portion. Verifypayment
+        // only books 'created' payments, so a capture arriving after that would be kept with no
+        // ticket: refund it instead (at most once, see refundCapturedCharge).
+        if (payment.Payment_Status === 'failure' && paymentEntity.status === 'captured') {
+            const refunded = await refundCapturedCharge(payment, payment.userid, paymentEntity.id, new Error('Payment arrived after this booking had expired'))
+            return res.status(200).json({ success: true, refunded })
+        }
 
         const result = { statusCode: 200, body: null, status(code) { this.statusCode = code; return this }, json(data) { this.body = data; return this } }
         await Verifypayment({ USER: { id: payment.userid }, body: {

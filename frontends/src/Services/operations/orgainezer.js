@@ -40,7 +40,7 @@ export function Creation(name,password,email,number,otp,code){
         }catch(error){
             console.log("Error in Creating the orgainezer",error)
             console.log("Error in Creating the orgainezer",error.message)
-            return { success: false, error: error.message };
+            return { success: false, error: error?.response?.data?.message || error.message };
         }
         finally {
             dispatch(setLoading(false));

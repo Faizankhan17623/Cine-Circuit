@@ -5,10 +5,11 @@ import { LuTimerReset } from "react-icons/lu";
 import { HiArrowNarrowLeft } from "react-icons/hi";
 import { MdVerifiedUser, MdEmail } from "react-icons/md";
 import toast from 'react-hot-toast';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { UserCreation, sendOtp } from '../../Services/operations/Auth';
 import { Creation } from '../../Services/operations/orgainezer';
+import { setSignupData } from '../../Slices/authSlice';
 
 const OTP_TIMER_KEY = 'otp_timer_expiry';
 const OTP_DURATION = 120; // seconds — matches backend OTP TTL (2 minutes)
@@ -16,22 +17,24 @@ const OTP_DURATION = 120; // seconds — matches backend OTP TTL (2 minutes)
 const OTP = ({ Style }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [otp, setOtp] = useState('');
   const [decrement, setDecrement] = useState(0);
   const intervalRef = useRef();
   const [loading, setLoading] = useState(false);
-  const [resendOtp, setResendOtp] = useState('');
 
-  const { otp: sentOtp, mail, data } = location.state || {};
+  // Filled by the signup form; lost on reload, which sends the user back to /SignUp
+  const data = useSelector((state) => state.auth.signupData);
+  const mail = data?.email;
+  // Set after a successful signup, which clears the data on purpose (not an invalid session)
+  const signedUp = useRef(false);
 
   useEffect(() => {
-    if (!sentOtp || !mail || !data) {
+    if (!data && !signedUp.current) {
       toast.error('Invalid session. Please sign up again.');
       navigate('/SignUp');
     }
-  }, [sentOtp, mail, data, navigate]);
+  }, [data, navigate]);
 
   // Calculate remaining seconds from stored expiry
   const getRemainingTime = useCallback(() => {
@@ -86,57 +89,29 @@ const OTP = ({ Style }) => {
     };
   }, []);
 
+  // The typed OTP goes straight to the create endpoint, which verifies it; the browser never has the real one
   const handleVerifyClick = async () => {
-    if (data.usertype === 'Viewer') {
-      if (otp === String(sentOtp) || otp === String(resendOtp)) {
-        try {
-          setLoading(true);
-          const fullName = `${data.firstName} ${data.lastName}`;
-          const response = await dispatch(
-            UserCreation(fullName, data.password, data.email, data.phoneNumber, otp, data.countryCode, data.referralCode)
-          );
-          if (response?.success) {
-            toast.success('User Created');
-            sessionStorage.removeItem(OTP_TIMER_KEY);
-            navigate('/Login');
-          } else {
-            toast.error('Error in creating the user');
-          }
-        } catch (error) {
-          console.log(error);
-          toast.error('Error in filling the details');
-        } finally {
-          setLoading(false);
-        }
+    try {
+      setLoading(true);
+      const fullName = `${data.firstName} ${data.lastName}`;
+      const response = data.usertype === 'Organizer'
+        ? await dispatch(Creation(fullName, data.password, data.email, data.phoneNumber, otp, data.countryCode))
+        : await dispatch(UserCreation(fullName, data.password, data.email, data.phoneNumber, otp, data.countryCode, data.referralCode));
+      if (response?.success) {
+        toast.success('User Created');
+        sessionStorage.removeItem(OTP_TIMER_KEY);
+        signedUp.current = true;
+        dispatch(setSignupData(null));
+        navigate('/Login');
       } else {
-        toast.error('Wrong OTP. Please try again.');
+        // e.g. "The OTP is not correct please try again"
+        toast.error(response?.error || 'Error in creating the user');
       }
-    }
-
-    if (data.usertype === 'Organizer') {
-      if (otp === String(sentOtp) || otp === String(resendOtp)) {
-        try {
-          setLoading(true);
-          const fullName = `${data.firstName} ${data.lastName}`;
-          // console.log(fullName, data.password, data.email, data.phoneNumber, otp)
-          // console.log(data)
-          const response = await dispatch(Creation(fullName, data.password, data.email, data.phoneNumber, otp, data.countryCode));
-          if (response?.success) {
-            toast.success('User Created');
-            sessionStorage.removeItem(OTP_TIMER_KEY);
-            navigate('/Login');
-          } else {
-            toast.error('Error in creating the user');
-          }
-        } catch (error) {
-          console.log(error);
-          toast.error('Error in filling the details');
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        toast.error('Wrong OTP. Please try again.');
-      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Error in filling the details');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -147,7 +122,6 @@ const OTP = ({ Style }) => {
       const response = await dispatch(sendOtp(data.email));
       if (response?.success) {
         toast.success('OTP sent to your email');
-        setResendOtp(response.data.data.data);
         startCountdown();
       } else {
         toast.error('Error in sending the OTP');

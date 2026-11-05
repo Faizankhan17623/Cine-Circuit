@@ -281,7 +281,8 @@ exports.UpdateShowtitle = async(req,res)=>{
         }
 
         const owner = await USER.findById(req.USER.id).select('showsCreated')
-        const Finding = await CreateShow.findOne({_id:id, _id: { $in: owner?.showsCreated || [] }})
+        // $and keeps both _id conditions; a repeated _id key in one object silently drops the requested id
+        const Finding = await CreateShow.findOne({ $and: [{_id:id}, {_id: { $in: owner?.showsCreated || [] }}] })
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not presentplease rechek the id",
@@ -296,7 +297,7 @@ exports.UpdateShowtitle = async(req,res)=>{
             })
         }
         if(Finding.VerifiedByTheAdmin === false && Finding.uploaded === false){
-            const Updating = await CreateShow.findByIdAndUpdate(id,{title:newTitle},{new:true})
+            const Updating = await CreateShow.findByIdAndUpdate(Finding._id,{title:newTitle},{new:true})
             return res.status(200).json({
                 message:"The title is been updated",
                 success:true,
@@ -331,7 +332,7 @@ exports.UpdateShowtagline = async(req,res)=>{
 
         // console.log("This is the id",s)
         const owner = await USER.findById(req.USER.id).select('showsCreated')
-        const Finding = await CreateShow.findOne({_id:Showid, _id: { $in: owner?.showsCreated || [] }})
+        const Finding = await CreateShow.findOne({ $and: [{_id:Showid}, {_id: { $in: owner?.showsCreated || [] }}] })
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not present please recheck the id",
@@ -348,7 +349,7 @@ exports.UpdateShowtagline = async(req,res)=>{
 
         if(Finding.VerifiedByTheAdmin === false && Finding.uploaded === false){
             const Updating = await CreateShow.findByIdAndUpdate(
-                Showid,
+                Finding._id,
                 { tagline: newTagline },
                 { new: true }
             )
@@ -408,7 +409,7 @@ exports.UpdateTitleImage = async(req,res)=>{
 
         
         const owner = await USER.findById(req.USER.id).select('showsCreated')
-        const Finding = await CreateShow.findOne({_id:id, _id: { $in: owner?.showsCreated || [] }})
+        const Finding = await CreateShow.findOne({ $and: [{_id:id}, {_id: { $in: owner?.showsCreated || [] }}] })
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not present please rechek the id",
@@ -421,7 +422,7 @@ exports.UpdateTitleImage = async(req,res)=>{
             let imageUpdating
             try {
                 imageUpdating = await uploadDatatoCloudinary(newImage,process.env.CLOUDINARY_FOLDER_NAME,1000,1000)
-                const updating = await CreateShow.findByIdAndUpdate(id,{Posterurl:imageUpdating.secure_url},{new:true})
+                const updating = await CreateShow.findByIdAndUpdate(Finding._id,{Posterurl:imageUpdating.secure_url},{new:true})
                 return res.json({
                     message:"The new image is been uploaded",
                     success:true
@@ -490,7 +491,7 @@ exports.UpdateTitletrailer = async(req,res)=>{
 
         
         const owner = await USER.findById(req.USER.id).select('showsCreated')
-        const Finding = await CreateShow.findOne({_id:id, _id: { $in: owner?.showsCreated || [] }})
+        const Finding = await CreateShow.findOne({ $and: [{_id:id}, {_id: { $in: owner?.showsCreated || [] }}] })
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not present please rechek the id",
@@ -504,7 +505,7 @@ exports.UpdateTitletrailer = async(req,res)=>{
             try {
                 imageUpdating = await uploadDatatoCloudinary(newTrailer,process.env.CLOUDINARY_FOLDER_NAME)
                 let conversion =  convertSecondsToDuration(imageUpdating.duration)
-                const updating = await CreateShow.findByIdAndUpdate(id,{trailerurl:imageUpdating.secure_url,TotalDuration:conversion},{new:true})
+                const updating = await CreateShow.findByIdAndUpdate(Finding._id,{trailerurl:imageUpdating.secure_url,TotalDuration:conversion},{new:true})
                 return res.json({
                     message:"The new trailer is been uploaded",
                     success:true
@@ -546,13 +547,14 @@ exports.deleteShow = async(req,res)=>{
         }
 
         const owner = await USER.findById(req.USER.id).select('showsCreated')
-        const Deetion = await CreateShow.findOneAndDelete({_id: showId, _id: { $in: owner?.showsCreated || [] }})
+        const Deetion = await CreateShow.findOneAndDelete({ $and: [{_id: showId}, {_id: { $in: owner?.showsCreated || [] }}] })
         if(!Deetion){
             return res.status(400).json({
                 message:"The show is not been found",
                 success:false
             })
         }
+        await USER.updateOne({_id:req.USER.id},{$pull:{showsCreated:Deetion._id}})
         return res.status(200).json({
             message:"The show is been deleted",
             success:true,

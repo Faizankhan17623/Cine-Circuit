@@ -36,7 +36,7 @@ exports.CancelTicket = async (req, res) => {
             return res.status(400).json({ message: "paymentId is required", success: false })
         }
 
-        const paymentDoc = await Payment.findById(paymentId)
+        let paymentDoc = await Payment.findById(paymentId)
         if (!paymentDoc) {
             return res.status(404).json({ message: "Ticket not found", success: false })
         }
@@ -49,7 +49,11 @@ exports.CancelTicket = async (req, res) => {
             return res.status(400).json({ message: "Only successfully paid tickets can be cancelled", success: false })
         }
 
-        if (paymentDoc.cancelled && !['pending', 'failed'].includes(paymentDoc.refundStatus)) {
+        // Only a refund that failed before anything was recorded may be retried. 'pending' is the
+        // normal state of a bank refund in flight, so retrying it would refund twice. A retryable
+        // ticket never had its inventory restored: that happens in the same transaction that sets refundId.
+        const retryable = paymentDoc.refundStatus === 'failed' && !paymentDoc.refundId
+        if (paymentDoc.cancelled && !retryable) {
             return res.status(400).json({ message: "This ticket is already cancelled", success: false })
         }
 
@@ -73,10 +77,20 @@ exports.CancelTicket = async (req, res) => {
         }
 
         // Mark cancellation before calling the gateway so a crash cannot leave
-        // a refunded ticket admissible. Pending/failed requests can be retried.
-        paymentDoc.cancelled = true
-        paymentDoc.refundStatus = 'pending'
-        await paymentDoc.save()
+        // a refunded ticket admissible. The filter makes this an atomic claim:
+        // of two concurrent requests (or a cancel racing a check-in) only one wins.
+        paymentDoc = await Payment.findOneAndUpdate(
+            {
+                _id: paymentDoc._id,
+                checkedIn: { $ne: true },
+                $or: [{ cancelled: { $ne: true } }, { refundStatus: 'failed', refundId: null }]
+            },
+            { $set: { cancelled: true, refundStatus: 'pending' } },
+            { new: true }
+        )
+        if (!paymentDoc) {
+            return res.status(409).json({ message: "This ticket was just cancelled or used. Please refresh your tickets.", success: false })
+        }
 
         // Two refund paths: instant wallet credit, or the original Razorpay refund (5-7 business days).
         let refund = null
@@ -162,6 +176,8 @@ exports.CancelTicket = async (req, res) => {
             await session.commitTransaction()
         } catch (txError) {
             await session.abortTransaction()
+            // Nothing above was committed: allow a retry, unless the bank refund already went out
+            await Payment.updateOne({ _id: paymentDoc._id }, refund ? { refundId: refund.id } : { refundStatus: 'failed' })
             throw txError
         } finally {
             session.endSession()

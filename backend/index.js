@@ -18,6 +18,7 @@ const mongoSanitize = require('mongo-sanitize')
 require('./Background_Process/Shows/movieStatusCronjobs')
 require('./Background_Process/Tickets/Tickets')
 require('./Background_Process/ReturnnsoldTickets')
+require('./Background_Process/ExpireWalletPayments')
 
 const app = express()
 app.use(helmet())

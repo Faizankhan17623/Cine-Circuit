@@ -18,8 +18,9 @@ exports.CreateOrgainezer = async(req,res)=>{
 
       // const USERId = req.USER.id
 
-        const {name,password,email,usertype="Organizer",number,countrycode,otp} = req.body
-    
+        // usertype is deliberately not read from the body: public signup may only create Organizers
+        const {name,password,email,number,countrycode,otp} = req.body
+
         if(!name || !password || !email || !number || !countrycode || !otp){
             return res.status(400).json({
                 message:"The input fields are been required",
@@ -62,7 +63,7 @@ const otps = await OTP.find({ email:email }).sort({createdAt:-1}).limit(1)
                 }); 
             }
             
-            if (otp !== otps[0].otp){
+            if (String(otp) !== String(otps[0].otp)){
                 return res.status(400).json({
                     message: "The OTP is not correct please try again",
                     success: false
@@ -82,7 +83,7 @@ const Creation = new USER({
     confirmpass: hasing,
     number: number,
     countrycode: countrycode,
-    usertype: usertype,
+    usertype: 'Organizer',
     createdAt: ps,
     image: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
     verified: false
@@ -133,9 +134,10 @@ exports.OrgaineserLogin = async(req,res)=>{
                 })
             }
 
-            if(user.usertype === 'Viewer'){
+            // Viewers, Administrators and Theatrers all sign in through the user login (/Login)
+            if(user.usertype !== 'Organizer'){
                 return res.status(400).json({
-                    message:"The User is an Viewer Please Use The Viewer Login",
+                    message:"This login is only for Organizers Please Use The User Login",
                     success:false
                 })
             }

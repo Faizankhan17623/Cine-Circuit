@@ -139,16 +139,27 @@ exports.deletesubgenre = async(req,res)=>{
 // This function is present in the admin route on line no 36
 exports.deleteAllsubGenres = async(req,res)=>{
     try {
+        // id is the genre whose sub genres are removed. It must be a plain ObjectId: the body was
+        // passed straight to deleteMany before, so {"id":{}} deleted every sub genre.
         const {id} = req.body
-        if(!id){
+        if(!mongoose.isObjectIdOrHexString(id)){
             return res.status(400).json({
-                message:"The input is is been required",
+                message:"A valid genre id is required",
                 success:false
             })
         }
 
+        const Finding = await genre.findById(id)
+        if(!Finding){
+            return res.status(404).json({
+                message:"The genre is not been found",
+                success:false
+            })
+        }
 
-        const deletion = await subgenre.deleteMany(id)
+        const ids = Finding.subgeneres
+        const deletion = await subgenre.deleteMany({_id:{$in:ids}})
+        await genre.updateMany({subgeneres:{$in:ids}},{$pull:{subgeneres:{$in:ids}}})
 
         return res.status(200).json({
             message:"The sub genre is been deleted",

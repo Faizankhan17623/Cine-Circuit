@@ -220,10 +220,11 @@ export function UserCreation(name,password,email,number,otp,code,referralCode){
         } catch (error) {
            console.log("Sign up failed");
            console.log(error)
-      console.error("Error in Creating the user", error.message);
-      toast.error(error.message || 'Signup failed'); 
-      return { success: false, error: error.message }; 
-        }finally {  
+      // The backend's reason (e.g. a wrong OTP), not axios' "Request failed with status code 400"; OTP.jsx shows it
+      const message = error?.response?.data?.message || error.message
+      console.error("Error in Creating the user", message);
+      return { success: false, error: message };
+        }finally {
 
         dispatch(setLoading(false))
         toast.dismiss(toastId)

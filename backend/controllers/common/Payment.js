@@ -185,6 +185,57 @@ const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, origi
 }
 exports.refundLostRaceCharge = refundLostRaceCharge
 
+// MakePayment debits the wallet before the Razorpay order exists, so whoever gives up on a still
+// unpaid ('created') payment must hand that wallet amount back, exactly once. Leaving 'created' and
+// crediting the wallet happen in one transaction, so of all racing closers (failed verification,
+// the expiry cron, an erroring verify) only the one whose update matched pays it back.
+const failAndReturnWallet = async (filter, update = {}) => {
+    const session = await mongoose.startSession()
+    try {
+        await session.withTransaction(async () => {
+            const failed = await Payment.findOneAndUpdate({ ...filter, Payment_Status: 'created' }, { ...update, Payment_Status: 'failure' }, { session })
+            if (failed?.walletAmountUsed > 0) {
+                await creditWallet(failed.userid, failed.walletAmountUsed, 'cancellation_refund', 'Refund of wallet portion for a booking that was not paid', failed._id, session)
+            }
+        })
+    } finally {
+        await session.endSession()
+    }
+}
+
+// Refunds a charge Razorpay captured for a booking that could not be completed, at most once;
+// recording razorpay_payment_id is the claim. The caller that moves the payment out of 'created'
+// refunds it in full. A payment already closed by the expiry cron or an erroring verify had its
+// wallet portion returned then, so only the captured amount is still owed.
+const refundCapturedCharge = async (paymentDoc, userId, razorpayPaymentId, error) => {
+    const open = await Payment.findOneAndUpdate({ _id: paymentDoc._id, Payment_Status: 'created' }, { Payment_Status: 'failure', razorpay_payment_id: razorpayPaymentId })
+    if (open) {
+        await refundLostRaceCharge(open, userId, razorpayPaymentId, error)
+        return true
+    }
+    const closed = await Payment.findOneAndUpdate({ _id: paymentDoc._id, Payment_Status: 'failure', razorpay_payment_id: null }, { razorpay_payment_id: razorpayPaymentId })
+    if (closed) {
+        await refundLostRaceCharge({ _id: closed._id, amount: closed.amount, walletAmountUsed: 0 }, userId, razorpayPaymentId, error)
+        return true
+    }
+    return false
+}
+exports.refundCapturedCharge = refundCapturedCharge
+
+// An abandoned Razorpay checkout leaves its payment 'created' forever, holding the wallet amount
+// MakePayment debited. Run by Background_Process/ExpireWalletPayments.js.
+exports.expireUnpaidWalletPayments = async () => {
+    const stale = await Payment.find({
+        Payment_Status: 'created',
+        walletAmountUsed: { $gt: 0 },
+        razorpay_order_id: { $not: /^wallet_/ },
+        createdAt: { $lt: new Date(Date.now() - 30 * 60 * 1000) }
+    }).select('_id')
+    for (const payment of stale) {
+        await failAndReturnWallet({ _id: payment._id }).catch(error => console.error(`Could not expire payment ${payment._id}:`, error.message))
+    }
+}
+
 // Student Features api kar ke ek page hain github main usko dekh lena agay payment ke isme kuch issue aaye to
 
 // This is the function that is present in the route of payment on line no 6
@@ -582,6 +633,10 @@ exports.MakePayment = async(req,res) => {
                 ticketsPurchased: totalTickets[index],
                 seats: seatsPerCategory ? seatsPerCategory[category._id.toString()] : []
             }))
+        }).catch(async (createError) => {
+            // Without a payment record neither verification nor the expiry cron could return it
+            if (walletAmountUsed > 0) await creditWallet(userId, walletAmountUsed, 'admin_adjustment', 'Refund: payment record creation failed').catch(() => {})
+            throw createError
         });
         return res.status(200).json({
             message: "Order created successfully",
@@ -805,7 +860,11 @@ exports.Verifypayment = async(req,res) => {
                 // that, e.g. someone else grabbed the same seat first, the user
                 // must not be left out of pocket. Refund automatically instead
                 // of just marking the payment as a silent failure.
-                await refundLostRaceCharge(PaymentVerifier, userId, razorpay_payment_id, error)
+                const refunded = await refundCapturedCharge(PaymentVerifier, userId, razorpay_payment_id, error)
+                // Nothing was refunded because a concurrent verification (e.g. the webhook) booked it
+                if (!refunded && await Payment.exists({ _id: PaymentVerifier._id, Payment_Status: 'success' })) {
+                    return res.status(200).json({ message: "Payment was already verified", success: true, idempotent: true })
+                }
 
                 return res.status(409).json({
                     message: `${error.message || "Booking could not be completed"}. Your payment has been refunded.`,
@@ -819,10 +878,9 @@ exports.Verifypayment = async(req,res) => {
             const pattern = date.compile('ddd, DD/MM/YYYY HH:mm:ss');
             const ps = date.format(now, pattern);
 
-            await Payment.findOneAndUpdate(
+            await failAndReturnWallet(
                 { razorpay_order_id },
                 {
-                    Payment_Status: "failure",
                     razorpay_payment_id: razorpay_payment_id || null,
                     razorpay_signature: razorpay_signature || null,
                     purchaseDate: ps,
@@ -853,10 +911,10 @@ exports.Verifypayment = async(req,res) => {
         const ps = date.format(now, pattern);
 
         try {
-            await Payment.findOneAndUpdate(
-                { razorpay_order_id: req.body.razorpay_order_id },
+            // Only ever closes this user's still-unpaid order (never a successful one) and returns its wallet amount
+            await failAndReturnWallet(
+                { razorpay_order_id: req.body.razorpay_order_id, userid: req.USER?.id },
                 {
-                    Payment_Status: "failure",
                     failureReason: error.message || "Payment verification failed",
                     paymentDate: ps
                 }
