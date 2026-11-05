@@ -120,10 +120,18 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 const { GenerateSitemap } = require('./controllers/common/Sitemap')
 app.get('/sitemap.xml', GenerateSitemap)
 
-app.use('/',(req,res)=>{
+app.get('/',(req,res)=>{
     res.status(200).json({
         message:`This is the default route for the backend`,
         success:true
+    })
+})
+
+// Unknown URLs must fail visibly instead of answering 200 success:true
+app.use((req,res)=>{
+    res.status(404).json({
+        message:'Route not found',
+        success:false
     })
 })
 

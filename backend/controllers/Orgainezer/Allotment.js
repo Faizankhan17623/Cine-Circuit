@@ -41,10 +41,11 @@ exports.AllotTheatre = async (req, res) => {
             });
         }
 
-        const TheatreFinding = await Theatre.findOne({_id: TheatreId});
+        // Only admin-approved theatres may receive tickets
+        const TheatreFinding = await Theatre.findOne({_id: TheatreId, status: "Approved"});
         if (!TheatreFinding) {
             return res.status(404).json({
-                message: "Theatre not found. Please check your input.",
+                message: "Theatre not found or not approved yet. Please check your input.",
                 success: false,
             });
         }

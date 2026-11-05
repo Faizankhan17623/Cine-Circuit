@@ -375,7 +375,8 @@ exports.deleteOrgainezer = async(req,res)=>{
                 success:false
             })    
         }
-        const finder = await USER.findOne({_id:id})
+        // Only organizer accounts can be removed here, never admins, theatres or viewers
+        const finder = await USER.findOne({_id:id, usertype:'Organizer'})
         if(!finder){
             return res.status(404).json({
                 message:"User not found",
@@ -383,13 +384,14 @@ exports.deleteOrgainezer = async(req,res)=>{
             })    
         }
 
-        const deletion = await USER.findByIdAndDelete(id)
+        const deletion = await USER.findOneAndDelete({_id:finder._id, usertype:'Organizer'})
         if(!deletion){
             return res.status(400).json({
                 message:"Cannot delete this user",
                 success:false
             })
         }
+        if(finder.orgainezerdata) await Orgdata.findByIdAndDelete(finder.orgainezerdata)
 
 
         return res.status(200).json({
@@ -425,13 +427,15 @@ exports.DeleteAllOrgainezers = async(req,res)=>{
             })
         }
 
-        const deletion = await USER.deleteMany({_id: {$in: id}})
+        const organizers = await USER.find({_id: {$in: id}, usertype:'Organizer'}).select('orgainezerdata')
+        const deletion = await USER.deleteMany({_id: {$in: organizers.map(o => o._id)}, usertype:'Organizer'})
         if(deletion.deletedCount === 0){
             return res.status(400).json({
                 message:"No users found to delete",
                 success:false
             })
         }
+        await Orgdata.deleteMany({_id: {$in: organizers.map(o => o.orgainezerdata).filter(Boolean)}})
 
 
         return res.status(200).json({

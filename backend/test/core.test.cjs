@@ -298,3 +298,220 @@ test('removing all sub genres needs a real genre id and only touches that genre'
   assert.deepEqual(deleteFilter, { _id: { $in: subs } });
   assert.deepEqual(unlink, [{ subgeneres: { $in: subs } }, { $pull: { subgeneres: { $in: subs } } }]);
 });
+
+// ---- Stage 2 (high) fixes ----
+const { uploadtheshow } = require('../controllers/Orgainezer/upload');
+const { updateCastname } = require('../controllers/Orgainezer/CreateCast');
+const { DeleteTagsname } = require('../controllers/Orgainezer/CreateHashtags');
+const { deleteOrgainezer, DeleteAllOrgainezers } = require('../controllers/Administrator/AdminVerification');
+const { TicketDistributionSystem } = require('../controllers/Theatrer/TicketDistrubation');
+const { DeleteAllShow, parseReleaseDate } = require('../controllers/Orgainezer/CreateTheatreShow');
+const { refundLostRaceCharge } = require('../controllers/common/Payment');
+const pdfTemplate = require('../templates/userTemplates/pdfTemplate');
+const ticketTemplate = require('../templates/userTemplates/TicketTemplate');
+const escapeHtml = require('../utils/escapeHtml');
+const cast = require('../models/Createcast');
+const hashtags = require('../models/CreateHashtags');
+const Theatres = require('../models/Theatres');
+const Theatrestickets = require('../models/TheatresTicket');
+const Coupon = require('../models/Coupon');
+const Referral = require('../models/Referral');
+const Notification = require('../models/Notification');
+const { Orgdata } = require('../models/Org_data');
+
+test('an organizer can only upload a show they created', async (t) => {
+  const owned = new mongoose.Types.ObjectId();
+  const othersShow = String(new mongoose.Types.ObjectId());
+  stub(t, USER, 'findById', () => query({ showsCreated: [owned] }));
+  let filter;
+  stub(t, CreateShow, 'findOne', (f) => { filter = f; return query(null); });
+  let updated = false;
+  stub(t, CreateShow, 'findByIdAndUpdate', () => { updated = true; return query({}); });
+  const res = fakeRes();
+
+  await uploadtheshow({ query: { id: othersShow }, USER: { id: 'u1' } }, res);
+
+  assert.equal(res.code, 400);
+  assert.equal(updated, false);
+  assert.deepEqual(filter, { $and: [{ _id: othersShow }, { _id: { $in: [owned] } }] });
+});
+
+test('cast and tag edits are limited to the caller, and tag delete reads the id the frontend sends', async (t) => {
+  const filters = [];
+  stub(t, cast, 'findOne', (f) => { filters.push(f); return query(null); });
+  stub(t, hashtags, 'findOne', (f) => { filters.push(f); return query(null); });
+  let deleted = false;
+  stub(t, hashtags, 'findByIdAndDelete', () => { deleted = true; return query({}); });
+
+  const renamed = fakeRes();
+  await updateCastname({ body: { id: 'c1', newname: 'x' }, USER: { id: 'u1' } }, renamed);
+  // Frontend: apiConnector("DELETE", DeleteTagsname, { id })
+  const removed = fakeRes();
+  await DeleteTagsname({ body: { id: 'h1' }, USER: { id: 'u1' } }, removed);
+
+  assert.equal(renamed.code, 400);
+  assert.equal(removed.code, 400);
+  assert.equal(deleted, false);
+  assert.deepEqual(filters, [{ _id: 'c1', userid: 'u1' }, { _id: 'h1', userid: 'u1' }]);
+});
+
+test('ticket PDF and booking email escape booking data and only embed our own QR data URL', () => {
+  const evil = '<script>alert(1)</script>';
+  const html = pdfTemplate({
+    _id: 'p1', movieName: evil, theatreName: '"><img src=x onerror=alert(1)>', theatreLocation: evil,
+    Showdate: evil, paymentMethod: evil, Payment_Status: evil,
+    categoryDetails: [{ categoryName: evil, ticketCount: 1, price: 100, seats: [evil] }],
+    qrCodeDataUrl: '" onerror="alert(1)',
+  });
+  assert.equal(html.includes('<script>'), false);
+  assert.equal(html.includes('<img src=x'), false);
+  assert.equal(html.includes('alt="Ticket QR Code"'), false);
+  assert.ok(html.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
+
+  const withQr = pdfTemplate({ _id: 'p1', categoryDetails: [], qrCodeDataUrl: 'data:image/png;base64,iVBORw0KGgo=' });
+  assert.ok(withQr.includes('src="data:image/png;base64,iVBORw0KGgo="'));
+
+  const mail = ticketTemplate({ _id: 'p1', Showdate: evil, paymentMethod: evil, amount: evil });
+  assert.equal(mail.includes('<script>'), false);
+  assert.equal(escapeHtml(`&<>"'`), '&amp;&lt;&gt;&quot;&#39;');
+  assert.equal(escapeHtml(undefined), '');
+});
+
+test('admins can delete organizers only, never other account types', async (t) => {
+  stub(t, USER, 'findOne', () => query(null)); // the id belongs to an admin, so the Organizer lookup misses
+  let deleted = false;
+  stub(t, USER, 'findOneAndDelete', () => { deleted = true; return query({}); });
+  const one = fakeRes();
+  await deleteOrgainezer({ body: { id: 'admin1' } }, one);
+  assert.equal(one.code, 404);
+  assert.equal(deleted, false);
+
+  const orgId = new mongoose.Types.ObjectId();
+  let findFilter;
+  stub(t, USER, 'find', (f) => { findFilter = f; return query([{ _id: orgId, orgainezerdata: 'od1' }]); });
+  let deleteFilter;
+  stub(t, USER, 'deleteMany', (f) => { deleteFilter = f; return query({ deletedCount: 1 }); });
+  let orgdataFilter;
+  stub(t, Orgdata, 'deleteMany', (f) => { orgdataFilter = f; return query({}); });
+  const all = fakeRes();
+  await DeleteAllOrgainezers({ body: { id: [String(orgId), 'admin1'] } }, all);
+  assert.equal(all.code, 200);
+  assert.deepEqual(findFilter, { _id: { $in: [String(orgId), 'admin1'] }, usertype: 'Organizer' });
+  assert.deepEqual(deleteFilter, { _id: { $in: [orgId] }, usertype: 'Organizer' });
+  assert.deepEqual(orgdataFilter, { _id: { $in: ['od1'] } });
+});
+
+test('ticket distribution rejects bad category entries and unapproved theatres before touching stock', async (t) => {
+  stub(t, mongoose, 'startSession', async () => ({ endSession() {}, inTransaction: () => false }));
+  stub(t, CreateShow, 'findById', () => query({ _id: 's1' }));
+  stub(t, USER, 'findById', () => query({ theatresCreated: 'th1' }));
+  let theatre;
+  stub(t, Theatres, 'findById', () => query(theatre));
+  stub(t, Theatrestickets, 'findOne', () => query(null));
+  let created = false;
+  stub(t, Theatrestickets, 'create', async () => { created = true; return [{}]; });
+  const inFiveDays = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+  const ReleaseDate = `${String(inFiveDays.getDate()).padStart(2, '0')}/${String(inFiveDays.getMonth() + 1).padStart(2, '0')}/${inFiveDays.getFullYear()}`;
+  const distribute = async (ticketsCreation) => {
+    const res = fakeRes();
+    await TicketDistributionSystem({ USER: { id: 'u1' }, query: { ShowId: 's1' }, body: { ticketsCreation, ReleaseDate } }, res);
+    return res;
+  };
+  const allotments = [{ showId: 's1', price: 100, ticketsReceived: 10, ticketsDistributed: 0 }];
+
+  theatre = { _id: 'th1', status: 'Rejected', allotments };
+  assert.equal((await distribute([{ category: 'VIP', numberOftickets: 5, price: 100 }])).code, 403);
+
+  theatre = { _id: 'th1', status: 'Approved', allotments };
+  // -5 + 15 = 10 fits the allotment of 10 on paper, but would create 15 VIP seats
+  const invalid = [
+    [{ category: 'Standard', numberOftickets: -5, price: 100 }, { category: 'VIP', numberOftickets: 15, price: 100 }],
+    [{ category: 'VIP', numberOftickets: 2.5, price: 100 }],
+    [{ category: 'VIP', numberOftickets: 2, price: -100 }],
+    [{ category: 'Balcony', numberOftickets: 2, price: 100 }],
+    [{ category: 'VIP', numberOftickets: 2, price: 100 }, { category: 'VIP', numberOftickets: 2, price: 100 }],
+  ];
+  for (const entries of invalid) {
+    assert.equal((await distribute(entries)).code, 400, JSON.stringify(entries));
+  }
+  assert.equal(created, false);
+});
+
+test('show status cron can parse the stored release date formats', () => {
+  const stored = parseReleaseDate('Mon, 05 May 2025');
+  assert.deepEqual([stored.getFullYear(), stored.getMonth(), stored.getDate()], [2025, 4, 5]);
+  const seeded = parseReleaseDate('2025-12-25');
+  assert.deepEqual([seeded.getFullYear(), seeded.getMonth(), seeded.getDate()], [2025, 11, 25]);
+  assert.ok(isNaN(parseReleaseDate('not a date').getTime()));
+});
+
+test('deleting all shows also unlinks them from the organizer', async (t) => {
+  const owned = [new mongoose.Types.ObjectId()];
+  stub(t, USER, 'findById', () => query({ showsCreated: owned }));
+  stub(t, CreateShow, 'deleteMany', () => query({ deletedCount: 1 }));
+  let ownerUpdate;
+  stub(t, USER, 'updateOne', (f, update) => { ownerUpdate = [f, update]; return query({}); });
+  const res = fakeRes();
+
+  await DeleteAllShow({ USER: { id: 'u1' } }, res);
+
+  assert.equal(res.code, 200);
+  assert.deepEqual(ownerUpdate, [{ _id: 'u1' }, { $pull: { showsCreated: { $in: owned } } }]);
+});
+
+test('a successful booking writes user, coupon and show inside the transaction and ends the session', async (t) => {
+  const session = {
+    active: false,
+    ended: false,
+    startTransaction() { this.active = true; },
+    async commitTransaction() { this.active = false; },
+    async abortTransaction() { this.active = false; },
+    inTransaction() { return this.active; },
+    async endSession() { this.ended = true; },
+  };
+  stub(t, mongoose, 'startSession', async () => session);
+  stub(t, USER, 'findOne', () => query({ email: 'buyer@example.com' }));
+  const payment = { _id: 'p1', userid: 'u1', razorpay_order_id: 'order_1', Payment_Status: 'created', amount: 5, walletAmountUsed: 0, ticketCategorey: [], ticketid: 't1', showid: 's1', couponCode: 'SAVE' };
+  stub(t, Payment, 'findOne', () => query(payment));
+  stub(t, razorpay.payments, 'fetch', async () => ({ order_id: 'order_1', status: 'captured', amount: 500, method: 'card' }));
+  stub(t, Payment, 'findOneAndUpdate', () => query({ ...payment, Payment_Status: 'success' }));
+  stub(t, Theatrestickets, 'findOneAndUpdate', () => query({}));
+  stub(t, Referral, 'findOneAndUpdate', () => query(null));
+  stub(t, Notification, 'create', async () => ({ toObject: () => ({}) }));
+  stub(t, CreateShow, 'findOne', () => query(null)); // PDF build fails; the mail is best-effort
+  stub(t, Theatres, 'findOne', () => query(null));
+  const writes = {};
+  stub(t, USER, 'findByIdAndUpdate', (id, update, options) => { writes.user = options; return query({}); });
+  stub(t, Coupon, 'findOneAndUpdate', (f, update, options) => { writes.coupon = options; return query({}); });
+  stub(t, CreateShow, 'findByIdAndUpdate', (id, update, options) => { writes.show = [update, options]; return query({}); });
+  const signature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRETS).update('order_1|pay_1').digest('hex');
+  const res = fakeRes();
+
+  await Verifypayment({ USER: { id: 'u1' }, body: { razorpay_order_id: 'order_1', razorpay_payment_id: 'pay_1', razorpay_signature: signature, paymentId: 'p1' } }, res);
+
+  assert.equal(res.code, 200);
+  assert.equal(writes.user.session, session);
+  assert.equal(writes.coupon.session, session);
+  assert.deepEqual(writes.show[0], { $push: { ticketspurchased: 'p1' } });
+  assert.equal(writes.show[1].session, session);
+  assert.equal(session.ended, true);
+});
+
+test('a lost-race refund pays the captured amount once even if the wallet portion cannot be credited', async (t) => {
+  const refunds = [];
+  stub(t, razorpay.payments, 'refund', async (id, options) => { refunds.push(options.amount); return { id: 'rfnd_1', status: 'pending' }; });
+  const creditAttempts = [];
+  stub(t, Wallet, 'findOne', () => query({ balance: 0 }));
+  stub(t, Wallet, 'findOneAndUpdate', (f, update) => { creditAttempts.push(update.$inc.balance); throw new Error('wallet down'); });
+  let recorded;
+  stub(t, Payment, 'findOneAndUpdate', (f, update) => { recorded = update; return query({}); });
+  stub(t, USER, 'findById', () => query(null));
+
+  await refundLostRaceCharge({ _id: 'p1', amount: 60, walletAmountUsed: 40 }, 'u1', 'pay_1', new Error('sold out'));
+
+  assert.deepEqual(refunds, [6000]);
+  // Only the wallet portion was attempted; no fallback credit of 60 + 40
+  assert.deepEqual(creditAttempts, [40]);
+  assert.equal(recorded.refundId, 'rfnd_1');
+  assert.equal(recorded.refundAmount, 60);
+});

@@ -297,33 +297,14 @@ exports.TheatreCreationRequest = async(req,res)=>{
             });
         }
 
-        // Check for existing email
-        // const EmailFinding = await Theatres.findOne({ email: email });
-        // if (EmailFinding) {
-        //     return res.status(400).json({
-        //         message: "This email is already taken. Use another email",
-        //         success: false
-        //     });
-        // }
-
-        // // Check for existing username
-        // const NameFinding = await Theatres.findOne({ username: Username });
-        // if (NameFinding) {
-        //     return res.status(400).json({
-        //         message: "The name is already taken. Please take another one",
-        //         success: false
-        //     });
-        // }
-
-        // Check for existing mobile number
-        const NumberFinding = await USER.findOne({ number: mobilenumber });
-        if (NumberFinding) {
+        // Check for existing email (stored lowercase on the user)
+        const EmailFinding = await USER.findOne({ email: String(email).toLowerCase() });
+        if (EmailFinding) {
             return res.status(400).json({
-                message: "The mobile number is already taken. Use another number",
+                message: "This email is already taken. Use another email",
                 success: false
             });
         }
-
 
          const UserNameFinding = await USER.findOne({ userName: Username });
         if (UserNameFinding) {

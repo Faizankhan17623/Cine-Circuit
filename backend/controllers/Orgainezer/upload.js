@@ -1,4 +1,5 @@
 const CreateShow = require('../../models/CreateShow')
+const USER = require('../../models/user')
 // This is the function thatis present in the createe sho route on the line no 50
 exports.uploadtheshow = async(req,res)=>{
     try {
@@ -11,7 +12,9 @@ exports.uploadtheshow = async(req,res)=>{
             })
         }
 
-        const Finding = await CreateShow.findById(id)
+        // Only the organizer who created the show may upload it
+        const owner = await USER.findById(req.USER.id).select('showsCreated')
+        const Finding = await CreateShow.findOne({ $and: [{_id:id}, {_id: { $in: owner?.showsCreated || [] }}] })
         // console.log(Finding)
         if(!Finding){
             return res.status(400).json({
@@ -34,7 +37,7 @@ exports.uploadtheshow = async(req,res)=>{
         }
         const time = new Date(Date.now())
         if(Finding.VerifiedByTheAdmin === true){
-            const updating = await CreateShow.findByIdAndUpdate(id,{uploaded:true,uploadingTime:time},{new:true})
+            const updating = await CreateShow.findByIdAndUpdate(Finding._id,{uploaded:true,uploadingTime:time},{new:true})
             // console.log("This is the updatedd result",updating)
             return res.status(200).json({
                 message:"you show is been uploaded",

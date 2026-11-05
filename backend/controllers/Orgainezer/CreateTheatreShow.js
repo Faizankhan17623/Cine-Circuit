@@ -584,6 +584,7 @@ exports.DeleteAllShow = async(req,res)=>{
         
         const owner = await USER.findById(userId).select('showsCreated')
         const Deletion = await CreateShow.deleteMany({_id:{$in: owner?.showsCreated || []}})
+        await USER.updateOne({_id:userId},{$pull:{showsCreated:{$in: owner?.showsCreated || []}}})
         if(!Deletion){
             return res.status(400).json({
                 message:"There are no shows to  deleted",
@@ -614,6 +615,15 @@ exports.DeleteAllShow = async(req,res)=>{
 
 // THis are not for now but for after wards 
 
+// CreateShow stores releasedate as "Mon, 05 May 2025" (seeded shows use "2025-12-25"). date-and-time 3.x
+// cannot parse the 'ddd' token, so the weekday is dropped before parsing.
+const parseReleaseDate = (value) => {
+    const text = String(value || '').replace(/^[A-Za-z]{3},\s*/, '')
+    const parsed = date.parse(text, 'DD MMM YYYY')
+    return isNaN(parsed.getTime()) ? date.parse(text, 'YYYY-MM-DD') : parsed
+}
+exports.parseReleaseDate = parseReleaseDate
+
 // These all are of the users not of the orgainzer
 exports.updateUpcomingToReleased = async () => {
     try {
@@ -626,7 +636,7 @@ exports.updateUpcomingToReleased = async () => {
         const upcomingMovies = await CreateShow.find({ movieStatus: "Upcoming" })
 
         const toUpdate = upcomingMovies.filter(movie => {
-            const parsed = date.parse(movie.releasedate, 'ddd, DD MMM YYYY')
+            const parsed = parseReleaseDate(movie.releasedate)
             if (!parsed || isNaN(parsed.getTime())) return false
             parsed.setHours(0, 0, 0, 0)
             return parsed <= currentDate
@@ -657,7 +667,7 @@ exports.updateReleasedToExpired = async () => {
 
         for(const movies of releasedMovies){
             // releasedate is stored as "Mon, 05 May 2025" — new Date() can't parse this format
-            const releaseDate = date.parse(movies.releasedate, 'ddd, DD MMM YYYY')
+            const releaseDate = parseReleaseDate(movies.releasedate)
             if (!releaseDate || isNaN(releaseDate.getTime())) {
                 console.log(`Skipping movie "${movies.title}" — could not parse releasedate: ${movies.releasedate}`)
                 continue

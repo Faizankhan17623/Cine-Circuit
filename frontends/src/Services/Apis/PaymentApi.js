@@ -9,7 +9,7 @@ export const paymentVerification = {
 }
 
 export const TicketDetails = {
-    downloadticketdata:BASE_URL+"/download/:ticketId"
+    downloadticketdata:BASE_URL+"/download"
 }
 
 export const SeatMapApi = {

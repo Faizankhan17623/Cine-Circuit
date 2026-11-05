@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const pdfTemplate = (data) => {
     const categories = data.categoryDetails ?? data.ticketCategorey ?? [];
     const totalAmount = categories.reduce((sum, cat) => sum + (cat.price * cat.ticketCount), 0);
@@ -39,6 +41,8 @@ const pdfTemplate = (data) => {
     }
 
     const reference = (data._id || '').toString().slice(-8).toUpperCase() || Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    // Only our own PNG data URL (generateTicketQrDataUrl) may become the image src
+    const qrCodeDataUrl = /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(data.qrCodeDataUrl || '') ? data.qrCodeDataUrl : '';
     const seatCategories = categories.filter(cat => Array.isArray(cat.seats) && cat.seats.length > 0);
 
     return `<!DOCTYPE html>
@@ -615,9 +619,9 @@ const pdfTemplate = (data) => {
                 <!-- Movie Info -->
                 <div class="movie-section">
                     <div class="movie-icon">&#127916;</div>
-                    <div class="movie-name">${data.movieName || 'Movie'}</div>
-                    <div class="theatre-name">&#127970; ${data.theatreName || 'Theatre'}</div>
-                    <div class="theatre-location">&#128205; ${data.theatreLocation || 'Location'}</div>
+                    <div class="movie-name">${escapeHtml(data.movieName || 'Movie')}</div>
+                    <div class="theatre-name">&#127970; ${escapeHtml(data.theatreName || 'Theatre')}</div>
+                    <div class="theatre-location">&#128205; ${escapeHtml(data.theatreLocation || 'Location')}</div>
                 </div>
 
                 <!-- Show Details -->
@@ -626,22 +630,22 @@ const pdfTemplate = (data) => {
                         <div class="detail-card">
                             <div class="detail-icon">&#128197;</div>
                             <div class="detail-label">Show Date</div>
-                            <div class="detail-value">${data.Showdate || 'N/A'}</div>
+                            <div class="detail-value">${escapeHtml(data.Showdate || 'N/A')}</div>
                         </div>
                         <div class="detail-card">
                             <div class="detail-icon">&#128336;</div>
                             <div class="detail-label">Show Time</div>
-                            <div class="detail-value">${timeChnage || 'N/A'}</div>
+                            <div class="detail-value">${escapeHtml(timeChnage || 'N/A')}</div>
                         </div>
                         <div class="detail-card">
                             <div class="detail-icon">&#127903;</div>
                             <div class="detail-label">Total Tickets</div>
-                            <div class="detail-value">${totalTickets}</div>
+                            <div class="detail-value">${escapeHtml(totalTickets)}</div>
                         </div>
                         <div class="detail-card">
                             <div class="detail-icon">&#128176;</div>
                             <div class="detail-label">Purchased At</div>
-                            <div class="detail-value">${purchaseDates || 'N/A'}</div>
+                            <div class="detail-value">${escapeHtml(purchaseDates || 'N/A')}</div>
                         </div>
                     </div>
                 </div>
@@ -666,10 +670,10 @@ const pdfTemplate = (data) => {
                         <tbody>
                             ${categories.map(cat => `
                                 <tr>
-                                    <td>${cat.categoryName}</td>
-                                    <td>${cat.ticketCount}</td>
-                                    <td>&#8377;${cat.price}</td>
-                                    <td>&#8377;${cat.price * cat.ticketCount}</td>
+                                    <td>${escapeHtml(cat.categoryName)}</td>
+                                    <td>${escapeHtml(cat.ticketCount)}</td>
+                                    <td>&#8377;${escapeHtml(cat.price)}</td>
+                                    <td>&#8377;${escapeHtml(cat.price * cat.ticketCount)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -678,7 +682,7 @@ const pdfTemplate = (data) => {
                     <div style="margin-top: 14px;">
                         ${seatCategories.map(cat => `
                             <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 4px;">
-                                <strong style="color: rgba(255,255,255,0.75);">${cat.categoryName} seats:</strong> ${cat.seats.join(', ')}
+                                <strong style="color: rgba(255,255,255,0.75);">${escapeHtml(cat.categoryName)} seats:</strong> ${escapeHtml(cat.seats.join(', '))}
                             </div>
                         `).join('')}
                     </div>
@@ -689,15 +693,15 @@ const pdfTemplate = (data) => {
                 <div class="total-section">
                     <div class="total-row">
                         <span class="total-label">Tickets</span>
-                        <span class="total-value">${totalTickets}</span>
+                        <span class="total-value">${escapeHtml(totalTickets)}</span>
                     </div>
                     <div class="total-row">
                         <span class="total-label">Subtotal</span>
-                        <span class="total-value">&#8377;${totalAmount}</span>
+                        <span class="total-value">&#8377;${escapeHtml(totalAmount)}</span>
                     </div>
                     <div class="total-row main">
                         <span class="total-label">Total Paid</span>
-                        <span class="total-value">&#8377;${totalAmount}</span>
+                        <span class="total-value">&#8377;${escapeHtml(totalAmount)}</span>
                     </div>
                 </div>
 
@@ -706,9 +710,9 @@ const pdfTemplate = (data) => {
                     <div class="payment-box">
                         <div class="payment-info">
                             <span class="payment-label">Payment Method</span>
-                            <span class="payment-value">${data.paymentMethod || 'Online'}</span>
+                            <span class="payment-value">${escapeHtml(data.paymentMethod || 'Online')}</span>
                         </div>
-                        <span class="status-badge">${data.Payment_Status || 'Paid'}</span>
+                        <span class="status-badge">${escapeHtml(data.Payment_Status || 'Paid')}</span>
                     </div>
                 </div>
 
@@ -716,16 +720,16 @@ const pdfTemplate = (data) => {
                 <div class="reference-section">
                     <div class="ref-box">
                         <div class="ref-label">Booking Reference</div>
-                        <div class="ref-code">#${reference}</div>
+                        <div class="ref-code">#${escapeHtml(reference)}</div>
                     </div>
                 </div>
 
-                ${data.qrCodeDataUrl ? `
+                ${qrCodeDataUrl ? `
                 <!-- QR Check-in Code -->
                 <div class="reference-section" style="padding-top: 0;">
                     <div class="ref-box">
                         <div class="ref-label">Show this at entry</div>
-                        <img src="${data.qrCodeDataUrl}" alt="Ticket QR Code" style="width: 140px; height: 140px; margin-top: 8px;" />
+                        <img src="${qrCodeDataUrl}" alt="Ticket QR Code" style="width: 140px; height: 140px; margin-top: 8px;" />
                     </div>
                 </div>
                 ` : ''}

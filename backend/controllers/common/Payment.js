@@ -124,19 +124,33 @@ const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, origi
 
     let refundId = null
     let refundStatus = 'failed'
+    let refundAmount = 0
 
+    let refund = null
     try {
-        const refund = await instance.payments.refund(razorpayPaymentId, {
+        refund = await instance.payments.refund(razorpayPaymentId, {
             amount: Math.round(paymentDoc.amount * 100),
             speed: "normal"
         })
-        refundId = refund.id
-        refundStatus = refund.status === "processed" ? "processed" : "pending"
-        if (paymentDoc.walletAmountUsed > 0) {
-            await creditWallet(userId, paymentDoc.walletAmountUsed, 'cancellation_refund', 'Refund of wallet portion after booking failure', paymentDoc._id)
-        }
     } catch (refundError) {
         console.error("Razorpay refund failed for lost-race charge, falling back to wallet credit:", refundError)
+    }
+
+    if (refund) {
+        refundId = refund.id
+        refundStatus = refund.status === "processed" ? "processed" : "pending"
+        refundAmount = paymentDoc.amount
+        // The bank refund already went out: a failure here must not trigger the full wallet fallback,
+        // which would pay the captured amount a second time. refundAmount then records the shortfall.
+        if (paymentDoc.walletAmountUsed > 0) {
+            try {
+                await creditWallet(userId, paymentDoc.walletAmountUsed, 'cancellation_refund', 'Refund of wallet portion after booking failure', paymentDoc._id)
+                refundAmount += paymentDoc.walletAmountUsed
+            } catch (walletError) {
+                console.error(`Wallet portion (${paymentDoc.walletAmountUsed}) of lost-race refund for payment ${paymentDoc._id} was not credited:`, walletError)
+            }
+        }
+    } else {
         try {
             await creditWallet(
                 userId,
@@ -147,6 +161,7 @@ const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, origi
             )
             refundId = 'wallet'
             refundStatus = 'processed'
+            refundAmount = paymentDoc.amount + (paymentDoc.walletAmountUsed || 0)
         } catch (walletError) {
             console.error("Wallet fallback credit also failed for lost-race charge:", walletError)
         }
@@ -162,7 +177,7 @@ const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, origi
             cancelledAt: ps,
             refundId,
             refundStatus,
-            refundAmount: refundStatus !== 'failed' ? paymentDoc.amount + (paymentDoc.walletAmountUsed || 0) : 0
+            refundAmount
         }
     )
 
@@ -786,13 +801,14 @@ exports.Verifypayment = async(req,res) => {
                 // console.log(createTicket)
                 // Update user's payment record
 
-                await USER.findByIdAndUpdate(userId,{$push:{PaymentId:paymentId}})
+                await USER.findByIdAndUpdate(userId,{$push:{PaymentId:paymentId}},{ session })
 
                 // Increment coupon usage — only after confirmed successful payment
                 if (PaymentVerifier.couponCode) {
                     await Coupon.findOneAndUpdate(
                         { code: PaymentVerifier.couponCode },
-                        { $inc: { usedCount: 1 }, $push: { usedBy: userId } }
+                        { $inc: { usedCount: 1 }, $push: { usedBy: userId } },
+                        { session }
                     )
                 }
 
@@ -802,18 +818,12 @@ exports.Verifypayment = async(req,res) => {
                 // First successful booking unlocks the signup referral reward for both sides
                 await completeReferral(userId, PaymentVerifier._id, session)
 
-                const paymentIds = await Payment.findOne({_id: paymentId})
-                if(!paymentIds){
-                    return res.status(400).json({
-                        message:"The payment is not present",
-                        success:false
-                    })
-                }
-                await CreateShow.findByIdAndUpdate(paymentIds.showid,{
+                // updatedPayment was read inside this transaction; ticketspurchased refs payments, not users
+                await CreateShow.findByIdAndUpdate(updatedPayment.showid,{
                     $push:{
-                        ticketspurchased:userId
+                        ticketspurchased:updatedPayment._id
                     }
-                },{new:true})
+                },{new:true, session})
                 // let otp = 231321321
                 // const mailes = await mailSender(
                 //     UserFinders.email,
@@ -852,8 +862,8 @@ exports.Verifypayment = async(req,res) => {
                 });
 
             } catch (error) {
-                await session.abortTransaction();
-                session.endSession();
+                // abortTransaction itself throws if the error came after commitTransaction
+                if (session.inTransaction()) await session.abortTransaction();
 
                 // Razorpay already captured this payment (that's why we got here
                 // with a valid signature) — if the booking itself failed after
@@ -871,6 +881,8 @@ exports.Verifypayment = async(req,res) => {
                     success: false,
                     status: "refunded"
                 });
+            } finally {
+                await session.endSession();
             }
         } else {
             // Payment verification failed - update status to failure
