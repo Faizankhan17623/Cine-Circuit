@@ -3,6 +3,7 @@ const date = require('date-and-time')
 const Payment = require('../../models/payment')
 const Theatrestickets = require('../../models/TheatresTicket')
 const USER = require('../../models/user')
+const CreateShow = require('../../models/CreateShow')
 const instance = require('../../config/razorpay')
 const mailSender = require('../../utils/mailsender')
 const cancellationTemplate = require('../../templates/userTemplates/cancellationTemplate')
@@ -153,6 +154,8 @@ exports.CancelTicket = async (req, res) => {
                 }
             }
             await paymentDoc.save({ session })
+            // The show no longer counts this booking among its purchases
+            await CreateShow.updateOne({ _id: paymentDoc.showid }, { $pull: { ticketspurchased: paymentDoc._id } }, { session })
 
             // Restore ticket counts and free up seats
             for (const category of paymentDoc.ticketCategorey) {

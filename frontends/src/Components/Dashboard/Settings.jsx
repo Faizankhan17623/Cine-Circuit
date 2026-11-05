@@ -162,7 +162,7 @@ const Settings = () => {
               Display Name <span className="text-red-500">*</span>
             </label>
             <input
-              {...register("displayName", { required: "Display Name is required" })}
+              {...register("displayName")}
               className="w-full px-4 py-2.5 bg-richblack-700 border border-richblack-600 rounded-lg text-white text-sm placeholder:text-richblack-400 outline-none transition-all duration-200 focus:ring-2 focus:ring-yellow-200/50 focus:border-yellow-200/50"
               placeholder="Enter your name"
             />
@@ -177,7 +177,7 @@ const Settings = () => {
               Profession <span className="text-red-500">*</span>
             </label>
             <select
-              {...register("profession", { required: "Profession is required" })}
+              {...register("profession")}
               className="w-full px-4 py-2.5 bg-richblack-700 border border-richblack-600 rounded-lg text-white text-sm outline-none transition-all duration-200 focus:ring-2 focus:ring-yellow-200/50 focus:border-yellow-200/50 cursor-pointer"
             >
               <option value="">Select your profession</option>
@@ -199,7 +199,7 @@ const Settings = () => {
             </label>
             <input
               type="date"
-              {...register("dob", { required: "Date of Birth is required" })}
+              {...register("dob")}
               className="w-full px-4 py-2.5 bg-richblack-700 border border-richblack-600 rounded-lg text-white text-sm outline-none transition-all duration-200 focus:ring-2 focus:ring-yellow-200/50 focus:border-yellow-200/50"
             />
             {errors.dob && (
@@ -216,7 +216,7 @@ const Settings = () => {
                   <input
                     type="radio"
                     value={g}
-                    {...register("gender", { required: "Gender is required" })}
+                    {...register("gender")}
                     className="accent-yellow-200 w-4 h-4"
                   />
                   <span className="text-sm text-richblack-200 group-hover:text-white transition-colors">{g}</span>

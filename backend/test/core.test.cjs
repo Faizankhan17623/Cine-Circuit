@@ -706,7 +706,7 @@ test('coupon updates are whitelisted, validated, and a percentage cannot exceed 
 test('a wallet-only booking can be cancelled and its wallet amount comes back once', async (t) => {
   const inTenDays = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
   const Showdate = `${String(inTenDays.getDate()).padStart(2, '0')}/${String(inTenDays.getMonth() + 1).padStart(2, '0')}/${inTenDays.getFullYear()}`;
-  const booking = { _id: 'p1', userid: 'u1', Payment_Status: 'success', razorpay_order_id: 'wallet_1', Showdate, time: '18:00', amount: 0, walletAmountUsed: 150, ticketCategorey: [] };
+  const booking = { _id: 'p1', userid: 'u1', Payment_Status: 'success', razorpay_order_id: 'wallet_1', Showdate, time: '18:00', amount: 0, walletAmountUsed: 150, ticketCategorey: [], showid: 's1' };
   stub(t, Payment, 'findById', () => query(booking));
   stub(t, Payment, 'findOneAndUpdate', () => query({ ...booking, cancelled: true, save: async () => {} }));
   stub(t, mongoose, 'startSession', async () => ({ startTransaction() {}, async commitTransaction() {}, async abortTransaction() {}, endSession() {} }));
@@ -715,12 +715,16 @@ test('a wallet-only booking can be cancelled and its wallet amount comes back on
   const credits = recordCredits(t);
   stub(t, Notification, 'create', async () => ({ toObject: () => ({}) }));
   stub(t, USER, 'findById', () => query(null));
+  let showPull;
+  stub(t, CreateShow, 'updateOne', (filter, update) => { showPull = [filter, update]; return query({}); });
   const res = fakeRes();
 
   await CancelTicket({ USER: { id: 'u1' }, body: { paymentId: 'p1', refundToWallet: false } }, res);
 
   assert.equal(res.code, 200);
   assert.deepEqual(credits, [150]);
+  // the cancelled booking leaves the show's purchase list
+  assert.deepEqual(showPull, [{ _id: 's1' }, { $pull: { ticketspurchased: 'p1' } }]);
   assert.equal(bankRefunds, 0);
   assert.equal(res.body.data.refundId, 'wallet');
 });
@@ -749,4 +753,26 @@ test('email templates escape user-supplied values and encode the reset token', (
   const reset = updatePasswordTemplate('a@example.com', 'abc"><x');
   assert.ok(reset.includes('https://mw-bay.vercel.app/abc%22%3E%3Cx'));
   assert.ok(!reset.includes('abc"><x'));
+});
+
+test('admin list page size is clamped between 1 and 100', () => {
+  const clampLimit = require('../utils/clampLimit');
+  assert.equal(clampLimit(undefined, 20), 20);
+  assert.equal(clampLimit('abc', 30), 30);
+  assert.equal(clampLimit('50'), 50);
+  assert.equal(clampLimit('99999'), 100);
+  assert.equal(clampLimit('-5'), 1);
+});
+
+test('a genre without sub genres can be renamed', async (t) => {
+  const { Updategenre } = require('../controllers/Administrator/CreateGenre');
+  stub(t, genre, 'findOne', (f) => query(f._id ? { _id: 'g1', subgeneres: [] } : null));
+  stub(t, subgenre, 'findOne', () => query(null));
+  stub(t, genre, 'findByIdAndUpdate', (id, update) => query({ _id: id, ...update }));
+  const res = fakeRes();
+
+  await Updategenre({ body: { id: 'g1', newName: 'Noir' } }, res);
+
+  assert.equal(res.code, 200);
+  assert.equal(res.body.data.genreName, 'Noir');
 });

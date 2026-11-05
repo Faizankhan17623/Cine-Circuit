@@ -585,7 +585,7 @@ export function MakeTicket  (ShowId, totalticket,price)  {
       // Handle success
       if (response?.data?.success) {
         toast.success(response.data.message);
-        return response.data.data; // Return ticket data if needed
+        return { success: true, data: response.data.data };
       } else {
         toast.error(response?.data?.message || "Failed to create ticket");
       }
@@ -658,7 +658,7 @@ export function AllotTickets(showid, theatreid, totaltoallot) {
       // Handle success
       if (response?.data?.success) {
         toast.success(response.data.message);
-        return response.data.data; // Return allotment data if needed
+        return { success: true, data: response.data.data };
       } else {
         toast.error(response?.data?.message || "Failed to allot tickets");
       }
@@ -706,7 +706,7 @@ export function VerifiedTheatres (token,navigate){
       // Handle success
       if (response?.data?.success) {
         toast.success(response.data.message);
-        return response.data.data; // Return allotment data if needed
+        return { success: true, data: response.data.data };
       } else {
         toast.error(response?.data?.message || "Failed to Get theatres date");
       }

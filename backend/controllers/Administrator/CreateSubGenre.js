@@ -21,7 +21,7 @@ exports.CreateSubgenre = async(req,res)=>{
 
         const sub = await subgenre.findOne({name:subgenrename})
         if(sub){
-            return res.status(404).json({
+            return res.status(409).json({
                 message:"The sub genre is already been present please create another one",
                 success:false
             })

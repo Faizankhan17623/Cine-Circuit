@@ -145,7 +145,8 @@ const CreateTicketes = () => {
     if (!totalTickets || !price) return
     setSubmitting(true)
     try {
-      await dispatch(MakeTicket(selectedShow._id, totalTickets, price))
+      const res = await dispatch(MakeTicket(selectedShow._id, totalTickets, price))
+      if (!res?.success) return // keep the form so the user can retry
       setTotalTickets('')
       setPrice('')
       setSelectedShow(null)

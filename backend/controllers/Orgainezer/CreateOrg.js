@@ -154,11 +154,9 @@ exports.OrgaineserLogin = async(req,res)=>{
                 const now = new Date();
                 const pattern = date.compile('DD/MM/YYYY HH:mm:ss');
                 let lastLoginTime = date.format(now, pattern);
-                const USERid = _id
                 // console.log("This is the id",_id)
                 await USER.findByIdAndUpdate(_id,{$push:{lastlogin:lastLoginTime}},{new:true})
 
-  await Orgdata.updateOne({_id:USERid},{attempts:0})
 
 
                 // console.log("This is the login code",login)

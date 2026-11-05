@@ -418,13 +418,16 @@ export function Updatepassword(token,newpass,oldpass){
     }
 }
 
-export function Updateimage(image){
+export function Updateimage(token, image){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setloading(true))
         try {
-            const response = await apiConnector("PUT",UpdateImage,{
-                image:image
+            // backend reads the multipart field displayPicture
+            const formData = new FormData()
+            formData.append("displayPicture", image)
+            const response = await apiConnector("PUT",UpdateImage,formData,{
+                Authorization: `Bearer ${token}`
             })
             if (!response.data.success) {
                 throw new Error(response.data.message)
@@ -466,17 +469,19 @@ export function Updatenumber(token, newnumber, countrycode = "+91"){
     }
 }
 
-export function GetCurrentUserDetails(){
+export function GetCurrentUserDetails(token){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setloading(true))
         try {
-            const response = await apiConnector("GET",CurrentUserDetails)
+            const response = await apiConnector("GET",CurrentUserDetails,null,{
+                Authorization: `Bearer ${token}`
+            })
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
 
-            dispatch(setUser(response.data.user))
+            dispatch(setUser(response.data.data))
         } catch (error) {
             toast.error(error?.response?.data?.message || "Error fetching user details")
         }
@@ -652,28 +657,6 @@ export function GetSpecificShowData(id){
             toast.error(error?.response?.data?.message || "Error fetching show")
         }
         dispatch(setlaoding(false))
-        toast.dismiss(toastId)
-    }
-}
-
-export function CommentOnBanner(id,comment){
-    return async(dispatch)=>{
-        const toastId = toast.loading("..loading")
-        dispatch(setloading(true))
-        try {
-            const response = await apiConnector("PUT",Comments,{
-                id,
-                comment:comment
-            })
-            if (!response.data.success) {
-                throw new Error(response.data.message)
-            }
-            toast.success("Comment Added Successfully")
-        } catch (error) {
-            console.log("Error in commenting on the banner",error)
-            console.log("Error in commenting on the banner")
-        }
-        dispatch(setloading(false))
         toast.dismiss(toastId)
     }
 }

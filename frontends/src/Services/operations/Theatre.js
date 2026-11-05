@@ -374,7 +374,7 @@ export function GetSingleShowDetails(showid, token){
             const response = await apiConnector("GET",getsingleshowdetails,null,{
                 Authorization: `Bearer ${token}`
             },{
-                showAlloted:showid
+                showId:showid
             })
 
             if(!response.data.success){

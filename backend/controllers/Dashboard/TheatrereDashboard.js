@@ -266,7 +266,7 @@ exports.getAllticketsDetails = async(req,res)=>{
 exports.getSingleShowDetails = async(req,res)=>{
     try{
 
-        const {showId} = req.body
+        const showId = req.query.showId || req.query.showAlloted
 
         const userId = req.USER.id;
         if(!userId) {

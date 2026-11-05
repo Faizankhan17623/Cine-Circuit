@@ -1,3 +1,4 @@
+const clampLimit = require('../../utils/clampLimit')
 const Coupon = require('../../models/Coupon')
 const logAudit = require('../../utils/logAudit')
 
@@ -86,19 +87,20 @@ const CreateCoupon = async (req, res) => {
 const GetAllCoupons = async (req, res) => {
     try {
         const { page = 1, limit = 20, isActive } = req.query
+        const pageSize = clampLimit(limit, 20)
 
         const filter = {}
         if (isActive !== undefined) {
             filter.isActive = isActive === 'true'
         }
 
-        const skip = (parseInt(page) - 1) * parseInt(limit)
+        const skip = (parseInt(page) - 1) * pageSize
 
         const [coupons, total] = await Promise.all([
             Coupon.find(filter)
                 .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(parseInt(limit))
+                .limit(pageSize)
                 .populate('createdBy', 'userName email'),
             Coupon.countDocuments(filter)
         ])
@@ -108,7 +110,7 @@ const GetAllCoupons = async (req, res) => {
             data: coupons,
             total,
             page: parseInt(page),
-            totalPages: Math.ceil(total / parseInt(limit))
+            totalPages: Math.ceil(total / pageSize)
         })
     } catch (error) {
         console.log('GetAllCoupons error:', error)

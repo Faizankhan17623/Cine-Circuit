@@ -135,12 +135,14 @@ export async function botCreateOrganizer(name, email, password, phone, otp, coun
 }
 
 // ── Create Theatre ────────────────────────────────────────────────────────────
-export async function botCreateTheatre(name, email, password) {
+export async function botCreateTheatre(name, email, password, phone, countrycode = '+91') {
   try {
     const res = await apiConnector('POST', CreateTheatrere.CreateTheatre, {
       name,
       email,
       password,
+      number: phone,
+      code: countrycode,
     });
     if (res.data.success) {
       return {
@@ -158,9 +160,9 @@ export async function botCreateTheatre(name, email, password) {
 // ── Search Movies ─────────────────────────────────────────────────────────────
 export async function botSearch(query) {
   try {
-    const res = await apiConnector('GET', SearchApi.search, null, {}, { query });
+    const res = await apiConnector('GET', SearchApi.search, null, {}, { q: query });
     if (res.data.success) {
-      const movies = res.data.data || [];
+      const movies = res.data.data?.movies || [];
       if (movies.length === 0) {
         return { success: true, message: `No movies found for "${query}".`, movies: [] };
       }

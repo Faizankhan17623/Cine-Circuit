@@ -375,9 +375,9 @@ export function FindLanguageByName(token, langname, navigate) {
         }
 
         try {
-            const response = await apiConnector("GET", FindSingleLanguage, { langname }, {
+            const response = await apiConnector("GET", FindSingleLanguage, null, {
                 Authorization: `Bearer ${token}`
-            })
+            }, { LangName: langname })
 
             if (!response.data.success) {
                 throw new Error(response.data.message || "Language not found")

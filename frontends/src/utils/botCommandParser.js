@@ -95,7 +95,7 @@ export const FLOW_FIELDS = {
   send_otp: ['email'],
   create_viewer: ['name', 'email', 'password', 'phone', 'otp'],
   create_organizer: ['name', 'email', 'password', 'phone', 'otp'],
-  create_theatre: ['name', 'email', 'password'],
+  create_theatre: ['name', 'email', 'password', 'phone'],
 };
 
 // Human-friendly prompts for each missing field

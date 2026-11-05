@@ -97,10 +97,11 @@ exports.CreateTheatres = async(req,res)=>{
             Theatrename:name,
             locationName:locationname,
             locationurl:locationurl,
-            languagesavailable:languagename,
+            languagesAvailable:languagename,
             theatreformat:theatreformat,
             CreationDate:ps,
-            locationimagesurl:uploadingImage,
+            // the admin form uploads one set of location photos; store them as the outside images
+            Theatreoutsideimages:uploadingImage,
             TheatreOwner:TheatreOwner,
             parking:parking
         }) 

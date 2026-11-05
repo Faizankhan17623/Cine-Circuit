@@ -41,6 +41,10 @@ const paymentSchema = new mongoose.Schema({
         enum: ["pending", "success", "failure", 'created'],
         default: "pending",
     },
+    failureReason: {
+        type: String,
+        default: null,
+    },
     showid:{
         type:String,
         required:true

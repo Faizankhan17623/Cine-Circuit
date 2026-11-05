@@ -63,13 +63,6 @@ exports.Updategenre = async(req,res)=>{
             })
         }
 
-        if(Finding.subgeneres.length === 0 ){
-            return res.status(404).json({
-                message:"you cannot update this genre as no sub genres are alloted to it",
-                success:false
-            })
-        }
-
         let nameFindinggenre = await genre.findOne({genreName:newName})
         let nameFindingsubgenre = await Subgenre.findOne({name:newName})
 
@@ -128,8 +121,8 @@ exports.deletegenre = async(req,res)=>{
         }
 
         if(Finding.subgeneres.length > 0 ){
-            return res.status(404).json({
-                message:"you cannot delete this genre as no sub genres are alloted to it",
+            return res.status(409).json({
+                message:"you cannot delete this genre as sub genres are still alloted to it",
                 success:false
             })
         }

@@ -1,10 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 
+const readJSON = (key, fallback) => {
+    try {
+        const v = JSON.parse(localStorage.getItem(key))
+        return v ?? fallback
+    } catch {
+        return fallback
+    }
+}
+
 const initialState = {
-    cart:localStorage.getItem("cart") ? JSON.parse(localStorage.getItem('cart')) : [],
-    total:localStorage.getItem("total") ? JSON.parse(localStorage.getItem('total')) : [],
-    totalItems:localStorage.getItem("totalItems") ? JSON.parse(localStorage.getItem('totalItems')) : [],
+    cart:Array.isArray(readJSON("cart", [])) ? readJSON("cart", []) : [],
+    total:Number(readJSON("cartTotal", 0)) || 0,
+    totalItems:Number(readJSON("cartTotalItems", 0)) || 0,
 }
 
 
@@ -15,7 +24,7 @@ const cartSlice = createSlice({
         Addtocart:(state,action)=>{
             const ticket = action.payload
             const index  = state.cart.findIndex((item) => item._id === ticket._id)
-            if(index >=1){
+            if(index !== -1){
                 toast.error("Ticket already added to cart")
                 return
             }
@@ -25,8 +34,8 @@ const cartSlice = createSlice({
             state.total += ticket.price
 
             localStorage.setItem("cart",JSON.stringify(state.cart))
-            localStorage.setItem("total",JSON.stringify(state.total))
-            localStorage.setItem("totalItems",JSON.stringify(state.totalItems))
+            localStorage.setItem("cartTotal",JSON.stringify(state.total))
+            localStorage.setItem("cartTotalItems",JSON.stringify(state.totalItems))
             toast.success("Ticket added to cart")
         },
         removefromcart:(state,action)=>{
@@ -38,8 +47,8 @@ const cartSlice = createSlice({
                 state.cart.splice(index,1)
                 
                 localStorage.setItem("cart",JSON.stringify(state.cart))
-                localStorage.setItem("total",JSON.stringify(state.total))
-                localStorage.setItem("totalItems",JSON.stringify(state.totalItems))
+                localStorage.setItem("cartTotal",JSON.stringify(state.total))
+                localStorage.setItem("cartTotalItems",JSON.stringify(state.totalItems))
                 toast.success("Ticket removed from cart")
             }
         },
@@ -48,8 +57,8 @@ const cartSlice = createSlice({
             state.total = 0
             state.totalItems = 0
             localStorage.removeItem("cart")
-            localStorage.removeItem("total")
-            localStorage.removeItem("totalItems")
+            localStorage.removeItem("cartTotal")
+            localStorage.removeItem("cartTotalItems")
         },
 
     }

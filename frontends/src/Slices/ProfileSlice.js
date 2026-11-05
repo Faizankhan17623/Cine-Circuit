@@ -73,16 +73,13 @@ const ProfileSlice = createSlice({
       }
 
        if (storedCooldown) {
-    try {
-      state.cooldownDate = JSON.parse(storedCooldown); // <-- Parse properly
-    } catch (error) {
-      console.error("Error parsing cooldownDate from localStorage", error);
-      localStorage.removeItem("cooldownDate");
-    }
+      // stored as a raw ISO string by setCooldownDate, not JSON
+      state.cooldownDate = storedCooldown;
   }
     },
     setsubmit:(state,action)=>{
-      localStorage.setItem("Data Submitted",true)
+      state.FormSubmitted = "true"
+      localStorage.setItem("Data_Submitted", "true")
     }
 
   }

@@ -37,6 +37,7 @@ const Movie = () => {
 
   const [movie, setMovie] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [averageRating, setAverageRating] = useState(0)
   const [userRating, setUserRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
@@ -69,11 +70,15 @@ const previousTag = location.state?.tag
   useEffect(() => {
     const fetchMovie = async () => {
       setLoading(true)
+      setNotFound(false)
       try {
         const response = await dispatch(MovieDetailsFinding(id))
+        if (!response?.success || !response.data?.data) {
+          setNotFound(true)
+          return
+        }
         if (response?.success) {
           const movieData = response.data.data
-          console.log("Movie data:", movieData)
           setMovie(movieData)
           setLikeCount(movieData.BannerLiked || 0)
           setDislikeCount(movieData.BannerDisLiked || 0)
@@ -104,15 +109,12 @@ const previousTag = location.state?.tag
         }
         // Fetch comments
         const commentRes = await dispatch(getAllComments(id, token))
-        console.log("Comment result:", commentRes)
         if (commentRes?.success && commentRes.data?.length > 0) {
           setComments(commentRes.data)
-          console.log("Comments set:", commentRes.data)
-        } else {
-          console.log("No comments found or error")
         }
       } catch (error) {
         console.log("Movie fetch error:", error)
+        setNotFound(true)
       } finally {
         setLoading(false)
       }
@@ -234,6 +236,24 @@ const previousTag = location.state?.tag
     } catch (error) {
       console.log("Comment delete error:", error)
     }
+  }
+
+  if (!loading && notFound) {
+    return (
+      <div className="min-h-screen bg-richblack-900 text-white flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 pt-20 px-6 text-center">
+          <h1 className="text-2xl font-bold">Movie not found</h1>
+          <p className="text-richblack-300">This movie does not exist or could not be loaded.</p>
+          <button
+            onClick={() => navigate("/")}
+            className="px-5 py-2 rounded-lg bg-yellow-400 hover:bg-yellow-300 text-black font-semibold"
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
+    )
   }
 
   if (loading || !movie) {
