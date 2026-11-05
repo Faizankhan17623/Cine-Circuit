@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const otpTemplate = (otp) => {
 	return `<!DOCTYPE html>
 	<html lang="en">
@@ -351,7 +353,7 @@ const otpTemplate = (otp) => {
 							<div class="otp-wrapper">
 								<div class="otp-box">
 									<p class="otp-label">Your Verification Code</p>
-									<p class="otp-code">${otp}</p>
+									<p class="otp-code">${escapeHtml(otp)}</p>
 									<p class="otp-timer">Expires in <span>1 minute</span></p>
 								</div>
 							</div>

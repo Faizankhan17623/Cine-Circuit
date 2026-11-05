@@ -161,8 +161,9 @@ exports.SearchTags = async (req,res)=>{
     try {
         const userId = req.USER.id
 
-        const name = req.body
-        if(!name){
+        // GET request: the frontend sends ?name=
+        const { name } = req.query
+        if(!name || typeof name !== 'string'){
             return res.status(400).json({
                 message:"The input name is been required",
                 success:false

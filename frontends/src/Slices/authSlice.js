@@ -1,9 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// A corrupt stored value (e.g. "undefined") must not crash every page load
+const readStored = (key) => {
+  try {
+    return JSON.parse(localStorage.getItem(key));
+  } catch {
+    return null;
+  }
+};
+
 const initialState = {
   user: "",
-  token: localStorage.getItem("token") ? JSON.parse(localStorage.getItem("token")) : null,
-  isLoggedIn:   localStorage.getItem("token") ? true : false,
+  token: readStored("token"),
+  isLoggedIn: Boolean(readStored("token")),
   loading: false,
   image: localStorage.getItem("userImage") ? localStorage.getItem("userImage") : null,
   // Signup form between /SignUp and /OTP. Kept in memory only, never in router state/history.

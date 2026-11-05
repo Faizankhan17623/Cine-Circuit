@@ -16,7 +16,7 @@ import { FaLock, FaHashtag, FaUserFriends, FaFilm, FaUpload, FaList } from 'reac
 import {UserDetails} from '../../Services/operations/Auth'
 import {GetMyOrgDetails} from '../../Services/operations/orgainezer'
 import { FaTheaterMasks } from 'react-icons/fa'
-import { MdAttachMoney, MdLocalMovies, MdAccessTime, MdConstruction, MdBugReport, MdDashboard, MdBarChart, MdLocalOffer, MdPeople } from 'react-icons/md'
+import { MdAttachMoney, MdLocalMovies, MdAccessTime, MdConstruction, MdBugReport, MdDashboard, MdBarChart, MdLocalOffer, MdPeople, MdQrCodeScanner } from 'react-icons/md'
 import { FaTicketSimple, FaGift } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 
@@ -153,6 +153,7 @@ const LeftSide = ({direction}) => {
     { icon: IoTicketSharp, label: 'All Tickets', path: '/Dashboard/All-Tickets', id: 5 },
     { icon: FaTicketSimple, label: 'Distribute Tickets', path: '/Dashboard/Distribute-Tickets', id: 6 },
     { icon: MdAccessTime, label: 'Update Ticket Time', path: '/Dashboard/Update-Ticket-Time', id: 7 },
+    { icon: MdQrCodeScanner, label: 'Check-In', path: '/Dashboard/Check-In', id: 9 },
     { icon: CiChat1, label: 'Chat', path: '/Dashboard/Chats', id: 8 },
   ];
 

@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const updatePasswordTemplate = (email, token) => {
 	return `<!DOCTYPE html>
 	<html lang="en">
@@ -394,7 +396,7 @@ const updatePasswordTemplate = (email, token) => {
 								<h1 class="title">Reset Your Password</h1>
 								<p class="subtitle">We received a request to reset your password</p>
 								<p class="greeting">
-									Hi <strong style="color: #ffffff;">${email}</strong>,<br><br>
+									Hi <strong style="color: #ffffff;">${escapeHtml(email)}</strong>,<br><br>
 									We received a password reset request for your <strong style="color: #e50914;">Cine Circuit</strong>
 									account. Click the button below to create a new password.
 								</p>
@@ -406,7 +408,7 @@ const updatePasswordTemplate = (email, token) => {
 									<p class="button-label">
 										Click the button below to reset your password and regain access to your account.
 									</p>
-									<a href="https://mw-bay.vercel.app/${token}" class="reset-btn">
+									<a href="https://mw-bay.vercel.app/${encodeURIComponent(token)}" class="reset-btn">
 										&#128274; &nbsp; Reset Password
 									</a>
 									<p class="button-expire">
@@ -419,7 +421,7 @@ const updatePasswordTemplate = (email, token) => {
 							<div class="link-section">
 								<div class="link-box">
 									<p class="link-label">Button not working? Copy this link</p>
-									<p class="link-url">https://mw-bay.vercel.app/${token}</p>
+									<p class="link-url">https://mw-bay.vercel.app/${encodeURIComponent(token)}</p>
 								</div>
 							</div>
 

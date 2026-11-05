@@ -22,7 +22,7 @@ exports.CreateTheatres = async(req,res)=>{
 
     try {
         const {name,locationname,locationurl,languagename,theatreformat,TheatreOwner,parking} = req.body
-        let theatreImage = req.files.theatreImage
+        let theatreImage = req.files?.theatreImage
         // console.log("This is the theatre images",theatreImage)
 
         if(!name || !locationname || !locationurl || !languagename || !theatreformat || !TheatreOwner ||   !parking ){
@@ -44,7 +44,7 @@ exports.CreateTheatres = async(req,res)=>{
         }
 
 
-        if(OwnerFinding.theatreCreated){
+        if(OwnerFinding.theatresCreated){
             return res.status(400).json({
                 message:"The user has already created a theatre and cannot create another oneplease check your inputs or youe email id ",
                 success:false
@@ -66,7 +66,7 @@ exports.CreateTheatres = async(req,res)=>{
             })
         }
 
-        const locationFinding = await Theatre.findOne({locationname:locationname})
+        const locationFinding = await Theatre.findOne({locationName:locationname})
 
 
         if(locationFinding){
@@ -82,7 +82,8 @@ exports.CreateTheatres = async(req,res)=>{
                         
                                     // const uploadingImage = await uploadDatatoCloudinary(theatreImage,process.env.CLOUDINARY_FOLDER_NAME,1000,1000)
                                     const uploadingImage = await Promise.all(
-                                        theatreImage.map(async(file)=>{
+                                        // express-fileupload gives a single object for one file, an array for several
+                                        [].concat(theatreImage).map(async(file)=>{
                                             let ats = await uploadDatatoCloudinary(file,process.env.CLOUDINARY_FOLDER_NAME,1000,1000)
                                             // console.log("This is the multiple",ats)
                                             return ats.secure_url
@@ -94,7 +95,7 @@ exports.CreateTheatres = async(req,res)=>{
 
         const CreateTheatre =  await Theatre.create({
             Theatrename:name,
-            locationname:locationname,
+            locationName:locationname,
             locationurl:locationurl,
             languagesavailable:languagename,
             theatreformat:theatreformat,
@@ -105,7 +106,7 @@ exports.CreateTheatres = async(req,res)=>{
         }) 
 
 
-        await USER.updateOne({_id:TheatreOwner},{theatreCreated:CreateTheatre._id})
+        await USER.updateOne({_id:TheatreOwner},{theatresCreated:CreateTheatre._id})
         // console.log("THis is the theatre that has been creatd",CreateTheatre)
         return res.status(200).json({
             message:"The theatre is been created",

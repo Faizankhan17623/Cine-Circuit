@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const bugReportSubmittedTemplate = (bugId, title, description, userName) => {
     return `<!DOCTYPE html>
 <html lang="en">
@@ -54,25 +56,25 @@ const bugReportSubmittedTemplate = (bugId, title, description, userName) => {
         <div class="icon-wrap">🐛</div>
       </div>
       <div class="body">
-        <div class="greeting">Bug Report Received, ${userName}!</div>
+        <div class="greeting">Bug Report Received, ${escapeHtml(userName)}!</div>
         <div class="subtitle">
           Thank you for taking the time to report this issue. Our team has received your bug report and will investigate it as soon as possible. We'll notify you once it's resolved.
         </div>
 
         <div class="id-box">
           <div class="id-label">Your Bug Report ID</div>
-          <div class="id-value">${bugId}</div>
+          <div class="id-value">${escapeHtml(bugId)}</div>
         </div>
 
         <div class="details-box">
           <div class="detail-row">
             <div class="detail-label">Bug Title</div>
-            <div class="detail-value">${title}</div>
+            <div class="detail-value">${escapeHtml(title)}</div>
           </div>
           <div class="divider"></div>
           <div class="detail-row">
             <div class="detail-label">Description</div>
-            <div class="detail-value">${description}</div>
+            <div class="detail-value">${escapeHtml(description)}</div>
           </div>
           <div class="divider"></div>
           <div class="detail-row">
@@ -88,7 +90,7 @@ const bugReportSubmittedTemplate = (bugId, title, description, userName) => {
 
         <div class="info-box">
           <p>
-            Please <span>save your Bug ID (${bugId})</span> for future reference. You can use it to track the status of your report in your dashboard under <span>My Bug Reports</span>.
+            Please <span>save your Bug ID (${escapeHtml(bugId)})</span> for future reference. You can use it to track the status of your report in your dashboard under <span>My Bug Reports</span>.
           </p>
         </div>
 

@@ -58,6 +58,8 @@ const finalizeWalletPayment = async (paymentId, userId) => {
         }
         await Theatrestickets.updateOne({ _id: paymentDoc.ticketid }, { $push: { ticketsPurchased: paymentDoc._id } }, { session })
         await USER.findByIdAndUpdate(userId, { $push: { PaymentId: paymentDoc._id } }, { session })
+        // Same as Verifypayment: the show records its purchases (ticketspurchased refs payments)
+        await CreateShow.findByIdAndUpdate(paymentDoc.showid, { $push: { ticketspurchased: paymentDoc._id } }, { session })
         if (paymentDoc.couponCode) await Coupon.findOneAndUpdate({ code: paymentDoc.couponCode }, { $inc: { usedCount: 1 }, $push: { usedBy: userId } }, { session })
         await earnPoints(userId, paymentDoc.walletAmountUsed, paymentDoc._id, session)
         await session.commitTransaction()
@@ -86,7 +88,7 @@ const buildTicketPdf = async (ticketData) => {
         _id: ticketData._id,
         movieName: MovieFind.title,
         theatreName: TheatreFind.Theatrename,
-        theatreLocation: TheatreFind.locationname,
+        theatreLocation: TheatreFind.locationName,
         Showdate: ticketData.Showdate,
         time: ticketData.time,
         purchaseDate: ticketData.purchaseDate,

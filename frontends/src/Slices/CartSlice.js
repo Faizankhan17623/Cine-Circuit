@@ -50,7 +50,6 @@ const cartSlice = createSlice({
             localStorage.removeItem("cart")
             localStorage.removeItem("total")
             localStorage.removeItem("totalItems")
-            toast.success("Cart reset successfully")
         },
 
     }

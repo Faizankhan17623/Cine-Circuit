@@ -49,7 +49,9 @@ exports.TicketDetails = async (req,res)=>{
             })
         }
 
-        const DetailsFinding = await ticket.findOne({ showid: showId })
+        // Only the organizer who created the show may read its ticket data
+        const owner = await USER.findById(userId).select('showsCreated')
+        const DetailsFinding = await ticket.findOne({ $and: [{ showid: showId }, { showid: { $in: owner?.showsCreated || [] } }] })
         if (!DetailsFinding) {
             return res.status(404).json({
                 message: "Ticket details not found for this show",
@@ -67,6 +69,7 @@ exports.TicketDetails = async (req,res)=>{
         console.log(error)
         console.log(error.message)
         console.log("There is an errror in the ticket Details")
+        return res.status(500).json({ message: "Internal Server Error", success: false })
     }
 }
 

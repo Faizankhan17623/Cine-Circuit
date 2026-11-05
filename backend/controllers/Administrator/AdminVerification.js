@@ -110,8 +110,9 @@ exports.VerifyOrgainezer = async (req, res) => {
         });
       }
 
-      const allowedStatuses = ["pending", "rejected", "approved", "locked"];
-      if (!allowedStatuses.includes(verificationStatus)) {
+      // Match case-insensitively but store the schema's exact enum value
+      const status = Orgdata.schema.path("status").enumValues.find((value) => value.toLowerCase() === String(verificationStatus).toLowerCase());
+      if (!status) {
         return res.status(400).json({
           success: false,
           message: "Invalid verification status",
@@ -185,12 +186,12 @@ exports.VerifyOrgainezer = async (req, res) => {
       const attemptsLeft = 3 - (org.attempts || 0);
 
      const orgReject =  await Orgdata.findByIdAndUpdate(org._id, {
-        status: verificationStatus,
+        status,
         $inc: { attempts: 1 },
         editUntil: new Date(
           `${ChangesDate.split("/").reverse().join("-")}T${ChangesTime}:00`
         ),
-      }, { new: true });
+      }, { new: true, runValidators: true });
 
       await USER.findByIdAndUpdate(user._id, {
         verified: false,

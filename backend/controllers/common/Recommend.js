@@ -20,7 +20,7 @@ const RecommendMovies = async (req, res) => {
             return res.status(400).json({ success: false, message: "Genre is required" })
         }
 
-        const filter = { genre: genreId }
+        const filter = { genre: genreId, uploaded: true, VerifiedByTheAdmin: true }
         if (subGenreId) {
             filter.SUbGenre = subGenreId
         }

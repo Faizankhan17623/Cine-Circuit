@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const orgRejectedTemplate = (username, editDate, editTime, attemptsLeft) => {
 	return `<!DOCTYPE html>
 	<html lang="en">
@@ -499,7 +501,7 @@ const orgRejectedTemplate = (username, editDate, editTime, attemptsLeft) => {
 								<h1 class="title">Verification Update</h1>
 								<p class="subtitle">Your organizer application needs some changes</p>
 								<p class="greeting">
-									Hi${username ? ' <strong style="color: #ffffff;">' + username + '</strong>' : ''},<br><br>
+									Hi${username ? ' <strong style="color: #ffffff;">' + escapeHtml(username) + '</strong>' : ''},<br><br>
 									We've reviewed your organizer verification request on <strong style="color: #e50914;">Cine Circuit</strong>
 									and unfortunately, it could not be approved at this time. Don't worry — you have a chance to
 									update your details and resubmit for review.
@@ -524,17 +526,17 @@ const orgRejectedTemplate = (username, editDate, editTime, attemptsLeft) => {
 										<div class="window-row">
 											<span class="window-icon">&#128197;</span>
 											<span class="window-label">Edit Before Date</span>
-											<span class="window-value">${editDate || 'N/A'}</span>
+											<span class="window-value">${escapeHtml(editDate || 'N/A')}</span>
 										</div>
 										<div class="window-row">
 											<span class="window-icon">&#128336;</span>
 											<span class="window-label">Edit Before Time</span>
-											<span class="window-value">${editTime || 'N/A'}</span>
+											<span class="window-value">${escapeHtml(editTime || 'N/A')}</span>
 										</div>
 										<div class="window-row">
 											<span class="window-icon">&#9888;&#65039;</span>
 											<span class="window-label">Attempts Remaining</span>
-											<span class="window-value danger">${attemptsLeft !== undefined ? attemptsLeft : 'N/A'}</span>
+											<span class="window-value danger">${escapeHtml(attemptsLeft !== undefined ? attemptsLeft : 'N/A')}</span>
 										</div>
 									</div>
 								</div>

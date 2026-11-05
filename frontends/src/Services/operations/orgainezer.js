@@ -63,6 +63,12 @@ export function OrgainezerLogin(email,password,navigate){
                 password:password
             })
 
+            // Check before storing anything: a 200 with success:false has no token or user
+            if(!response.data.success){
+                toast.error(response.data.message)
+                return
+            }
+
             // console.log("THis is the response",response)
                  console.log("User is been logged in ")
                 toast.success('Congragulations you are logged in')
@@ -90,11 +96,6 @@ export function OrgainezerLogin(email,password,navigate){
                       localStorage.setItem('Verified', JSON.stringify(response.data.user.verified))
                       localStorage.setItem('userImage', userimage)
 
-
-            if(!response.data.success){
-                toast.error(response.data.message)
-                return
-            }
 
             navigate('/Dashboard/My-Profile')
         }catch(error){

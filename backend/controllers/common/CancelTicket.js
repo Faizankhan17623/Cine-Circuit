@@ -72,7 +72,10 @@ exports.CancelTicket = async (req, res) => {
             }
         }
 
-        if (!paymentDoc.razorpay_payment_id) {
+        // A booking paid entirely from the wallet has no Razorpay payment; it is always refunded to the wallet
+        const walletOnly = String(paymentDoc.razorpay_order_id || '').startsWith('wallet_')
+        const toWallet = Boolean(refundToWallet) || walletOnly
+        if (!walletOnly && !paymentDoc.razorpay_payment_id) {
             return res.status(400).json({ message: "No payment record to refund", success: false })
         }
 
@@ -94,7 +97,7 @@ exports.CancelTicket = async (req, res) => {
 
         // Two refund paths: instant wallet credit, or the original Razorpay refund (5-7 business days).
         let refund = null
-        if (!refundToWallet) {
+        if (!toWallet) {
             // Call Razorpay refund first — if it fails, no state should change.
             try {
                 refund = await instance.payments.refund(paymentDoc.razorpay_payment_id, {
@@ -124,7 +127,7 @@ exports.CancelTicket = async (req, res) => {
             const totalRefund = paymentDoc.amount + (paymentDoc.walletAmountUsed || 0)
             paymentDoc.refundAmount = totalRefund
 
-            if (refundToWallet) {
+            if (toWallet) {
                 await creditWallet(
                     userId,
                     totalRefund,

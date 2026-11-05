@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const bugResolvedTemplate = (bugId, title, adminNote, userName) => {
     return `<!DOCTYPE html>
 <html lang="en">
@@ -61,7 +63,7 @@ const bugResolvedTemplate = (bugId, title, adminNote, userName) => {
         <div class="icon-wrap">✅</div>
       </div>
       <div class="body">
-        <div class="greeting">Great News, ${userName}!</div>
+        <div class="greeting">Great News, ${escapeHtml(userName)}!</div>
         <div class="subtitle">
           Your bug report has been reviewed and resolved by our admin team. Thank you for helping us improve Cine Circuit — your contribution makes the platform better for everyone.
         </div>
@@ -74,13 +76,13 @@ const bugResolvedTemplate = (bugId, title, adminNote, userName) => {
 
         <div class="id-box">
           <div class="id-label">Bug Report ID</div>
-          <div class="id-value">${bugId}</div>
+          <div class="id-value">${escapeHtml(bugId)}</div>
         </div>
 
         <div class="details-box">
           <div class="detail-row">
             <div class="detail-label">Bug Title</div>
-            <div class="detail-value">${title}</div>
+            <div class="detail-value">${escapeHtml(title)}</div>
           </div>
           <div class="divider"></div>
           <div class="detail-row">
@@ -97,7 +99,7 @@ const bugResolvedTemplate = (bugId, title, adminNote, userName) => {
         ${adminNote ? `
         <div class="admin-note">
           <div class="admin-note-label">Admin Note</div>
-          <div class="admin-note-text">${adminNote}</div>
+          <div class="admin-note-text">${escapeHtml(adminNote)}</div>
         </div>
         ` : ''}
 

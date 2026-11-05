@@ -9,6 +9,7 @@ import { CreateTheatrere } from '../Apis/TheatreApi';
 import { setToken, setLogin, setUser, setUserImage } from '../../Slices/authSlice';
 import { setuser } from '../../Slices/ProfileSlice';
 import { setStatus,setRejectedData , setAttempts, setEditUntil} from '../../Slices/orgainezerSlice';
+import { UserLogout } from './Auth';
 
 // ── Send OTP ──────────────────────────────────────────────────────────────────
 export async function botSendOtp(email) {
@@ -79,21 +80,9 @@ export async function botLogin(email, password, dispatch, navigate) {
 }
 
 // ── Logout ────────────────────────────────────────────────────────────────────
+// Same logout as the dashboard: clears every slice and disconnects the socket
 export function botLogout(dispatch) {
-  dispatch(setToken(null));
-  dispatch(setUser(null));
-  dispatch(setLogin(false));
-  dispatch(setuser(null));
-  dispatch(setStatus('pending'));
-  dispatch(setAttempts(0));
-  dispatch(setEditUntil(''));
-  dispatch(setRejectedData(null));
-  Cookies.remove('token');
-  localStorage.removeItem('token');
-  localStorage.removeItem('userImage');
-  localStorage.removeItem('user');
-  localStorage.removeItem('Verified');
-  localStorage.removeItem('Data_Submitted');
+  dispatch(UserLogout());
   return { success: true, message: 'You have been logged out successfully.' };
 }
 

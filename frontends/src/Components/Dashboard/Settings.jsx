@@ -6,6 +6,7 @@ import Profesion from "../../data/Professsion.json";
 import CountryCodee from "../../data/CountryCode.json";
 import { MdDelete } from "react-icons/md";
 import { Changeimage } from "../../Services/operations/User";
+import { Updatepassword, Updatenumber } from "../../Services/operations/Auth";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { LiaEyeSolid,LiaEyeSlashSolid  } from "react-icons/lia";
@@ -52,9 +53,14 @@ const Settings = () => {
     ? Math.ceil((new Date(cooldownDate) - new Date()) / (1000 * 60 * 60 * 24))
     : 0;
 
-  const onSubmit = (data) => {
-    console.log("Form Submitted:", data);
-    // send to backend
+  // Password and number are optional: each is sent only when filled in
+  const onSubmit = async (data) => {
+    if (data.newPassword) {
+      await dispatch(Updatepassword(token, data.newPassword, data.currentPassword));
+    }
+    if (data.mobileNumber) {
+      await dispatch(Updatenumber(token, data.mobileNumber, data.countryCode));
+    }
   };
 
   if (loading) {
@@ -226,11 +232,11 @@ const Settings = () => {
         {/* Mobile Number */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm text-richblack-100 font-medium">
-            Mobile Number <span className="text-red-500">*</span>
+            Mobile Number
           </label>
           <div className="flex gap-3">
             <select
-              {...register("countryCode", { required: "Code is required" })}
+              {...register("countryCode", { validate: (v) => !watch("mobileNumber") || !!v || "Code is required" })}
               className="w-[160px] sm:w-[200px] px-3 py-2.5 bg-richblack-700 border border-richblack-600 rounded-lg text-white text-sm outline-none transition-all duration-200 focus:ring-2 focus:ring-yellow-200/50 focus:border-yellow-200/50 cursor-pointer shrink-0"
               defaultValue=""
             >
@@ -242,7 +248,7 @@ const Settings = () => {
             <input
               type="tel"
               maxLength={10}
-              {...register("mobileNumber", { required: "Number is required" })}
+              {...register("mobileNumber", { pattern: { value: /^\d{10}$/, message: "Number must be 10 digits" } })}
               className="flex-1 px-4 py-2.5 bg-richblack-700 border border-richblack-600 rounded-lg text-white text-sm placeholder:text-richblack-400 outline-none transition-all duration-200 focus:ring-2 focus:ring-yellow-200/50 focus:border-yellow-200/50"
               placeholder="Enter number"
             />
@@ -264,7 +270,7 @@ const Settings = () => {
             <input
               type="password"
               {...register("currentPassword", {
-                required: "New password is required",
+                validate: (v) => !newPassword || !!v || "Current password is required",
                  minLength: { value: 6, message: "Password must be at least 6 character" },
                 maxLength: { value: 10, message: "Password must be at most 10 characters" },
               })}
@@ -277,12 +283,11 @@ const Settings = () => {
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm text-richblack-100 font-medium">
-              New Password <span className="text-red-500">*</span>
+              New Password
             </label>
             <input
               type="password"
               {...register("newPassword", {
-                required: "New password is required",
                 minLength: { value: 6, message: "Password must be at least 6 character" },
                 maxLength: { value: 10, message: "Password must be at most 10 characters" },
               })}

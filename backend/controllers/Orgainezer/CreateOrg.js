@@ -223,26 +223,15 @@ exports.OrgData = async (req, res) => {
 
     const Finding = await Orgdata.findOne({id:ID})
     if(Finding){
-      // If the organizer was rejected, delete old data so they can re-submit
-      if(Finding.status === "rejected"){
-        // Delete old role-specific data
-        if(Finding.DirectFresh){
-          await directorfresher.findByIdAndDelete(Finding.DirectFresh)
-        }
-        if(Finding.DirectorExperience){
-          await directorexperience.findByIdAndDelete(Finding.DirectorExperience)
-        }
-        if(Finding.ProducerFresher){
-          await producerfresher.findByIdAndDelete(Finding.ProducerFresher)
-        }
-        if(Finding.ProducerExperience){
-          await producerexperience.findByIdAndDelete(Finding.ProducerExperience)
-        }
-        // Delete old org data
-        await Orgdata.findByIdAndDelete(Finding._id)
-        // Remove reference from user
-        await USER.findByIdAndUpdate(ID, { orgainezerdata: null })
-      } else {
+      const lockActive = Finding.lockedUntill ? Finding.lockedUntill > new Date() : Finding.status === "locked"
+      if(lockActive){
+        return res.status(403).json({
+          message:"Your profile is locked after repeated rejections; you cannot resubmit yet",
+          success:false
+        })
+      }
+      // Only a rejected (or expired-lock) profile may re-submit; the old data is replaced once the new one is saved
+      if(Finding.status !== "rejected" && Finding.status !== "locked"){
         return res.status(400).json({
           message:"You have already registered the data in the orgainzation form",
           success:false
@@ -260,6 +249,12 @@ exports.OrgData = async (req, res) => {
     } = parsedBody;
 
     const Image = req.files?.Image
+    if(!Image){
+      return res.status(400).json({
+        message:"Please upload an image",
+        success:false
+      })
+    }
     const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
     const Max_Size = 5 * 1024 * 1024 //The max size is 5 mb
@@ -989,8 +984,20 @@ try{
       Comfortable:String(collabrotion),
       Role:role,
       ExperienceLevel:experience,
-      status:"pending"
+      status:"pending",
+      // Rejections carry over, so resubmitting cannot reset the 3-strike lock in VerifyOrgainezer
+      attempts:Finding?.attempts || 0,
+      lockedUntill:Finding?.lockedUntill
 })
+
+// The new submission is saved; now remove the rejected one it replaces
+if(Finding){
+  if(Finding.DirectFresh) await directorfresher.findByIdAndDelete(Finding.DirectFresh)
+  if(Finding.DirectorExperience) await directorexperience.findByIdAndDelete(Finding.DirectorExperience)
+  if(Finding.ProducerFresher) await producerfresher.findByIdAndDelete(Finding.ProducerFresher)
+  if(Finding.ProducerExperience) await producerexperience.findByIdAndDelete(Finding.ProducerExperience)
+  await Orgdata.findByIdAndDelete(Finding._id)
+}
 
 await USER.findByIdAndUpdate(ID,{orgainezerdata:Uploading._id})
 // await Orgdata.save()
@@ -1630,7 +1637,7 @@ exports.ProducerExperience = async (req, res) => {
 
         // -------- Resume (PDF) --------
     // Expecting a single file field named "Resume" (or "resume")
-    let Resum = req.files.Resume || req.files.resume;
+    let Resum = req.files?.Resume || req.files?.resume;
 
     const { affiliated, teamSize, projectcount, riskmanagement } = parsedBody;
 

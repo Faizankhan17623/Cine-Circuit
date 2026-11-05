@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const updateNameTemplate = (oldusername, username) => {
 	return `<!DOCTYPE html>
 	<html lang="en">
@@ -421,7 +423,7 @@ const updateNameTemplate = (oldusername, username) => {
 								<h1 class="title">Username Updated</h1>
 								<p class="subtitle">Your display name has been changed successfully</p>
 								<p class="greeting">
-									Hi <strong style="color: #ffffff;">${oldusername}</strong>,<br><br>
+									Hi <strong style="color: #ffffff;">${escapeHtml(oldusername)}</strong>,<br><br>
 									Your username on <strong style="color: #e50914;">Cine Circuit</strong> has been
 									updated successfully. Here are the details of the change.
 								</p>
@@ -437,7 +439,7 @@ const updateNameTemplate = (oldusername, username) => {
 										<!-- Old Name -->
 										<div class="name-row">
 											<p class="name-label">Previous Name</p>
-											<p class="name-value-old">${oldusername}</p>
+											<p class="name-value-old">${escapeHtml(oldusername)}</p>
 										</div>
 
 										<!-- Arrow -->
@@ -448,7 +450,7 @@ const updateNameTemplate = (oldusername, username) => {
 										<!-- New Name -->
 										<div class="name-row">
 											<p class="name-label">New Name</p>
-											<p class="name-value-new">${username}</p>
+											<p class="name-value-new">${escapeHtml(username)}</p>
 										</div>
 									</div>
 								</div>

@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const paymentFailedTemplate = (userName, amount, failureReason) => {
 	return `<!DOCTYPE html>
 <html lang="en">
@@ -502,8 +504,8 @@ const paymentFailedTemplate = (userName, amount, failureReason) => {
                             <h1 class="title">Payment Failed</h1>
                             <p class="subtitle">Your payment could not be processed</p>
                             <p class="greeting">
-                                Hi${userName ? ' <strong style="color: #ffffff;">' + userName + '</strong>' : ''},<br><br>
-                                We regret to inform you that your payment of <strong style="color: #e74c3c;">&#8377;${amount || 0}</strong>
+                                Hi${userName ? ' <strong style="color: #ffffff;">' + escapeHtml(userName) + '</strong>' : ''},<br><br>
+                                We regret to inform you that your payment of <strong style="color: #e74c3c;">&#8377;${escapeHtml(amount || 0)}</strong>
                                 could not be processed. Please try again or use a different payment method.
                             </p>
                         </div>
@@ -513,7 +515,7 @@ const paymentFailedTemplate = (userName, amount, failureReason) => {
                             <div class="amount-card">
                                 <div class="amount-left">
                                     <p class="amount-label">Amount Failed</p>
-                                    <p class="amount-value">&#8377;${amount || 0}</p>
+                                    <p class="amount-value">&#8377;${escapeHtml(amount || 0)}</p>
                                 </div>
                                 <div class="amount-right">
                                     <span class="payment-badge">Failed</span>
@@ -529,7 +531,7 @@ const paymentFailedTemplate = (userName, amount, failureReason) => {
                                     <p class="reason-header-text">Reason</p>
                                 </div>
                                 <div class="reason-body">
-                                    <p class="reason-text">${failureReason}</p>
+                                    <p class="reason-text">${escapeHtml(failureReason)}</p>
                                 </div>
                             </div>
                         </div>

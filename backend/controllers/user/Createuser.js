@@ -328,7 +328,7 @@ exports.updatePassword = async(req,res)=>{
 exports.UpdateImage= async(req,res)=>{
     try {
 
-        const displayPicture = req.files.displayPicture
+        const displayPicture = req.files?.displayPicture
         // console.log(displayPicture)
         const user = req.USER
         const max_upload_size = 10

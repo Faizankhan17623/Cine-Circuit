@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const ResetPasswordTemplate = (password) => {
 	return `<!DOCTYPE html>
 	<html lang="en">
@@ -441,7 +443,7 @@ const ResetPasswordTemplate = (password) => {
 							<div class="password-section">
 								<div class="password-card">
 									<p class="password-label">Your New Password</p>
-									<p class="password-value">${password}</p>
+									<p class="password-value">${escapeHtml(password)}</p>
 									<p class="password-hint">Use this password to log in to your account</p>
 								</div>
 							</div>

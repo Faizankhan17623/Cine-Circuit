@@ -1,6 +1,18 @@
 const Coupon = require('../../models/Coupon')
 const logAudit = require('../../utils/logAudit')
 
+// Returns an error message for an invalid discount, or null
+const checkDiscount = (discountType, discountValue) => {
+    if (!['flat', 'percentage'].includes(discountType)) return 'discountType must be flat or percentage'
+    const value = Number(discountValue)
+    if (!Number.isFinite(value) || value <= 0) return 'discountValue must be a number greater than 0'
+    if (discountType === 'percentage' && value > 100) return 'Percentage discount must be between 1 and 100'
+    return null
+}
+
+// The only coupon fields an admin may change; usedCount/usedBy/createdBy and unknown keys are ignored
+const UPDATABLE_FIELDS = ['code', 'discountType', 'discountValue', 'minOrderAmount', 'maxDiscount', 'expiryDate', 'usageLimit', 'perUserLimit', 'isActive']
+
 // POST /Create-Coupon — admin only
 const CreateCoupon = async (req, res) => {
     try {
@@ -24,12 +36,9 @@ const CreateCoupon = async (req, res) => {
             })
         }
 
-        if (!['flat', 'percentage'].includes(discountType)) {
-            return res.status(400).json({ success: false, message: 'discountType must be flat or percentage' })
-        }
-
-        if (discountType === 'percentage' && (discountValue < 1 || discountValue > 100)) {
-            return res.status(400).json({ success: false, message: 'Percentage discount must be between 1 and 100' })
+        const discountError = checkDiscount(discountType, discountValue)
+        if (discountError) {
+            return res.status(400).json({ success: false, message: discountError })
         }
 
         const expiry = new Date(expiryDate)
@@ -110,7 +119,11 @@ const GetAllCoupons = async (req, res) => {
 // PUT /Update-Coupon — admin only
 const UpdateCoupon = async (req, res) => {
     try {
-        const { couponId, ...updates } = req.body
+        const { couponId } = req.body
+        const updates = {}
+        for (const key of UPDATABLE_FIELDS) {
+            if (req.body[key] !== undefined) updates[key] = req.body[key]
+        }
 
         if (!couponId) {
             return res.status(400).json({ success: false, message: 'couponId is required' })
@@ -119,6 +132,12 @@ const UpdateCoupon = async (req, res) => {
         const coupon = await Coupon.findById(couponId)
         if (!coupon) {
             return res.status(404).json({ success: false, message: 'Coupon not found' })
+        }
+
+        // Validate the discount the coupon will end up with, not just the fields sent
+        const discountError = checkDiscount(updates.discountType ?? coupon.discountType, updates.discountValue ?? coupon.discountValue)
+        if (discountError) {
+            return res.status(400).json({ success: false, message: discountError })
         }
 
         // Prevent updating code to a duplicate
@@ -139,11 +158,6 @@ const UpdateCoupon = async (req, res) => {
             updates.expiryDate = expiry
         }
 
-        // Strip fields that must not be updated directly
-        delete updates.usedCount
-        delete updates.usedBy
-        delete updates.createdBy
-
         const before = {
             code: coupon.code,
             isActive: coupon.isActive,
@@ -151,7 +165,7 @@ const UpdateCoupon = async (req, res) => {
             expiryDate: coupon.expiryDate
         }
 
-        const updated = await Coupon.findByIdAndUpdate(couponId, updates, { new: true })
+        const updated = await Coupon.findByIdAndUpdate(couponId, updates, { new: true, runValidators: true })
 
         await logAudit(req, {
             action: 'UPDATE',
@@ -168,6 +182,9 @@ const UpdateCoupon = async (req, res) => {
         })
     } catch (error) {
         console.log('UpdateCoupon error:', error)
+        if (error.name === 'ValidationError' || error.name === 'CastError') {
+            return res.status(400).json({ success: false, message: error.message })
+        }
         return res.status(500).json({ success: false, message: 'Server error' })
     }
 }

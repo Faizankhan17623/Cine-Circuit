@@ -116,7 +116,7 @@ exports.updateCastname = async (req,res)=>{
 exports.updatecastimage = async (req,res)=>{
     try{
         const {id} = req.body
-        const image = req.files.image
+        const image = req.files?.image
 
         if(!id){
             return res.status(400).json({

@@ -66,6 +66,7 @@ const AllotedShowsDash = lazy(() => import('./Components/Dashboard/AllotedShows'
 const TheatreAllTickets = lazy(() => import('./Components/Dashboard/TheatreAllTickets'))
 const DistributeTickets = lazy(() => import('./Components/Dashboard/DistributeTickets'))
 const UpdateTicketTime = lazy(() => import('./Components/Dashboard/UpdateTicketTime'))
+const CheckIn = lazy(() => import('./Components/Dashboard/CheckIn'))
 const MovieCategory = lazy(() => import('./Components/Home/MovieCategory'))
 const MaintenanceMode = lazy(() => import('./Components/Dashboard/MaintenanceMode'))
 const BugReports = lazy(() => import('./Components/Dashboard/BugReports'))
@@ -348,6 +349,7 @@ useEffect(() => {
       <Route path="/Dashboard/All-Tickets" element={<TheatreAllTickets />} />
       <Route path="/Dashboard/Distribute-Tickets" element={<DistributeTickets />} />
       <Route path="/Dashboard/Update-Ticket-Time" element={<UpdateTicketTime />} />
+      <Route path="/Dashboard/Check-In" element={<CheckIn />} />
       <Route path="/Dashboard/Chats" element={<Chat />} />
     </>
   )}

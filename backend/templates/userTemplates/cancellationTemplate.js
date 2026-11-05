@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const cancellationTemplate = (userName, data) => {
     return `<!DOCTYPE html>
     <html lang="en">
@@ -23,13 +25,13 @@ const cancellationTemplate = (userName, data) => {
             <div class="card">
                 <div class="header"><p class="brand">Cine Circuit</p></div>
                 <div class="body">
-                    <p>Hi ${userName || 'there'},</p>
+                    <p>Hi ${escapeHtml(userName || 'there')},</p>
                     <p>Your booking has been cancelled and a refund has been initiated.</p>
                     <div style="margin-top:16px;">
-                        <div class="row"><span class="label">Show Date</span><span class="value">${data.Showdate || 'N/A'}</span></div>
-                        <div class="row"><span class="label">Show Time</span><span class="value">${data.time || 'N/A'}</span></div>
-                        <div class="row"><span class="label">Refund Amount</span><span class="value">&#8377;${data.refundAmount || 0}</span></div>
-                        <div class="row"><span class="label">Refund Status</span><span class="value">${data.refundStatus || 'pending'}</span></div>
+                        <div class="row"><span class="label">Show Date</span><span class="value">${escapeHtml(data.Showdate || 'N/A')}</span></div>
+                        <div class="row"><span class="label">Show Time</span><span class="value">${escapeHtml(data.time || 'N/A')}</span></div>
+                        <div class="row"><span class="label">Refund Amount</span><span class="value">&#8377;${escapeHtml(data.refundAmount || 0)}</span></div>
+                        <div class="row"><span class="label">Refund Status</span><span class="value">${escapeHtml(data.refundStatus || 'pending')}</span></div>
                     </div>
                     <p style="margin-top:16px;">Refunds are typically processed by your bank within 5-7 business days.</p>
                 </div>

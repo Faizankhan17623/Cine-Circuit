@@ -4,6 +4,10 @@ const Theatres = require('../../models/Theatres')
 const Theatrestickets = require('../../models/TheatresTicket');
 const Payment = require('../../models/payment')
 const CreateShow = require('../../models/CreateShow');
+const escapeRegex = require('../../utils/escapeRegex')
+
+// Public theatre responses keep allotments[].showId (the showAlloted virtual needs it) but hide owner and money fields
+const PUBLIC_THEATRE_FIELDS = '-allotments.ticketsReceived -allotments.price -allotments.receivedAt -allotments.ticketsDistributed -Owner -ticketCreation -issues'
 
 exports.CalculateTotalSale = async(req,res)=>{
     try{
@@ -212,7 +216,7 @@ exports.getAllticketsDetails = async(req,res)=>{
                 message: "No shows alloted yet",
                 success: true,
                 data: {
-                    theatre: { name: Finding.Theatrename, location: Finding.locationname },
+                    theatre: { name: Finding.Theatrename, location: Finding.locationName },
                     shows: [],
                     totalShows: 0,
                     totalTicketsReceived: 0
@@ -244,7 +248,7 @@ exports.getAllticketsDetails = async(req,res)=>{
             data: {
                 theatre: {
                     name: Finding.Theatrename,
-                    location: Finding.locationname
+                    location: Finding.locationName
                 },
                 shows: ShowData,
                 totalShows: ShowData.length,
@@ -318,9 +322,10 @@ exports.getTheatreDetails = async (req,res)=>{
 
 
          const Finder = await Theatres.find({
-      theatreformat: { $regex: theatre, $options: "i" },
-      Verified:true
-    });
+      theatreformat: { $regex: escapeRegex(theatre), $options: "i" },
+      Verified:true,
+      status:'Approved'
+    }).select(PUBLIC_THEATRE_FIELDS);
 
     if (!Finder || Finder.length === 0) {
       return res.status(404).json({
@@ -353,7 +358,7 @@ exports.GetShowsDetails = async (req,res)=>{
             });
         }
 
-        const theatre = await Theatres.findById(Theatreid)
+        const theatre = await Theatres.findOne({ _id: Theatreid, status: 'Approved' })
 
         if (!theatre) {
             return res.status(404).json({
@@ -369,7 +374,7 @@ exports.GetShowsDetails = async (req,res)=>{
             });
         }
 
-        const shows = await CreateShow.find({_id: {$in: theatre.showAlloted}})
+        const shows = await CreateShow.find({_id: {$in: theatre.showAlloted}, uploaded: true, VerifiedByTheAdmin: true}).select('-totalbudget -ticketspurchased')
 
         if (!shows || shows.length === 0) {
             return res.status(404).json({
@@ -407,7 +412,7 @@ exports.GetSingleTheatreDetails = async (req,res)=>{
             });
         }
 
-        const theatre = await Theatres.findById(theatreid)
+        const theatre = await Theatres.findOne({ _id: theatreid, status: 'Approved' }).select(PUBLIC_THEATRE_FIELDS)
 
         if (!theatre) {
             return res.status(404).json({
@@ -427,5 +432,6 @@ exports.GetSingleTheatreDetails = async (req,res)=>{
         console.log(error)
         console.log(error.message)
         console.log("There is an error in the get single theatre deatils ")
+        return res.status(500).json({ message: "Internal Server Error", success: false })
     }
 } 

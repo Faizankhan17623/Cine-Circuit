@@ -33,8 +33,8 @@ exports.CreateShow = async(req,res)=>{
         const userid = req.USER.id
 
         const {title,tagline,releasedate,genreid,subgenereid,languagename,castid=[],directorname,producername,writersname,totalbudget,hashid,Duration} = req.body
-        const image = req.files.image
-        const trailer = req.files.trailer
+        const image = req.files?.image
+        const trailer = req.files?.trailer
         // console.log('THis is the image ',image.size)
         // console.log("This is the trailer",trailer.size)
 
@@ -55,7 +55,7 @@ exports.CreateShow = async(req,res)=>{
         }
 
         
-        if(!req.files.image || !req.files.trailer || !req.files){
+        if(!image || !trailer){
             return res.status(400).json({
                 message:"The input fields of the images are been required",
                 success:false
@@ -376,8 +376,14 @@ exports.UpdateShowtagline = async(req,res)=>{
 // This is the function that is present in the create show route on line 43
 exports.UpdateTitleImage = async(req,res)=>{
     try {
-        const newImage = req.files.newImage
+        const newImage = req.files?.newImage
         const id = req.query.id
+        if(!newImage){
+            return res.status(400).json({
+                message:"Please upload the new image",
+                success:false
+            })
+        }
 
         const Image_Format = ['png','jpeg','jpg']
        
@@ -454,7 +460,13 @@ exports.UpdateTitleImage = async(req,res)=>{
 // This is the function that is present in the create show route on line 44
 exports.UpdateTitletrailer = async(req,res)=>{
     try {
-        const newTrailer = req.files.newTrailer
+        const newTrailer = req.files?.newTrailer
+        if(!newTrailer){
+            return res.status(400).json({
+                message:"Please upload the new trailer",
+                success:false
+            })
+        }
         
  const id = req.query.id
         

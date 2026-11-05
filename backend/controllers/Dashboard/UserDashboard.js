@@ -230,6 +230,7 @@ exports.BannerMovies = async(req,res)=>{
         console.log(error)
         console.log(error.message)
         console.log("Theere is an error in the banner movies code")
+        return res.status(500).json({ message: "Internal Server Error", success: false })
     }
 }
 
@@ -254,7 +255,9 @@ exports.FIndusingMOvieTags = async(req,res)=>{
 
         const MovieFinding = await CreateShow.find({
       genre: Finder._id,
-    });
+      uploaded: true,
+      VerifiedByTheAdmin: true,
+    }).select('-totalbudget -ticketspurchased');
 
     if (!MovieFinding || MovieFinding.length === 0) {
       return res.status(404).json({
@@ -272,6 +275,7 @@ exports.FIndusingMOvieTags = async(req,res)=>{
         console.log(error)
         console.log(error.message)
         console.log("Theere is an error in the Find movie code")
+        return res.status(500).json({ message: "Internal Server Error", success: false })
     }
 }
 
@@ -348,6 +352,7 @@ exports.FindWholeMoviesData = async (req,res)=>{
         console.log(error)
         console.log(error.message)
         console.log("There is an error in the find whole movie date code ")
+        return res.status(500).json({ message: "Internal Server Error", success: false })
     }
 }
 

@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const theatreRejectedTemplate = (theatreName, ownerName, rejectionReason) => {
 	return `<!DOCTYPE html>
 <html lang="en">
@@ -501,8 +503,8 @@ const theatreRejectedTemplate = (theatreName, ownerName, rejectionReason) => {
                             <h1 class="title">Verification Update</h1>
                             <p class="subtitle">Your theatre application needs some changes</p>
                             <p class="greeting">
-                                Hi${ownerName ? ' <strong style="color: #ffffff;">' + ownerName + '</strong>' : ''},<br><br>
-                                We've reviewed your theatre <strong style="color: #e50914;">${theatreName || 'Theatre'}</strong>
+                                Hi${ownerName ? ' <strong style="color: #ffffff;">' + escapeHtml(ownerName) + '</strong>' : ''},<br><br>
+                                We've reviewed your theatre <strong style="color: #e50914;">${escapeHtml(theatreName || 'Theatre')}</strong>
                                 verification request on <strong style="color: #e50914;">Cine Circuit</strong>
                                 and unfortunately, it could not be approved at this time. Don't worry — you have a chance to
                                 update your details and resubmit for review.
@@ -525,7 +527,7 @@ const theatreRejectedTemplate = (theatreName, ownerName, rejectionReason) => {
                                     <p class="reason-header-text">Reason for Rejection</p>
                                 </div>
                                 <div class="reason-body">
-                                    <p class="reason-text">${rejectionReason}</p>
+                                    <p class="reason-text">${escapeHtml(rejectionReason)}</p>
                                 </div>
                             </div>
                         </div>

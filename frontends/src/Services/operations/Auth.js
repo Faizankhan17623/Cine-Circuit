@@ -7,6 +7,10 @@ import {CreateUser,SendOtp,Login,ResetPassword,UpdatePersonalDetails,PersonalCho
 import {setShow,setlaoding,setallShow} from '../../Slices/ShowSlice.js'
 import Cookies from "js-cookie";
 import { disconnectSocket } from '../socket.js'
+import { resetcart } from '../../Slices/CartSlice.js'
+import { clearWatchlist } from '../../Slices/watchlistSlice.js'
+import { clearChat } from '../../Slices/chatSlice.js'
+import { clearNotifications } from '../../Slices/notificationSlice.js'
 // import {setuser} from '../../Slices/ProfileSlice.js'
 
 const {createuser} = CreateUser 
@@ -286,6 +290,12 @@ export function UserLogout(){
             disconnectSocket()
             dispatch(setToken(null))
             dispatch(setUser(null))
+            // Clear the previous account's data so the next login on this browser does not see it
+            dispatch(setuser(null))
+            dispatch(resetcart())
+            dispatch(clearWatchlist())
+            dispatch(clearChat())
+            dispatch(clearNotifications())
             localStorage.removeItem('token')
             Cookies.remove('token');
             localStorage.removeItem('userImage')
@@ -381,7 +391,7 @@ export function Updateusername(name){
     }
 }
 
-export function Updatepassword(newpass,oldpass){
+export function Updatepassword(token,newpass,oldpass){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setloading(true))
@@ -390,16 +400,21 @@ export function Updatepassword(newpass,oldpass){
             const response = await apiConnector("PUT",UpdatePassword,{
                 newPassword:newpass,
                 oldPassword:oldpass
+            },{
+                Authorization: `Bearer ${token}`
             })
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
             toast.success("Password Updated Successfully")
+            return { success: true }
         } catch (error) {
-            toast.error(error?.response?.data?.message || "The old password is not correct")
+            toast.error(error?.response?.data?.message || error.message || "The old password is not correct")
+            return { success: false }
+        } finally {
+            dispatch(setloading(false))
+            toast.dismiss(toastId)
         }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
     }
 }
 
@@ -424,7 +439,7 @@ export function Updateimage(image){
     }
 }
 
-export function Updatenumber(newnumber, countrycode = "+91"){
+export function Updatenumber(token, newnumber, countrycode = "+91"){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setloading(true))
@@ -432,17 +447,22 @@ export function Updatenumber(newnumber, countrycode = "+91"){
             const response = await apiConnector("PUT",UpdateNumber,{
                 number:newnumber,
                 countrycode
+            },{
+                Authorization: `Bearer ${token}`
             })
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
 
             toast.success("Number Updated Successfully")
+            return { success: true }
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Error updating number")
+            toast.error(error?.response?.data?.message || error.message || "Error updating number")
+            return { success: false }
+        } finally {
+            dispatch(setloading(false))
+            toast.dismiss(toastId)
         }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
     }
 }
 

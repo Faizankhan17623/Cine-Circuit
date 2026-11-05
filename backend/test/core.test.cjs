@@ -515,3 +515,238 @@ test('a lost-race refund pays the captured amount once even if the wallet portio
   assert.equal(recorded.refundId, 'rfnd_1');
   assert.equal(recorded.refundAmount, 60);
 });
+
+const escapeRegex = require('../utils/escapeRegex');
+const ticketModel = require('../models/ticket');
+const { SearchAll } = require('../controllers/common/Showlist');
+const { EnhancedFinder } = require('../controllers/Dashboard/EnhancedSearch');
+const { TicketDetails } = require('../controllers/Dashboard/OrgainezerDashboard');
+const { getTheatreDetails, GetShowsDetails, GetSingleTheatreDetails } = require('../controllers/Dashboard/TheatrereDashboard');
+const { FIndusingMOvieTags } = require('../controllers/Dashboard/UserDashboard');
+const { RecommendMovies } = require('../controllers/common/Recommend');
+const { OrgData } = require('../controllers/Orgainezer/CreateOrg');
+const { VerifyOrgainezer } = require('../controllers/Administrator/AdminVerification');
+const { CreateTheatres } = require('../controllers/Administrator/CreateTheatres');
+const { UpdateTitleImage } = require('../controllers/Orgainezer/CreateTheatreShow');
+const { SearchTags } = require('../controllers/Orgainezer/CreateHashtags');
+const { UpdateCoupon } = require('../controllers/Administrator/Coupon');
+const { finalizeWalletPayment } = require('../controllers/common/Payment');
+const genreModel = require('../models/genre');
+const bugReportSubmittedTemplate = require('../templates/userTemplates/bugReportSubmittedTemplate');
+const updatePasswordTemplate = require('../templates/userTemplates/Updatepasswordtemplate');
+
+// Like query(), but records the argument of every .select() call
+const selecting = (value, selects) => {
+  const q = query(value);
+  q.select = (fields) => { selects.push(fields); return selecting(value, selects); };
+  return q;
+};
+
+test('search input is matched literally and length-capped', async (t) => {
+  assert.equal(escapeRegex('(a+)+$'), '\\(a\\+\\)\\+\\$');
+  assert.equal(escapeRegex('x'.repeat(500)).length, 100);
+
+  const filters = [];
+  stub(t, CreateShow, 'find', (f) => { filters.push(f); return query([]); });
+  stub(t, Theatres, 'find', (f) => { filters.push(f); return query([]); });
+  const res = fakeRes();
+  await SearchAll({ query: { q: '(a+)+$' } }, res);
+  assert.equal(res.code, 200);
+  assert.ok(filters.every((f) => (f.title || f.Theatrename).test('(a+)+$')));
+  assert.equal(filters[0].title.test('aaaa'), false);
+
+  let theatreFilter;
+  Theatres.find = (f) => { theatreFilter = f; return query([]); };
+  await EnhancedFinder({ body: { date: '01/01/2030', location: '.*', theatreName: '[' } }, fakeRes());
+  assert.equal(theatreFilter.locationName.$regex, '\\.\\*');
+  assert.equal(theatreFilter.Theatrename.$regex, '\\[');
+});
+
+test('organizers only read ticket data for shows they created', async (t) => {
+  const owned = new mongoose.Types.ObjectId();
+  stub(t, USER, 'findById', () => query({ showsCreated: [owned] }));
+  let filter;
+  stub(t, ticketModel, 'findOne', (f) => { filter = f; return query(null); });
+  const res = fakeRes();
+
+  await TicketDetails({ USER: { id: 'u1' }, query: { showId: 'someone-elses-show' } }, res);
+
+  assert.equal(res.code, 404);
+  assert.deepEqual(filter, { $and: [{ showid: 'someone-elses-show' }, { showid: { $in: [owned] } }] });
+});
+
+test('public theatre and movie endpoints only return approved data without internal fields', async (t) => {
+  const selects = [];
+  const filters = [];
+  stub(t, Theatres, 'find', (f) => { filters.push(f); return selecting([{}], selects); });
+  stub(t, Theatres, 'findOne', (f) => { filters.push(f); return selecting({ showAlloted: ['s1'] }, selects); });
+  stub(t, CreateShow, 'find', (f) => { filters.push(f); return selecting([{}], selects); });
+  stub(t, genreModel, 'findOne', () => query({ _id: 'g1' }));
+
+  await getTheatreDetails({ body: { theatre: 'IMAX' } }, fakeRes());
+  await GetSingleTheatreDetails({ query: { theatreid: 't1' } }, fakeRes());
+  await GetShowsDetails({ query: { Theatreid: 't1' } }, fakeRes());
+  await FIndusingMOvieTags({ body: { movies: 'Action' } }, fakeRes());
+  await RecommendMovies({ body: { genreId: 'g1' } }, fakeRes());
+
+  const [tags, single, showsTheatre, shows, byTag, recommended] = filters;
+  assert.equal(tags.status, 'Approved');
+  assert.equal(single.status, 'Approved');
+  assert.equal(showsTheatre.status, 'Approved');
+  for (const f of [shows, byTag, recommended]) {
+    assert.equal(f.uploaded, true);
+    assert.equal(f.VerifiedByTheAdmin, true);
+  }
+  const theatreSelect = selects.find((s) => s.includes('allotments.price'));
+  for (const field of ['-allotments.price', '-allotments.ticketsReceived', '-Owner']) assert.ok(theatreSelect.includes(field));
+  assert.ok(selects.filter((s) => s.includes('-totalbudget')).length >= 2);
+});
+
+test('a public endpoint error responds with 500 instead of hanging', async (t) => {
+  stub(t, Theatres, 'findOne', () => { throw new Error('db down'); });
+  const res = fakeRes();
+  await GetSingleTheatreDetails({ query: { theatreid: 't1' } }, res);
+  assert.equal(res.code, 500);
+});
+
+test('a locked organizer cannot resubmit, and a rejected one keeps its data until the new one is valid', async (t) => {
+  let current;
+  stub(t, Orgdata, 'findOne', () => query(current));
+  let deleted = 0;
+  stub(t, Orgdata, 'findByIdAndDelete', () => { deleted += 1; return query({}); });
+
+  current = { _id: 'o1', status: 'locked', attempts: 3, lockedUntill: new Date(Date.now() + 86400000) };
+  const locked = fakeRes();
+  await OrgData({ USER: { id: 'u1' }, body: {} }, locked);
+  assert.equal(locked.code, 403);
+
+  current = { _id: 'o1', status: 'pending', attempts: 1 };
+  const pending = fakeRes();
+  await OrgData({ USER: { id: 'u1' }, body: {} }, pending);
+  assert.equal(pending.code, 400);
+
+  // Rejected: the resubmission is invalid (no image), so nothing is deleted and attempts survive
+  current = { _id: 'o1', status: 'rejected', attempts: 2 };
+  const invalid = fakeRes();
+  await OrgData({ USER: { id: 'u1' }, body: {} }, invalid);
+  assert.equal(invalid.code, 400);
+  assert.equal(deleted, 0);
+});
+
+test('organizer verification stores the schema enum value and runs validators', async (t) => {
+  stub(t, USER, 'findById', () => query({ _id: 'u1', usertype: 'Organizer', orgainezerdata: 'o1', email: 'org@example.com' }));
+  stub(t, Orgdata, 'findById', () => query({ _id: 'o1', attempts: 0 }));
+  let update;
+  stub(t, Orgdata, 'findByIdAndUpdate', (id, u, options) => { update = [u, options]; return query({}); });
+  stub(t, USER, 'findByIdAndUpdate', () => query({}));
+  stub(t, mailTransport, 'sendMail', async () => ({}));
+  const nextYear = new Date().getFullYear() + 1;
+  const res = fakeRes();
+
+  await VerifyOrgainezer({ body: { id: 'u1', verify: false, ChangesDate: `01/01/${nextYear}`, ChangesTime: '10:00', verificationStatus: 'REJECTED' } }, res);
+
+  assert.equal(res.code, 200);
+  assert.equal(update[0].status, 'rejected');
+  assert.equal(update[1].runValidators, true);
+
+  const bad = fakeRes();
+  await VerifyOrgainezer({ body: { id: 'u1', verify: false, ChangesDate: `01/01/${nextYear}`, ChangesTime: '10:00', verificationStatus: 'banana' } }, bad);
+  assert.equal(bad.code, 400);
+});
+
+test('admin theatre creation uses theatresCreated and answers 400 when no image is sent', async (t) => {
+  const body = { name: 'N', locationname: 'L', locationurl: 'u', languagename: 'Hindi', theatreformat: 'IMAX', TheatreOwner: 'u1', parking: 'Car' };
+  stub(t, USER, 'findOne', () => query({ theatresCreated: 't1' }));
+  const already = fakeRes();
+  await CreateTheatres({ body }, already);
+  assert.equal(already.code, 400);
+  assert.match(already.body.message, /already created a theatre/);
+
+  USER.findOne = () => query({});
+  const noFiles = fakeRes();
+  await CreateTheatres({ body }, noFiles);
+  assert.equal(noFiles.code, 400);
+  assert.equal(noFiles.body.message, 'no images uploaded');
+});
+
+test('uploads without a file get a 400, and tag search reads the GET query string', async (t) => {
+  const res = fakeRes();
+  await UpdateTitleImage({ query: { id: 's1' }, USER: { id: 'u1' } }, res);
+  assert.equal(res.code, 400);
+
+  let filter;
+  stub(t, hashtags, 'find', (f) => { filter = f; return query([]); });
+  const search = fakeRes();
+  await SearchTags({ USER: { id: 'u1' }, query: { name: 'action' }, body: {} }, search);
+  assert.equal(search.code, 200);
+  assert.deepEqual(filter, { name: 'action', userid: 'u1' });
+});
+
+test('coupon updates are whitelisted, validated, and a percentage cannot exceed 100', async (t) => {
+  stub(t, Coupon, 'findById', () => query({ _id: 'c1', discountType: 'percentage', discountValue: 10 }));
+  stub(t, USER, 'findById', () => query(null));
+  const updates = [];
+  stub(t, Coupon, 'findByIdAndUpdate', (id, u, options) => { updates.push([u, options]); return query({ code: 'X' }); });
+
+  const tooBig = fakeRes();
+  await UpdateCoupon({ body: { couponId: 'c1', discountValue: 500 } }, tooBig);
+  assert.equal(tooBig.code, 400);
+  const zero = fakeRes();
+  await UpdateCoupon({ body: { couponId: 'c1', discountType: 'flat', discountValue: 0 } }, zero);
+  assert.equal(zero.code, 400);
+  assert.equal(updates.length, 0);
+
+  const ok = fakeRes();
+  await UpdateCoupon({ body: { couponId: 'c1', isActive: false, usedCount: 0, usedBy: [], createdBy: 'x', $where: '1' } }, ok);
+  assert.equal(ok.code, 200);
+  assert.deepEqual(updates[0][0], { isActive: false });
+  assert.equal(updates[0][1].runValidators, true);
+});
+
+test('a wallet-only booking can be cancelled and its wallet amount comes back once', async (t) => {
+  const inTenDays = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
+  const Showdate = `${String(inTenDays.getDate()).padStart(2, '0')}/${String(inTenDays.getMonth() + 1).padStart(2, '0')}/${inTenDays.getFullYear()}`;
+  const booking = { _id: 'p1', userid: 'u1', Payment_Status: 'success', razorpay_order_id: 'wallet_1', Showdate, time: '18:00', amount: 0, walletAmountUsed: 150, ticketCategorey: [] };
+  stub(t, Payment, 'findById', () => query(booking));
+  stub(t, Payment, 'findOneAndUpdate', () => query({ ...booking, cancelled: true, save: async () => {} }));
+  stub(t, mongoose, 'startSession', async () => ({ startTransaction() {}, async commitTransaction() {}, async abortTransaction() {}, endSession() {} }));
+  let bankRefunds = 0;
+  stub(t, razorpay.payments, 'refund', async () => { bankRefunds += 1; });
+  const credits = recordCredits(t);
+  stub(t, Notification, 'create', async () => ({ toObject: () => ({}) }));
+  stub(t, USER, 'findById', () => query(null));
+  const res = fakeRes();
+
+  await CancelTicket({ USER: { id: 'u1' }, body: { paymentId: 'p1', refundToWallet: false } }, res);
+
+  assert.equal(res.code, 200);
+  assert.deepEqual(credits, [150]);
+  assert.equal(bankRefunds, 0);
+  assert.equal(res.body.data.refundId, 'wallet');
+});
+
+test('a finalized wallet booking is recorded on the show inside the transaction', async (t) => {
+  const session = { startTransaction() {}, async commitTransaction() {}, async abortTransaction() {}, async endSession() {} };
+  stub(t, mongoose, 'startSession', async () => session);
+  stub(t, Payment, 'findOneAndUpdate', () => query({ _id: 'p1', showid: 's1', ticketid: 't1', ticketCategorey: [], walletAmountUsed: 0 }));
+  stub(t, Theatrestickets, 'updateOne', () => query({}));
+  stub(t, USER, 'findByIdAndUpdate', () => query({}));
+  stub(t, Notification, 'create', async () => ({ toObject: () => ({}) }));
+  let showWrite;
+  stub(t, CreateShow, 'findByIdAndUpdate', (id, update, options) => { showWrite = [id, update, options]; return query({}); });
+
+  await finalizeWalletPayment('p1', 'u1');
+
+  assert.deepEqual(showWrite.slice(0, 2), ['s1', { $push: { ticketspurchased: 'p1' } }]);
+  assert.equal(showWrite[2].session, session);
+});
+
+test('email templates escape user-supplied values and encode the reset token', () => {
+  const html = bugReportSubmittedTemplate('BUG-1', '<script>alert(1)</script>', '<img src=x onerror=alert(1)>', '"Eve"');
+  assert.ok(!html.includes('<script>alert(1)</script>'));
+  assert.ok(!html.includes('<img src=x'));
+  assert.ok(html.includes('&lt;script&gt;'));
+  const reset = updatePasswordTemplate('a@example.com', 'abc"><x');
+  assert.ok(reset.includes('https://mw-bay.vercel.app/abc%22%3E%3Cx'));
+  assert.ok(!reset.includes('abc"><x'));
+});
