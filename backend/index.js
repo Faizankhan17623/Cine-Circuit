@@ -8,7 +8,6 @@ const cookieParser  = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 const colors = require('colors')
 var morgan = require('morgan')
-const VisitorCounter = require('express-visitor-counter')
 const rateLimit  = require('express-rate-limit')
 const swaggerUi = require('swagger-ui-express')
 const swaggerSpec = require('./config/swagger')
@@ -21,6 +20,7 @@ require('./Background_Process/ExpireWalletPayments')
 
 const app = express()
 app.set('query parser', 'extended') // Express 5 defaults to 'simple'; keep Express 4 qs parsing (a[b]=1)
+app.set('trust proxy', 1) // Render sits behind a proxy: use the client IP for rate limits and visitor tracking
 app.use(helmet())
 // Taking extra precautions if the first two are blocked then in this case we will use the third one if the user has blocked first two
 const port = process.env.DEFAULT_PORT_NUMBER || process.env.SECOND_NUMBER || 4003
@@ -75,7 +75,18 @@ app.use('/api/v1/createAccount/Create-OTP', authLimiter)
 app.use(cookieParser())
 app.use(morgan("dev"));
 
-app.use(VisitorCounter(Visitor))
+// Fire-and-forget visit tracking in the shape AdminStats reads (ip / visitCount / lastVisited).
+// Skipped while MongoDB is down and never throws: a failed write must not crash the server.
+app.use((req, res, next) => {
+    if (mongoose.connection.readyState === 1) {
+        Visitor.updateOne(
+            { ip: req.ip },
+            { $inc: { visitCount: 1 }, $set: { lastVisited: new Date() } },
+            { upsert: true }
+        ).catch(err => console.error('Visitor tracking failed:', err.message))
+    }
+    next()
+})
 
 app.use(fileUpload({
     useTempFiles : true,
