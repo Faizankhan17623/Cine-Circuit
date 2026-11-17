@@ -6,7 +6,6 @@ const Theatrestickets = require('../../models/TheatresTicket');
 const Theatre = require('../../models/Theatres');
 const date = require('date-and-time');
 const crypto = require('crypto');
-const session = require('express-session');
 const mongoose = require('mongoose')
 const mailSender = require('../../utils/mailsender')
 const generatePDF = require('../../templates/userTemplates/sendPdf')

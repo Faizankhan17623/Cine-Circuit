@@ -1,4 +1,4 @@
-const { ObjectId } = require('mongodb');
+const { Types: { ObjectId } } = require('mongoose');
 const language = require('../../models/CreateLanguage')
 // THis is the function which is present in the admin route on line no 61
 exports.CreateLanguage = async(req,res)=>{
