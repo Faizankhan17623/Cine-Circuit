@@ -1,3 +1,4 @@
+const clampLimit = require('../../utils/clampLimit')
 const USER = require('../../models/user')
 const CreateShow = require('../../models/CreateShow')
 const BugReport = require('../../models/BugReport')
@@ -106,7 +107,7 @@ exports.GetAdminStats = async (req, res) => {
 exports.GetVisitorStats = async (req, res) => {
     try {
         const page  = parseInt(req.query.page)  || 1
-        const limit = parseInt(req.query.limit) || 20
+        const limit = clampLimit(req.query.limit, 20)
         const skip  = (page - 1) * limit
 
         const startOfToday = new Date()

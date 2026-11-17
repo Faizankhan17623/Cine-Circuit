@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { FiSend } from 'react-icons/fi';
 import { IoChatbubblesOutline } from 'react-icons/io5';
 import { HiOutlineChatBubbleLeftRight } from 'react-icons/hi2';
@@ -28,6 +29,7 @@ const Chat = () => {
   const [startingSupport, setStartingSupport] = useState(false);
   const [blockedReason, setBlockedReason] = useState('');
   const bottomRef = useRef(null);
+  const lastSentRef = useRef('');
 
   const isViewer = user?.usertype === ACCOUNT_TYPE.USER;
 
@@ -60,6 +62,9 @@ const Chat = () => {
       socket.emit('join_conversation', activeConversationId);
       socket.emit('mark_read', activeConversationId);
     }
+    return () => {
+      getSocket()?.emit('leave_conversation', activeConversationId);
+    };
   }, [activeConversationId, token, dispatch]);
 
   useEffect(() => {
@@ -69,6 +74,7 @@ const Chat = () => {
     const onNewMessage = (message) => {
       dispatch(appendMessage(message));
       if (message.conversation === activeConversationId) {
+        lastSentRef.current = '';
         const socketNow = getSocket();
         socketNow?.emit('mark_read', activeConversationId);
       }
@@ -76,18 +82,31 @@ const Chat = () => {
     const onConversationUpdated = (conversation) => {
       dispatch(upsertConversation(conversation));
     };
+    // put the unsent text back so the user does not lose it
+    const restoreDraft = () => {
+      const lastSent = lastSentRef.current;
+      lastSentRef.current = '';
+      if (lastSent) setDraft((d) => d || lastSent);
+    };
     const onBlocked = ({ reason }) => {
       setBlockedReason(reason);
+      restoreDraft();
+    };
+    const onChatError = ({ message } = {}) => {
+      toast.error(message || 'Message could not be sent');
+      restoreDraft();
     };
 
     socket.on('new_message', onNewMessage);
     socket.on('conversation_updated', onConversationUpdated);
     socket.on('message_blocked', onBlocked);
+    socket.on('chat_error', onChatError);
 
     return () => {
       socket.off('new_message', onNewMessage);
       socket.off('conversation_updated', onConversationUpdated);
       socket.off('message_blocked', onBlocked);
+      socket.off('chat_error', onChatError);
     };
   }, [dispatch, activeConversationId]);
 
@@ -112,6 +131,7 @@ const Chat = () => {
     const socket = getSocket();
     if (!socket) return;
 
+    lastSentRef.current = text;
     socket.emit('send_message', { conversationId: activeConversationId, body: text });
     setDraft('');
   };

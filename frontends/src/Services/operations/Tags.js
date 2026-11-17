@@ -117,7 +117,7 @@ export function UpdateTagName(token, id, newname, navigate) {
         dispatch(setTagsLoading(true))
 
         try {
-            const response = await apiConnector("PUT", UpdateTagsname, { id, newname }, {
+            const response = await apiConnector("PUT", UpdateTagsname, { id, newName: newname }, {
                 Authorization: `Bearer ${token}`
             })
 

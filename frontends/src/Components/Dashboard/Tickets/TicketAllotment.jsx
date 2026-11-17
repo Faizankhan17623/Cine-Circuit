@@ -153,7 +153,8 @@ const handleAllot = async () => {
   if (!selectedShow?._id || !selectedTheatre?._id || !totalToAllot) return
   setSubmitting(true)
   try {
-    await dispatch(AllotTickets(selectedShow._id, selectedTheatre._id, totalToAllot))
+    const res = await dispatch(AllotTickets(selectedShow._id, selectedTheatre._id, totalToAllot))
+    if (!res?.success) return // keep the form so the user can retry
     setTotalToAllot('')
     setSelectedTheatre(null)
     // Refresh theatres list and ticket details after successful allotment

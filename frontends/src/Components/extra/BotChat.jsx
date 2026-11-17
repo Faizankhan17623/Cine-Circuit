@@ -144,7 +144,7 @@ export default function BotChat({ onClose, onBack }) {
       } else if (intent === 'create_organizer') {
         result = await botCreateOrganizer(data.name, data.email, data.password, data.phone, data.otp, data.countrycode);
       } else if (intent === 'create_theatre') {
-        result = await botCreateTheatre(data.name, data.email, data.password);
+        result = await botCreateTheatre(data.name, data.email, data.password, data.phone, data.countrycode);
       } else if (intent === 'search') {
         result = await botSearch(data.query);
       } else {
@@ -168,7 +168,11 @@ export default function BotChat({ onClose, onBack }) {
     const text = input.trim();
     if (!text || busy) return;
 
-    pushUser(text);
+    // never echo a typed password into the transcript; the real value still goes to the action
+    const shown = pendingIntent && remainingFields[0] === 'password'
+      ? '••••••'
+      : text.replace(/((?:password|pass|pwd)\s+)\S+/gi, '$1••••••');
+    pushUser(shown);
     setInput('');
 
     // ── If we're mid guided-flow, treat input as the answer to the next field

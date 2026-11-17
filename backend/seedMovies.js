@@ -9,9 +9,11 @@ const Genre = require('./models/genre');
 const Languages = require('./models/CreateLanguage');
 const Cast = require('./models/Createcast');
 
+const DB_URI = process.env.DATABASE_URL || process.env.MONGODB_URI || 'mongodb://localhost:27017/cinecircuit';
+
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cinecircuit');
+    await mongoose.connect(DB_URI);
     console.log('MongoDB Connected');
   } catch (error) {
     console.error('MongoDB connection error:', error);
@@ -380,5 +382,13 @@ const seedData = async () => {
     process.exit(1);
   }
 };
+
+// This wipes shows, cast, languages and genres, so it only runs when explicitly confirmed
+console.log(`Seed target: ${DB_URI.replace(/\/\/[^@/]*@/, '//***@')}`);
+if (!process.argv.includes('--yes') && process.env.SEED_CONFIRM !== 'yes') {
+  console.error('Refusing to run: this deletes ALL shows, cast, languages and genres in the database above.');
+  console.error('Re-run with --yes (node seedMovies.js --yes) or SEED_CONFIRM=yes to confirm.');
+  process.exit(1);
+}
 
 seedData();

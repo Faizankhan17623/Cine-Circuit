@@ -78,7 +78,7 @@ exports.updateCastname = async (req,res)=>{
                 success:false
             })
         }
-        const Finding = await cast.findOne({_id:id})
+        const Finding = await cast.findOne({_id:id, userid:req.USER.id})
         if(!Finding){
             return res.status(400).json({
                 message:"This name is alreay been taken ir this cast is alreay present",
@@ -95,7 +95,7 @@ exports.updateCastname = async (req,res)=>{
         }
 
         const timeNow = new Date(Date.now())
-        const updating = await cast.findByIdAndUpdate(id,{name:newname,updatedAt:timeNow},{new:true})
+        const updating = await cast.findByIdAndUpdate(Finding._id,{name:newname,updatedAt:timeNow},{new:true})
 
         return res.status(200).json({
             message:"The cast name is been updated",
@@ -116,7 +116,7 @@ exports.updateCastname = async (req,res)=>{
 exports.updatecastimage = async (req,res)=>{
     try{
         const {id} = req.body
-        const image = req.files.image
+        const image = req.files?.image
 
         if(!id){
             return res.status(400).json({
@@ -126,7 +126,7 @@ exports.updatecastimage = async (req,res)=>{
         }
 
 
-        const Finding = await cast.findOne({_id:id})
+        const Finding = await cast.findOne({_id:id, userid:req.USER.id})
         if(!Finding){
             return res.status(400).json({
                 message:"This id  is not preseent please check your inpputs",
@@ -149,7 +149,7 @@ exports.updatecastimage = async (req,res)=>{
         }
 
         const imageUploading = await uploadDatatoCloudinary(image,process.env.CLOUDINARY_FOLDER_NAME,1000,1000)
-        const creation = await cast.findByIdAndUpdate(id,{images:imageUploading.secure_url},{new:true})
+        const creation = await cast.findByIdAndUpdate(Finding._id,{images:imageUploading.secure_url},{new:true})
         console.log(`The image is been uploaded`.bgRed)
     // console.log(imageUploading)
     return res.status(200).json({
@@ -177,7 +177,7 @@ exports.deletecast = async (req,res)=>{
                 success:false
             })
         }
-        const Finding = await cast.findOne({_id:id})
+        const Finding = await cast.findOne({_id:id, userid:req.USER.id})
         if(!Finding){
             return res.status(400).json({
                 message:"This name is alreay been taken ir this cast is alreay present",
@@ -186,7 +186,7 @@ exports.deletecast = async (req,res)=>{
         }
 
 
-        const deletion = await cast.findByIdAndDelete(id,{new:true})
+        const deletion = await cast.findByIdAndDelete(Finding._id)
         return res.status(200).json({
             message:"The cast is been deleted",
             success:true,

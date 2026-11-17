@@ -1,4 +1,4 @@
-import {CreateTheatrere,theatreinfos,AllTheatres,TheatreCreationRequest,DistributeTickets,UpdateTicketTime,TicketsCreated,TheatreDetails,totalsale,GetShowAllotedDetailss,GetAllTicketsDetails,GetSingleShowDetailss,CheckInStats} from '../Apis/TheatreApi'
+import {CreateTheatrere,theatreinfos,AllTheatres,TheatreCreationRequest,DistributeTickets,UpdateTicketTime,TicketsCreated,TheatreDetails,totalsale,GetShowAllotedDetailss,GetAllTicketsDetails,GetSingleShowDetailss,CheckInStats,CheckIn} from '../Apis/TheatreApi'
 import {setTheatre,setLoading,setImage,setUser} from '../../Slices/TheatreSlice'
 import { toast } from 'react-hot-toast'
 import {apiConnector} from '../apiConnector'
@@ -15,6 +15,7 @@ const {theatredetails} = TheatreDetails
 const {TotalSale} = totalsale
 const {getshowalloteddetails} = GetShowAllotedDetailss
 const {checkinstats} = CheckInStats
+const {checkin} = CheckIn
 const {getallticketsdetails} = GetAllTicketsDetails
 const {getsingleshowdetails} = GetSingleShowDetailss
 // const {TheatreInfo} = 
@@ -294,6 +295,24 @@ export function GetCheckInStats(token){
     }
 }
 
+// paymentId and signature come from the ticket QR code ({ id, sig })
+export function CheckInTicket(paymentId, signature, token){
+    return async()=>{
+        try{
+            const response = await apiConnector("POST", checkin, { paymentId, signature }, {
+                Authorization: `Bearer ${token}`
+            })
+            if(!response.data.success){
+                return { success: false, message: response.data.message }
+            }
+            return { success: true, data: response.data.data }
+        }catch(error){
+            console.log(error)
+            return { success: false, message: error?.response?.data?.message || "Check-in failed" }
+        }
+    }
+}
+
 export function GetShowAllotedDetails(token){
     return async(dispatch)=>{
         const toastId = toast.loading('...loading')
@@ -355,7 +374,7 @@ export function GetSingleShowDetails(showid, token){
             const response = await apiConnector("GET",getsingleshowdetails,null,{
                 Authorization: `Bearer ${token}`
             },{
-                showAlloted:showid
+                showId:showid
             })
 
             if(!response.data.success){

@@ -22,9 +22,10 @@ const notificationSlice = createSlice({
       state.items.forEach(item => { item.readAt = item.readAt || now })
       state.unreadCount = 0
     },
-    setNotificationLoading(state, action) { state.loading = action.payload }
+    setNotificationLoading(state, action) { state.loading = action.payload },
+    clearNotifications(state) { state.items = []; state.unreadCount = 0 }
   }
 })
 
-export const { setNotifications, addNotification, markNotificationRead, markAllNotificationsRead, setNotificationLoading } = notificationSlice.actions
+export const { setNotifications, addNotification, markNotificationRead, markAllNotificationsRead, setNotificationLoading, clearNotifications } = notificationSlice.actions
 export default notificationSlice.reducer

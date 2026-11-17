@@ -6,7 +6,6 @@ const cookieParser  = require('cookie-parser')
 const OTP = require('../../models/otp')
 const {Orgdata} = require('../../models/Org_data')
 const {uploadDatatoCloudinary}= require('../../utils/imageUploader')
-const qs = require('qs')
 const directorfresher = require('../../models/DirectorFresher')
 const directorexperience = require('../../models/DirectorExperience')
 const producerexperience = require("../../models/ProducerExperience")
@@ -18,8 +17,9 @@ exports.CreateOrgainezer = async(req,res)=>{
 
       // const USERId = req.USER.id
 
-        const {name,password,email,usertype="Organizer",number,countrycode,otp} = req.body
-    
+        // usertype is deliberately not read from the body: public signup may only create Organizers
+        const {name,password,email,number,countrycode,otp} = req.body
+
         if(!name || !password || !email || !number || !countrycode || !otp){
             return res.status(400).json({
                 message:"The input fields are been required",
@@ -62,7 +62,7 @@ const otps = await OTP.find({ email:email }).sort({createdAt:-1}).limit(1)
                 }); 
             }
             
-            if (otp !== otps[0].otp){
+            if (String(otp) !== String(otps[0].otp)){
                 return res.status(400).json({
                     message: "The OTP is not correct please try again",
                     success: false
@@ -82,7 +82,7 @@ const Creation = new USER({
     confirmpass: hasing,
     number: number,
     countrycode: countrycode,
-    usertype: usertype,
+    usertype: 'Organizer',
     createdAt: ps,
     image: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
     verified: false
@@ -133,9 +133,10 @@ exports.OrgaineserLogin = async(req,res)=>{
                 })
             }
 
-            if(user.usertype === 'Viewer'){
+            // Viewers, Administrators and Theatrers all sign in through the user login (/Login)
+            if(user.usertype !== 'Organizer'){
                 return res.status(400).json({
-                    message:"The User is an Viewer Please Use The Viewer Login",
+                    message:"This login is only for Organizers Please Use The User Login",
                     success:false
                 })
             }
@@ -152,11 +153,9 @@ exports.OrgaineserLogin = async(req,res)=>{
                 const now = new Date();
                 const pattern = date.compile('DD/MM/YYYY HH:mm:ss');
                 let lastLoginTime = date.format(now, pattern);
-                const USERid = _id
                 // console.log("This is the id",_id)
                 await USER.findByIdAndUpdate(_id,{$push:{lastlogin:lastLoginTime}},{new:true})
 
-  await Orgdata.updateOne({_id:USERid},{attempts:0})
 
 
                 // console.log("This is the login code",login)
@@ -221,26 +220,15 @@ exports.OrgData = async (req, res) => {
 
     const Finding = await Orgdata.findOne({id:ID})
     if(Finding){
-      // If the organizer was rejected, delete old data so they can re-submit
-      if(Finding.status === "rejected"){
-        // Delete old role-specific data
-        if(Finding.DirectFresh){
-          await directorfresher.findByIdAndDelete(Finding.DirectFresh)
-        }
-        if(Finding.DirectorExperience){
-          await directorexperience.findByIdAndDelete(Finding.DirectorExperience)
-        }
-        if(Finding.ProducerFresher){
-          await producerfresher.findByIdAndDelete(Finding.ProducerFresher)
-        }
-        if(Finding.ProducerExperience){
-          await producerexperience.findByIdAndDelete(Finding.ProducerExperience)
-        }
-        // Delete old org data
-        await Orgdata.findByIdAndDelete(Finding._id)
-        // Remove reference from user
-        await USER.findByIdAndUpdate(ID, { orgainezerdata: null })
-      } else {
+      const lockActive = Finding.lockedUntill ? Finding.lockedUntill > new Date() : Finding.status === "locked"
+      if(lockActive){
+        return res.status(403).json({
+          message:"Your profile is locked after repeated rejections; you cannot resubmit yet",
+          success:false
+        })
+      }
+      // Only a rejected (or expired-lock) profile may re-submit; the old data is replaced once the new one is saved
+      if(Finding.status !== "rejected" && Finding.status !== "locked"){
         return res.status(400).json({
           message:"You have already registered the data in the orgainzation form",
           success:false
@@ -258,6 +246,12 @@ exports.OrgData = async (req, res) => {
     } = parsedBody;
 
     const Image = req.files?.Image
+    if(!Image){
+      return res.status(400).json({
+        message:"Please upload an image",
+        success:false
+      })
+    }
     const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
     const Max_Size = 5 * 1024 * 1024 //The max size is 5 mb
@@ -987,8 +981,20 @@ try{
       Comfortable:String(collabrotion),
       Role:role,
       ExperienceLevel:experience,
-      status:"pending"
+      status:"pending",
+      // Rejections carry over, so resubmitting cannot reset the 3-strike lock in VerifyOrgainezer
+      attempts:Finding?.attempts || 0,
+      lockedUntill:Finding?.lockedUntill
 })
+
+// The new submission is saved; now remove the rejected one it replaces
+if(Finding){
+  if(Finding.DirectFresh) await directorfresher.findByIdAndDelete(Finding.DirectFresh)
+  if(Finding.DirectorExperience) await directorexperience.findByIdAndDelete(Finding.DirectorExperience)
+  if(Finding.ProducerFresher) await producerfresher.findByIdAndDelete(Finding.ProducerFresher)
+  if(Finding.ProducerExperience) await producerexperience.findByIdAndDelete(Finding.ProducerExperience)
+  await Orgdata.findByIdAndDelete(Finding._id)
+}
 
 await USER.findByIdAndUpdate(ID,{orgainezerdata:Uploading._id})
 // await Orgdata.save()
@@ -1628,7 +1634,7 @@ exports.ProducerExperience = async (req, res) => {
 
         // -------- Resume (PDF) --------
     // Expecting a single file field named "Resume" (or "resume")
-    let Resum = req.files.Resume || req.files.resume;
+    let Resum = req.files?.Resume || req.files?.resume;
 
     const { affiliated, teamSize, projectcount, riskmanagement } = parsedBody;
 

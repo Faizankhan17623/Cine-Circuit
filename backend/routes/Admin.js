@@ -131,6 +131,7 @@ route.get("/Unverified-Users",auth,IsAdmin,GetAllUsersDetailsVerifiedfalse)
 route.get("/Verified-Orgainesers",auth,IsAdmin,GetAllOrganizerDetailsVerified)
 route.get("/Unverified-Orgainesers",auth,IsAdmin,GetAllOrganizerDetailsVerifiedfalse)
 route.put("/Verify-Theatres",auth,IsAdmin,VerifyTheatrer)
+route.get("/Verified-Theatres",auth,IsAdmin,GetAllTheatrerDetailsVerified)
 route.get("/Unverified-Theatres",auth,IsAdmin,GetAllTheatrerDetailsVerifiedfalse)
 // DONE this are all the routes that are present in the admin dashboard file in the dashboard folder
 

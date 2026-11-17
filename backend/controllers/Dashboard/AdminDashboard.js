@@ -1,10 +1,12 @@
 const USER = require('../../models/user')
 const TheatreCreation = require('../../models/TheatrerRequest')
+// toJSON already strips these, but .lean()/aggregate would not, so never load them
+const SAFE_USER_FIELDS = '-password -confirmpass -token -resetPasswordExpires'
 // This is the function that is present in the admin route on line no 73            
 // This is the route that will geet all the verified user details
 exports.GetAllUsersDetailsVerified = async (req, res) => {
     try {
-        const Finding = await USER.find({usertype:"Viewer",verified:true})
+        const Finding = await USER.find({usertype:"Viewer",verified:true}).select(SAFE_USER_FIELDS)
         if(!Finding || Finding.length === 0) return res.status(404).json({ message: "No users found" });
         return res.status(200).json({ message: "Users found", data: Finding ,success:true});
     } catch (error) {
@@ -17,7 +19,7 @@ exports.GetAllUsersDetailsVerified = async (req, res) => {
 // THis is the route that will get all the unverified user details
 exports.GetAllUsersDetailsVerifiedfalse = async (req, res) => {
     try {
-        const Finding = await USER.find({usertype:"Viewer"})
+        const Finding = await USER.find({usertype:"Viewer",verified:false}).select(SAFE_USER_FIELDS)
         if(!Finding || Finding.length === 0) return res.status(404).json({ message: "No users found" });
         return res.status(200).json({ message: "Users found", data: Finding ,success:true});
     } catch (error) {
@@ -31,7 +33,7 @@ exports.GetAllUsersDetailsVerifiedfalse = async (req, res) => {
 // This is the route that will get all the verified orgainezer details
 exports.GetAllOrganizerDetailsVerified = async (req, res) => {
     try {
-        const Finding = await USER.find({usertype:"Organizer",verified:true})
+        const Finding = await USER.find({usertype:"Organizer",verified:true}).select(SAFE_USER_FIELDS)
         if(!Finding || Finding.length === 0) return res.status(404).json({ message: "No users found" });
         return res.status(200).json({ message: "Users found", data: Finding ,success:true});
     } catch (error) {
@@ -46,7 +48,7 @@ exports.GetAllOrganizerDetailsVerified = async (req, res) => {
 // This is the function that is present in the admin route on line no 76
 exports.GetAllOrganizerDetailsVerifiedfalse = async (req, res) => {
     try {
-        const Finding = await USER.find({usertype:"Organizer"})
+        const Finding = await USER.find({usertype:"Organizer",verified:false}).select(SAFE_USER_FIELDS)
         if(!Finding || Finding.length === 0) return res.status(404).json({ message: "No users found" });
         return res.status(200).json({ message: "Users found", data: Finding ,success:true});
     } catch (error) {
@@ -63,7 +65,7 @@ exports.GetAllOrganizerDetailsVerifiedfalse = async (req, res) => {
 // This is the function that is present in the admin route on line no 77
 exports.GetAllTheatrerDetailsVerified = async (req, res) => {
     try {
-        const Finding = await USER.find({usertype:"Theatrer",verified:true})
+        const Finding = await USER.find({usertype:"Theatrer",verified:true}).select(SAFE_USER_FIELDS)
         if(!Finding || Finding.length === 0) return res.status(404).json({ message: "No users found" });
         return res.status(200).json({ message: "Users found", data: Finding ,success:true});
     } catch (error) {
@@ -76,7 +78,7 @@ exports.GetAllTheatrerDetailsVerified = async (req, res) => {
 // This is the route that will get all the unverified theatrere details
 exports.GetAllTheatrerDetailsVerifiedfalse = async (req, res) => {
     try {
-        const Finding = await USER.find({usertype:"Theatrer"})
+        const Finding = await USER.find({usertype:"Theatrer",verified:false}).select(SAFE_USER_FIELDS)
         if(!Finding || Finding.length === 0) return res.status(404).json({ message: "No users found" });
         return res.status(200).json({ message: "Users found", data: Finding ,success:true});
     } catch (error) {

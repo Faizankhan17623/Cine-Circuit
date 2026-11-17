@@ -196,8 +196,8 @@ const SearchPopup = ({ open, onClose }) => {
                       <p className="text-white text-sm font-medium truncate group-hover:text-purple-300 transition-colors">
                         {theatre.Theatrename}
                       </p>
-                      {theatre.locationname && (
-                        <p className="text-richblack-500 text-xs truncate">{theatre.locationname}</p>
+                      {theatre.locationName && (
+                        <p className="text-richblack-500 text-xs truncate">{theatre.locationName}</p>
                       )}
                     </div>
                     <span className="text-richblack-600 text-xs shrink-0">Theatre →</span>

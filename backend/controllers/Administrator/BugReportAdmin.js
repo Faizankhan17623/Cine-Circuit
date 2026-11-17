@@ -1,3 +1,4 @@
+const clampLimit = require('../../utils/clampLimit')
 const BugReport = require('../../models/BugReport')
 const USER = require('../../models/user')
 const mailSenders = require('../../utils/mailsender')
@@ -8,20 +9,21 @@ const logAudit = require('../../utils/logAudit')
 const GetAllBugReports = async (req, res) => {
     try {
         const { status, page = 1, limit = 20 } = req.query
+        const pageSize = clampLimit(limit, 20)
 
         const filter = {}
         if (status && ['open', 'in-progress', 'resolved'].includes(status)) {
             filter.status = status
         }
 
-        const skip = (parseInt(page) - 1) * parseInt(limit)
+        const skip = (parseInt(page) - 1) * pageSize
 
         const [reports, total] = await Promise.all([
             BugReport.find(filter)
                 .populate('reportedBy', 'userName email usertype')
                 .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(parseInt(limit)),
+                .limit(pageSize),
             BugReport.countDocuments(filter),
         ])
 
@@ -30,7 +32,7 @@ const GetAllBugReports = async (req, res) => {
             data: reports,
             total,
             page: parseInt(page),
-            totalPages: Math.ceil(total / parseInt(limit)),
+            totalPages: Math.ceil(total / pageSize),
         })
     } catch (error) {
         console.log('GetAllBugReports error:', error)

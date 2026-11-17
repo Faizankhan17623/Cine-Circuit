@@ -623,6 +623,12 @@ const Purchase = () => {
                     Only viewers can make a payment
                   </p>
                 )}
+                {/* Razorpay cannot create a 0-amount order, so a 100%-off coupon cannot be checked out yet */}
+                {appliedCoupon && totalAmount === 0 && (
+                  <p className="text-orange-400 text-xs text-center mt-2">
+                    This coupon makes the order free, which cannot be checked out online yet. Remove the coupon or use a different one.
+                  </p>
+                )}
               </div>
             </div>
           </div>

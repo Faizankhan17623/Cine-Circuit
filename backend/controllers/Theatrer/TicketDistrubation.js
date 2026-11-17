@@ -51,6 +51,13 @@ exports.TicketDistributionSystem = async (req, res) => {
                 success: false
             });
         }
+        // A theatre rejected after it was allotted a show must not keep selling it
+        if (TheatreFinding.status !== "Approved") {
+            return res.status(403).json({
+                message: "Your theatre is not approved by the admin",
+                success: false
+            });
+        }
 
         const allotment = TheatreFinding.allotments.find(a => a.showId.toString() === ShowId.toString());
         if (!allotment) {
@@ -85,20 +92,29 @@ exports.TicketDistributionSystem = async (req, res) => {
         }
         
         let totalTicketsCreated = 0
+        const categories = Theatrestickets.schema.path('ticketsCategory.category').enumValues
+        const seenCategories = new Set()
 
         for(const tickets of ticketsCreation){
-            if(Number(tickets.price) < TicketPrice){
+            // A negative or fractional count in one category would let another exceed the allotment
+            const count = Number(tickets?.numberOftickets)
+            const price = Number(tickets?.price)
+            if(!Number.isInteger(count) || count <= 0 || !Number.isFinite(price) || price <= 0 || !categories.includes(tickets?.category) || seenCategories.has(tickets.category)){
+                return res.status(400).json({
+                    message:`Each ticket entry needs a different category (${categories.join(', ')}), a positive whole numberOftickets and a positive price`,
+                    success:false
+                })
+            }
+            seenCategories.add(tickets.category)
+
+            if(price < TicketPrice){
                 return res.status(400).json({
                     message:`The price cannot be lower then the price that is been given by the orgainzer ${TicketPrice}`,
                     success:false
                 })
             }
 
-            if (!tickets.category || !tickets.numberOftickets || !tickets.price) {
-                    throw new Error("All ticket details (category, numberOftickets, price) are required");
-                }
-
-                 totalTicketsCreated += Number(tickets.numberOftickets)
+            totalTicketsCreated += count
         }
 
 

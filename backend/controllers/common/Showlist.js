@@ -1,5 +1,6 @@
 const CreateShow = require('../../models/CreateShow')
 const Theatre = require('../../models/Theatres')
+const escapeRegex = require('../../utils/escapeRegex')
 
 // THis is the function that is been created on the route of orgainezer on line no 15
 // it is also preseent in the user route 
@@ -130,14 +131,14 @@ exports.SearchAll = async (req, res) => {
         if (!q || q.trim().length < 2) {
             return res.status(400).json({ success: false, message: "Query must be at least 2 characters" })
         }
-        const regex = new RegExp(q.trim(), 'i')
+        const regex = new RegExp(escapeRegex(q), 'i')
 
         const [movies, theatres] = await Promise.all([
             CreateShow.find({ title: regex, uploaded: true, VerifiedByTheAdmin: true })
                 .select('_id title image')
                 .limit(6),
             Theatre.find({ Theatrename: regex, status: 'Approved', Verified: true })
-                .select('_id Theatrename locationname')
+                .select('_id Theatrename locationName')
                 .limit(6)
         ])
 

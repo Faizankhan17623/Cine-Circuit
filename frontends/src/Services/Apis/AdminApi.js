@@ -87,10 +87,6 @@ export const UnverifiedTheatres = {
     UnverifiedTheatres:BASE_URL+"/Unverified-Theatres"
 }
 
-export const DeleteComment={
-    deleteComment:BASE_URL+"/delete-Comment"
-}
-
 export const TheatreVerification = {
     Verify_Theatres:BASE_URL+"/Verify-Theatres"
 }

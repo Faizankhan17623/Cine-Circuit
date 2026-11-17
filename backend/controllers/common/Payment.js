@@ -6,7 +6,6 @@ const Theatrestickets = require('../../models/TheatresTicket');
 const Theatre = require('../../models/Theatres');
 const date = require('date-and-time');
 const crypto = require('crypto');
-const session = require('express-session');
 const mongoose = require('mongoose')
 const mailSender = require('../../utils/mailsender')
 const generatePDF = require('../../templates/userTemplates/sendPdf')
@@ -58,6 +57,8 @@ const finalizeWalletPayment = async (paymentId, userId) => {
         }
         await Theatrestickets.updateOne({ _id: paymentDoc.ticketid }, { $push: { ticketsPurchased: paymentDoc._id } }, { session })
         await USER.findByIdAndUpdate(userId, { $push: { PaymentId: paymentDoc._id } }, { session })
+        // Same as Verifypayment: the show records its purchases (ticketspurchased refs payments)
+        await CreateShow.findByIdAndUpdate(paymentDoc.showid, { $push: { ticketspurchased: paymentDoc._id } }, { session })
         if (paymentDoc.couponCode) await Coupon.findOneAndUpdate({ code: paymentDoc.couponCode }, { $inc: { usedCount: 1 }, $push: { usedBy: userId } }, { session })
         await earnPoints(userId, paymentDoc.walletAmountUsed, paymentDoc._id, session)
         await session.commitTransaction()
@@ -86,7 +87,7 @@ const buildTicketPdf = async (ticketData) => {
         _id: ticketData._id,
         movieName: MovieFind.title,
         theatreName: TheatreFind.Theatrename,
-        theatreLocation: TheatreFind.locationname,
+        theatreLocation: TheatreFind.locationName,
         Showdate: ticketData.Showdate,
         time: ticketData.time,
         purchaseDate: ticketData.purchaseDate,
@@ -124,19 +125,33 @@ const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, origi
 
     let refundId = null
     let refundStatus = 'failed'
+    let refundAmount = 0
 
+    let refund = null
     try {
-        const refund = await instance.payments.refund(razorpayPaymentId, {
+        refund = await instance.payments.refund(razorpayPaymentId, {
             amount: Math.round(paymentDoc.amount * 100),
             speed: "normal"
         })
-        refundId = refund.id
-        refundStatus = refund.status === "processed" ? "processed" : "pending"
-        if (paymentDoc.walletAmountUsed > 0) {
-            await creditWallet(userId, paymentDoc.walletAmountUsed, 'cancellation_refund', 'Refund of wallet portion after booking failure', paymentDoc._id)
-        }
     } catch (refundError) {
         console.error("Razorpay refund failed for lost-race charge, falling back to wallet credit:", refundError)
+    }
+
+    if (refund) {
+        refundId = refund.id
+        refundStatus = refund.status === "processed" ? "processed" : "pending"
+        refundAmount = paymentDoc.amount
+        // The bank refund already went out: a failure here must not trigger the full wallet fallback,
+        // which would pay the captured amount a second time. refundAmount then records the shortfall.
+        if (paymentDoc.walletAmountUsed > 0) {
+            try {
+                await creditWallet(userId, paymentDoc.walletAmountUsed, 'cancellation_refund', 'Refund of wallet portion after booking failure', paymentDoc._id)
+                refundAmount += paymentDoc.walletAmountUsed
+            } catch (walletError) {
+                console.error(`Wallet portion (${paymentDoc.walletAmountUsed}) of lost-race refund for payment ${paymentDoc._id} was not credited:`, walletError)
+            }
+        }
+    } else {
         try {
             await creditWallet(
                 userId,
@@ -147,6 +162,7 @@ const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, origi
             )
             refundId = 'wallet'
             refundStatus = 'processed'
+            refundAmount = paymentDoc.amount + (paymentDoc.walletAmountUsed || 0)
         } catch (walletError) {
             console.error("Wallet fallback credit also failed for lost-race charge:", walletError)
         }
@@ -162,7 +178,7 @@ const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, origi
             cancelledAt: ps,
             refundId,
             refundStatus,
-            refundAmount: refundStatus !== 'failed' ? paymentDoc.amount + (paymentDoc.walletAmountUsed || 0) : 0
+            refundAmount
         }
     )
 
@@ -184,6 +200,57 @@ const refundLostRaceCharge = async (paymentDoc, userId, razorpayPaymentId, origi
     }
 }
 exports.refundLostRaceCharge = refundLostRaceCharge
+
+// MakePayment debits the wallet before the Razorpay order exists, so whoever gives up on a still
+// unpaid ('created') payment must hand that wallet amount back, exactly once. Leaving 'created' and
+// crediting the wallet happen in one transaction, so of all racing closers (failed verification,
+// the expiry cron, an erroring verify) only the one whose update matched pays it back.
+const failAndReturnWallet = async (filter, update = {}) => {
+    const session = await mongoose.startSession()
+    try {
+        await session.withTransaction(async () => {
+            const failed = await Payment.findOneAndUpdate({ ...filter, Payment_Status: 'created' }, { ...update, Payment_Status: 'failure' }, { session })
+            if (failed?.walletAmountUsed > 0) {
+                await creditWallet(failed.userid, failed.walletAmountUsed, 'cancellation_refund', 'Refund of wallet portion for a booking that was not paid', failed._id, session)
+            }
+        })
+    } finally {
+        await session.endSession()
+    }
+}
+
+// Refunds a charge Razorpay captured for a booking that could not be completed, at most once;
+// recording razorpay_payment_id is the claim. The caller that moves the payment out of 'created'
+// refunds it in full. A payment already closed by the expiry cron or an erroring verify had its
+// wallet portion returned then, so only the captured amount is still owed.
+const refundCapturedCharge = async (paymentDoc, userId, razorpayPaymentId, error) => {
+    const open = await Payment.findOneAndUpdate({ _id: paymentDoc._id, Payment_Status: 'created' }, { Payment_Status: 'failure', razorpay_payment_id: razorpayPaymentId })
+    if (open) {
+        await refundLostRaceCharge(open, userId, razorpayPaymentId, error)
+        return true
+    }
+    const closed = await Payment.findOneAndUpdate({ _id: paymentDoc._id, Payment_Status: 'failure', razorpay_payment_id: null }, { razorpay_payment_id: razorpayPaymentId })
+    if (closed) {
+        await refundLostRaceCharge({ _id: closed._id, amount: closed.amount, walletAmountUsed: 0 }, userId, razorpayPaymentId, error)
+        return true
+    }
+    return false
+}
+exports.refundCapturedCharge = refundCapturedCharge
+
+// An abandoned Razorpay checkout leaves its payment 'created' forever, holding the wallet amount
+// MakePayment debited. Run by Background_Process/ExpireWalletPayments.js.
+exports.expireUnpaidWalletPayments = async () => {
+    const stale = await Payment.find({
+        Payment_Status: 'created',
+        walletAmountUsed: { $gt: 0 },
+        razorpay_order_id: { $not: /^wallet_/ },
+        createdAt: { $lt: new Date(Date.now() - 30 * 60 * 1000) }
+    }).select('_id')
+    for (const payment of stale) {
+        await failAndReturnWallet({ _id: payment._id }).catch(error => console.error(`Could not expire payment ${payment._id}:`, error.message))
+    }
+}
 
 // Student Features api kar ke ek page hain github main usko dekh lena agay payment ke isme kuch issue aaye to
 
@@ -582,6 +649,10 @@ exports.MakePayment = async(req,res) => {
                 ticketsPurchased: totalTickets[index],
                 seats: seatsPerCategory ? seatsPerCategory[category._id.toString()] : []
             }))
+        }).catch(async (createError) => {
+            // Without a payment record neither verification nor the expiry cron could return it
+            if (walletAmountUsed > 0) await creditWallet(userId, walletAmountUsed, 'admin_adjustment', 'Refund: payment record creation failed').catch(() => {})
+            throw createError
         });
         return res.status(200).json({
             message: "Order created successfully",
@@ -731,13 +802,14 @@ exports.Verifypayment = async(req,res) => {
                 // console.log(createTicket)
                 // Update user's payment record
 
-                await USER.findByIdAndUpdate(userId,{$push:{PaymentId:paymentId}})
+                await USER.findByIdAndUpdate(userId,{$push:{PaymentId:paymentId}},{ session })
 
                 // Increment coupon usage — only after confirmed successful payment
                 if (PaymentVerifier.couponCode) {
                     await Coupon.findOneAndUpdate(
                         { code: PaymentVerifier.couponCode },
-                        { $inc: { usedCount: 1 }, $push: { usedBy: userId } }
+                        { $inc: { usedCount: 1 }, $push: { usedBy: userId } },
+                        { session }
                     )
                 }
 
@@ -747,18 +819,12 @@ exports.Verifypayment = async(req,res) => {
                 // First successful booking unlocks the signup referral reward for both sides
                 await completeReferral(userId, PaymentVerifier._id, session)
 
-                const paymentIds = await Payment.findOne({_id: paymentId})
-                if(!paymentIds){
-                    return res.status(400).json({
-                        message:"The payment is not present",
-                        success:false
-                    })
-                }
-                await CreateShow.findByIdAndUpdate(paymentIds.showid,{
+                // updatedPayment was read inside this transaction; ticketspurchased refs payments, not users
+                await CreateShow.findByIdAndUpdate(updatedPayment.showid,{
                     $push:{
-                        ticketspurchased:userId
+                        ticketspurchased:updatedPayment._id
                     }
-                },{new:true})
+                },{new:true, session})
                 // let otp = 231321321
                 // const mailes = await mailSender(
                 //     UserFinders.email,
@@ -797,21 +863,27 @@ exports.Verifypayment = async(req,res) => {
                 });
 
             } catch (error) {
-                await session.abortTransaction();
-                session.endSession();
+                // abortTransaction itself throws if the error came after commitTransaction
+                if (session.inTransaction()) await session.abortTransaction();
 
                 // Razorpay already captured this payment (that's why we got here
                 // with a valid signature) — if the booking itself failed after
                 // that, e.g. someone else grabbed the same seat first, the user
                 // must not be left out of pocket. Refund automatically instead
                 // of just marking the payment as a silent failure.
-                await refundLostRaceCharge(PaymentVerifier, userId, razorpay_payment_id, error)
+                const refunded = await refundCapturedCharge(PaymentVerifier, userId, razorpay_payment_id, error)
+                // Nothing was refunded because a concurrent verification (e.g. the webhook) booked it
+                if (!refunded && await Payment.exists({ _id: PaymentVerifier._id, Payment_Status: 'success' })) {
+                    return res.status(200).json({ message: "Payment was already verified", success: true, idempotent: true })
+                }
 
                 return res.status(409).json({
                     message: `${error.message || "Booking could not be completed"}. Your payment has been refunded.`,
                     success: false,
                     status: "refunded"
                 });
+            } finally {
+                await session.endSession();
             }
         } else {
             // Payment verification failed - update status to failure
@@ -819,10 +891,9 @@ exports.Verifypayment = async(req,res) => {
             const pattern = date.compile('ddd, DD/MM/YYYY HH:mm:ss');
             const ps = date.format(now, pattern);
 
-            await Payment.findOneAndUpdate(
+            await failAndReturnWallet(
                 { razorpay_order_id },
                 {
-                    Payment_Status: "failure",
                     razorpay_payment_id: razorpay_payment_id || null,
                     razorpay_signature: razorpay_signature || null,
                     purchaseDate: ps,
@@ -853,10 +924,10 @@ exports.Verifypayment = async(req,res) => {
         const ps = date.format(now, pattern);
 
         try {
-            await Payment.findOneAndUpdate(
-                { razorpay_order_id: req.body.razorpay_order_id },
+            // Only ever closes this user's still-unpaid order (never a successful one) and returns its wallet amount
+            await failAndReturnWallet(
+                { razorpay_order_id: req.body.razorpay_order_id, userid: req.USER?.id },
                 {
-                    Payment_Status: "failure",
                     failureReason: error.message || "Payment verification failed",
                     paymentDate: ps
                 }

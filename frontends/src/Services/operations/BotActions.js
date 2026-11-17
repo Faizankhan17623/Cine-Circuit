@@ -9,6 +9,7 @@ import { CreateTheatrere } from '../Apis/TheatreApi';
 import { setToken, setLogin, setUser, setUserImage } from '../../Slices/authSlice';
 import { setuser } from '../../Slices/ProfileSlice';
 import { setStatus,setRejectedData , setAttempts, setEditUntil} from '../../Slices/orgainezerSlice';
+import { UserLogout } from './Auth';
 
 // ── Send OTP ──────────────────────────────────────────────────────────────────
 export async function botSendOtp(email) {
@@ -79,21 +80,9 @@ export async function botLogin(email, password, dispatch, navigate) {
 }
 
 // ── Logout ────────────────────────────────────────────────────────────────────
+// Same logout as the dashboard: clears every slice and disconnects the socket
 export function botLogout(dispatch) {
-  dispatch(setToken(null));
-  dispatch(setUser(null));
-  dispatch(setLogin(false));
-  dispatch(setuser(null));
-  dispatch(setStatus('pending'));
-  dispatch(setAttempts(0));
-  dispatch(setEditUntil(''));
-  dispatch(setRejectedData(null));
-  Cookies.remove('token');
-  localStorage.removeItem('token');
-  localStorage.removeItem('userImage');
-  localStorage.removeItem('user');
-  localStorage.removeItem('Verified');
-  localStorage.removeItem('Data_Submitted');
+  dispatch(UserLogout());
   return { success: true, message: 'You have been logged out successfully.' };
 }
 
@@ -146,12 +135,14 @@ export async function botCreateOrganizer(name, email, password, phone, otp, coun
 }
 
 // ── Create Theatre ────────────────────────────────────────────────────────────
-export async function botCreateTheatre(name, email, password) {
+export async function botCreateTheatre(name, email, password, phone, countrycode = '+91') {
   try {
     const res = await apiConnector('POST', CreateTheatrere.CreateTheatre, {
       name,
       email,
       password,
+      number: phone,
+      code: countrycode,
     });
     if (res.data.success) {
       return {
@@ -169,9 +160,9 @@ export async function botCreateTheatre(name, email, password) {
 // ── Search Movies ─────────────────────────────────────────────────────────────
 export async function botSearch(query) {
   try {
-    const res = await apiConnector('GET', SearchApi.search, null, {}, { query });
+    const res = await apiConnector('GET', SearchApi.search, null, {}, { q: query });
     if (res.data.success) {
-      const movies = res.data.data || [];
+      const movies = res.data.data?.movies || [];
       if (movies.length === 0) {
         return { success: true, message: `No movies found for "${query}".`, movies: [] };
       }

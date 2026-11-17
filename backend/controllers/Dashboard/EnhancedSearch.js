@@ -3,6 +3,10 @@ const Theatre = require('../../models/Theatres')
 const Theatrestickets = require('../../models/TheatresTicket')
 const genre = require('../../models/genre')
 const language = require('../../models/CreateLanguage')
+const escapeRegex = require('../../utils/escapeRegex')
+
+// Caps theatres, shows and results so one broad search cannot scan whole collections
+const MAX_RESULTS = 50
 
 /**
  * GET /Public-Genres-Languages
@@ -40,10 +44,10 @@ exports.EnhancedFinder = async (req, res) => {
 
         // ── Step 1: Find matching theatres ───────────────────────────────────
         const theatreQuery = {}
-        if (location && location.trim()) theatreQuery.locationName = { $regex: location.trim(), $options: 'i' }
-        if (theatreName && theatreName.trim()) theatreQuery.Theatrename = { $regex: theatreName.trim(), $options: 'i' }
+        if (location && location.trim()) theatreQuery.locationName = { $regex: escapeRegex(location), $options: 'i' }
+        if (theatreName && theatreName.trim()) theatreQuery.Theatrename = { $regex: escapeRegex(theatreName), $options: 'i' }
 
-        const theatres = await Theatre.find(theatreQuery, '_id Theatrename locationName')
+        const theatres = await Theatre.find(theatreQuery, '_id Theatrename locationName').limit(MAX_RESULTS)
         if (theatres.length === 0) {
             return res.status(200).json({ success: true, data: [], message: 'No theatres found' })
         }
@@ -54,13 +58,14 @@ exports.EnhancedFinder = async (req, res) => {
             AllotedToTheNumberOfTheatres: { $in: theatreIds },
             VerifiedByTheAdmin: true,
         }
-        if (movieName && movieName.trim()) showQuery.title = { $regex: movieName.trim(), $options: 'i' }
+        if (movieName && movieName.trim()) showQuery.title = { $regex: escapeRegex(movieName), $options: 'i' }
         if (genreId && genreId.trim()) showQuery.genre = genreId
         if (languageId && languageId.trim()) showQuery.language = languageId
 
         const shows = await CreateShow.find(showQuery, 'title genre language Posterurl AllotedToTheNumberOfTheatres _id')
             .populate('genre', 'genreName')
             .populate('language', 'name')
+            .limit(MAX_RESULTS)
 
         if (shows.length === 0) {
             return res.status(200).json({ success: true, data: [], message: 'No shows found' })
@@ -70,6 +75,7 @@ exports.EnhancedFinder = async (req, res) => {
         const results = []
 
         for (const show of shows) {
+            if (results.length >= MAX_RESULTS) break
             const allottedIds = show.AllotedToTheNumberOfTheatres.map(id => id.toString())
             const matchingTheatres = theatres.filter(t => allottedIds.includes(t._id.toString()))
 

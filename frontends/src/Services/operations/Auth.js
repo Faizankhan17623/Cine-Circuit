@@ -7,6 +7,10 @@ import {CreateUser,SendOtp,Login,ResetPassword,UpdatePersonalDetails,PersonalCho
 import {setShow,setlaoding,setallShow} from '../../Slices/ShowSlice.js'
 import Cookies from "js-cookie";
 import { disconnectSocket } from '../socket.js'
+import { resetcart } from '../../Slices/CartSlice.js'
+import { clearWatchlist } from '../../Slices/watchlistSlice.js'
+import { clearChat } from '../../Slices/chatSlice.js'
+import { clearNotifications } from '../../Slices/notificationSlice.js'
 // import {setuser} from '../../Slices/ProfileSlice.js'
 
 const {createuser} = CreateUser 
@@ -220,10 +224,11 @@ export function UserCreation(name,password,email,number,otp,code,referralCode){
         } catch (error) {
            console.log("Sign up failed");
            console.log(error)
-      console.error("Error in Creating the user", error.message);
-      toast.error(error.message || 'Signup failed'); 
-      return { success: false, error: error.message }; 
-        }finally {  
+      // The backend's reason (e.g. a wrong OTP), not axios' "Request failed with status code 400"; OTP.jsx shows it
+      const message = error?.response?.data?.message || error.message
+      console.error("Error in Creating the user", message);
+      return { success: false, error: message };
+        }finally {
 
         dispatch(setLoading(false))
         toast.dismiss(toastId)
@@ -285,6 +290,12 @@ export function UserLogout(){
             disconnectSocket()
             dispatch(setToken(null))
             dispatch(setUser(null))
+            // Clear the previous account's data so the next login on this browser does not see it
+            dispatch(setuser(null))
+            dispatch(resetcart())
+            dispatch(clearWatchlist())
+            dispatch(clearChat())
+            dispatch(clearNotifications())
             localStorage.removeItem('token')
             Cookies.remove('token');
             localStorage.removeItem('userImage')
@@ -380,7 +391,7 @@ export function Updateusername(name){
     }
 }
 
-export function Updatepassword(newpass,oldpass){
+export function Updatepassword(token,newpass,oldpass){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setloading(true))
@@ -389,26 +400,34 @@ export function Updatepassword(newpass,oldpass){
             const response = await apiConnector("PUT",UpdatePassword,{
                 newPassword:newpass,
                 oldPassword:oldpass
+            },{
+                Authorization: `Bearer ${token}`
             })
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
             toast.success("Password Updated Successfully")
+            return { success: true }
         } catch (error) {
-            toast.error(error?.response?.data?.message || "The old password is not correct")
+            toast.error(error?.response?.data?.message || error.message || "The old password is not correct")
+            return { success: false }
+        } finally {
+            dispatch(setloading(false))
+            toast.dismiss(toastId)
         }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
     }
 }
 
-export function Updateimage(image){
+export function Updateimage(token, image){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setloading(true))
         try {
-            const response = await apiConnector("PUT",UpdateImage,{
-                image:image
+            // backend reads the multipart field displayPicture
+            const formData = new FormData()
+            formData.append("displayPicture", image)
+            const response = await apiConnector("PUT",UpdateImage,formData,{
+                Authorization: `Bearer ${token}`
             })
             if (!response.data.success) {
                 throw new Error(response.data.message)
@@ -423,7 +442,7 @@ export function Updateimage(image){
     }
 }
 
-export function Updatenumber(newnumber, countrycode = "+91"){
+export function Updatenumber(token, newnumber, countrycode = "+91"){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setloading(true))
@@ -431,31 +450,38 @@ export function Updatenumber(newnumber, countrycode = "+91"){
             const response = await apiConnector("PUT",UpdateNumber,{
                 number:newnumber,
                 countrycode
+            },{
+                Authorization: `Bearer ${token}`
             })
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
 
             toast.success("Number Updated Successfully")
+            return { success: true }
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Error updating number")
+            toast.error(error?.response?.data?.message || error.message || "Error updating number")
+            return { success: false }
+        } finally {
+            dispatch(setloading(false))
+            toast.dismiss(toastId)
         }
-        dispatch(setloading(false))
-        toast.dismiss(toastId)
     }
 }
 
-export function GetCurrentUserDetails(){
+export function GetCurrentUserDetails(token){
     return async(dispatch)=>{
         const toastId = toast.loading("..loading")
         dispatch(setloading(true))
         try {
-            const response = await apiConnector("GET",CurrentUserDetails)
+            const response = await apiConnector("GET",CurrentUserDetails,null,{
+                Authorization: `Bearer ${token}`
+            })
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
 
-            dispatch(setUser(response.data.user))
+            dispatch(setUser(response.data.data))
         } catch (error) {
             toast.error(error?.response?.data?.message || "Error fetching user details")
         }
@@ -631,28 +657,6 @@ export function GetSpecificShowData(id){
             toast.error(error?.response?.data?.message || "Error fetching show")
         }
         dispatch(setlaoding(false))
-        toast.dismiss(toastId)
-    }
-}
-
-export function CommentOnBanner(id,comment){
-    return async(dispatch)=>{
-        const toastId = toast.loading("..loading")
-        dispatch(setloading(true))
-        try {
-            const response = await apiConnector("PUT",Comments,{
-                id,
-                comment:comment
-            })
-            if (!response.data.success) {
-                throw new Error(response.data.message)
-            }
-            toast.success("Comment Added Successfully")
-        } catch (error) {
-            console.log("Error in commenting on the banner",error)
-            console.log("Error in commenting on the banner")
-        }
-        dispatch(setloading(false))
         toast.dismiss(toastId)
     }
 }

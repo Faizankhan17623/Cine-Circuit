@@ -33,8 +33,8 @@ exports.CreateShow = async(req,res)=>{
         const userid = req.USER.id
 
         const {title,tagline,releasedate,genreid,subgenereid,languagename,castid=[],directorname,producername,writersname,totalbudget,hashid,Duration} = req.body
-        const image = req.files.image
-        const trailer = req.files.trailer
+        const image = req.files?.image
+        const trailer = req.files?.trailer
         // console.log('THis is the image ',image.size)
         // console.log("This is the trailer",trailer.size)
 
@@ -55,7 +55,7 @@ exports.CreateShow = async(req,res)=>{
         }
 
         
-        if(!req.files.image || !req.files.trailer || !req.files){
+        if(!image || !trailer){
             return res.status(400).json({
                 message:"The input fields of the images are been required",
                 success:false
@@ -281,7 +281,8 @@ exports.UpdateShowtitle = async(req,res)=>{
         }
 
         const owner = await USER.findById(req.USER.id).select('showsCreated')
-        const Finding = await CreateShow.findOne({_id:id, _id: { $in: owner?.showsCreated || [] }})
+        // $and keeps both _id conditions; a repeated _id key in one object silently drops the requested id
+        const Finding = await CreateShow.findOne({ $and: [{_id:id}, {_id: { $in: owner?.showsCreated || [] }}] })
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not presentplease rechek the id",
@@ -296,7 +297,7 @@ exports.UpdateShowtitle = async(req,res)=>{
             })
         }
         if(Finding.VerifiedByTheAdmin === false && Finding.uploaded === false){
-            const Updating = await CreateShow.findByIdAndUpdate(id,{title:newTitle},{new:true})
+            const Updating = await CreateShow.findByIdAndUpdate(Finding._id,{title:newTitle},{new:true})
             return res.status(200).json({
                 message:"The title is been updated",
                 success:true,
@@ -331,7 +332,7 @@ exports.UpdateShowtagline = async(req,res)=>{
 
         // console.log("This is the id",s)
         const owner = await USER.findById(req.USER.id).select('showsCreated')
-        const Finding = await CreateShow.findOne({_id:Showid, _id: { $in: owner?.showsCreated || [] }})
+        const Finding = await CreateShow.findOne({ $and: [{_id:Showid}, {_id: { $in: owner?.showsCreated || [] }}] })
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not present please recheck the id",
@@ -348,7 +349,7 @@ exports.UpdateShowtagline = async(req,res)=>{
 
         if(Finding.VerifiedByTheAdmin === false && Finding.uploaded === false){
             const Updating = await CreateShow.findByIdAndUpdate(
-                Showid,
+                Finding._id,
                 { tagline: newTagline },
                 { new: true }
             )
@@ -375,8 +376,14 @@ exports.UpdateShowtagline = async(req,res)=>{
 // This is the function that is present in the create show route on line 43
 exports.UpdateTitleImage = async(req,res)=>{
     try {
-        const newImage = req.files.newImage
+        const newImage = req.files?.newImage
         const id = req.query.id
+        if(!newImage){
+            return res.status(400).json({
+                message:"Please upload the new image",
+                success:false
+            })
+        }
 
         const Image_Format = ['png','jpeg','jpg']
        
@@ -408,7 +415,7 @@ exports.UpdateTitleImage = async(req,res)=>{
 
         
         const owner = await USER.findById(req.USER.id).select('showsCreated')
-        const Finding = await CreateShow.findOne({_id:id, _id: { $in: owner?.showsCreated || [] }})
+        const Finding = await CreateShow.findOne({ $and: [{_id:id}, {_id: { $in: owner?.showsCreated || [] }}] })
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not present please rechek the id",
@@ -421,7 +428,7 @@ exports.UpdateTitleImage = async(req,res)=>{
             let imageUpdating
             try {
                 imageUpdating = await uploadDatatoCloudinary(newImage,process.env.CLOUDINARY_FOLDER_NAME,1000,1000)
-                const updating = await CreateShow.findByIdAndUpdate(id,{Posterurl:imageUpdating.secure_url},{new:true})
+                const updating = await CreateShow.findByIdAndUpdate(Finding._id,{Posterurl:imageUpdating.secure_url},{new:true})
                 return res.json({
                     message:"The new image is been uploaded",
                     success:true
@@ -453,7 +460,13 @@ exports.UpdateTitleImage = async(req,res)=>{
 // This is the function that is present in the create show route on line 44
 exports.UpdateTitletrailer = async(req,res)=>{
     try {
-        const newTrailer = req.files.newTrailer
+        const newTrailer = req.files?.newTrailer
+        if(!newTrailer){
+            return res.status(400).json({
+                message:"Please upload the new trailer",
+                success:false
+            })
+        }
         
  const id = req.query.id
         
@@ -490,7 +503,7 @@ exports.UpdateTitletrailer = async(req,res)=>{
 
         
         const owner = await USER.findById(req.USER.id).select('showsCreated')
-        const Finding = await CreateShow.findOne({_id:id, _id: { $in: owner?.showsCreated || [] }})
+        const Finding = await CreateShow.findOne({ $and: [{_id:id}, {_id: { $in: owner?.showsCreated || [] }}] })
         if(!Finding){
             return res.status(400).json({
                 message:"This show is not present please rechek the id",
@@ -504,7 +517,7 @@ exports.UpdateTitletrailer = async(req,res)=>{
             try {
                 imageUpdating = await uploadDatatoCloudinary(newTrailer,process.env.CLOUDINARY_FOLDER_NAME)
                 let conversion =  convertSecondsToDuration(imageUpdating.duration)
-                const updating = await CreateShow.findByIdAndUpdate(id,{trailerurl:imageUpdating.secure_url,TotalDuration:conversion},{new:true})
+                const updating = await CreateShow.findByIdAndUpdate(Finding._id,{trailerurl:imageUpdating.secure_url,TotalDuration:conversion},{new:true})
                 return res.json({
                     message:"The new trailer is been uploaded",
                     success:true
@@ -546,13 +559,14 @@ exports.deleteShow = async(req,res)=>{
         }
 
         const owner = await USER.findById(req.USER.id).select('showsCreated')
-        const Deetion = await CreateShow.findOneAndDelete({_id: showId, _id: { $in: owner?.showsCreated || [] }})
+        const Deetion = await CreateShow.findOneAndDelete({ $and: [{_id: showId}, {_id: { $in: owner?.showsCreated || [] }}] })
         if(!Deetion){
             return res.status(400).json({
                 message:"The show is not been found",
                 success:false
             })
         }
+        await USER.updateOne({_id:req.USER.id},{$pull:{showsCreated:Deetion._id}})
         return res.status(200).json({
             message:"The show is been deleted",
             success:true,
@@ -582,6 +596,7 @@ exports.DeleteAllShow = async(req,res)=>{
         
         const owner = await USER.findById(userId).select('showsCreated')
         const Deletion = await CreateShow.deleteMany({_id:{$in: owner?.showsCreated || []}})
+        await USER.updateOne({_id:userId},{$pull:{showsCreated:{$in: owner?.showsCreated || []}}})
         if(!Deletion){
             return res.status(400).json({
                 message:"There are no shows to  deleted",
@@ -612,6 +627,15 @@ exports.DeleteAllShow = async(req,res)=>{
 
 // THis are not for now but for after wards 
 
+// CreateShow stores releasedate as "Mon, 05 May 2025" (seeded shows use "2025-12-25"). date-and-time 3.x
+// cannot parse the 'ddd' token, so the weekday is dropped before parsing.
+const parseReleaseDate = (value) => {
+    const text = String(value || '').replace(/^[A-Za-z]{3},\s*/, '')
+    const parsed = date.parse(text, 'DD MMM YYYY')
+    return isNaN(parsed.getTime()) ? date.parse(text, 'YYYY-MM-DD') : parsed
+}
+exports.parseReleaseDate = parseReleaseDate
+
 // These all are of the users not of the orgainzer
 exports.updateUpcomingToReleased = async () => {
     try {
@@ -624,7 +648,7 @@ exports.updateUpcomingToReleased = async () => {
         const upcomingMovies = await CreateShow.find({ movieStatus: "Upcoming" })
 
         const toUpdate = upcomingMovies.filter(movie => {
-            const parsed = date.parse(movie.releasedate, 'ddd, DD MMM YYYY')
+            const parsed = parseReleaseDate(movie.releasedate)
             if (!parsed || isNaN(parsed.getTime())) return false
             parsed.setHours(0, 0, 0, 0)
             return parsed <= currentDate
@@ -655,7 +679,7 @@ exports.updateReleasedToExpired = async () => {
 
         for(const movies of releasedMovies){
             // releasedate is stored as "Mon, 05 May 2025" — new Date() can't parse this format
-            const releaseDate = date.parse(movies.releasedate, 'ddd, DD MMM YYYY')
+            const releaseDate = parseReleaseDate(movies.releasedate)
             if (!releaseDate || isNaN(releaseDate.getTime())) {
                 console.log(`Skipping movie "${movies.title}" — could not parse releasedate: ${movies.releasedate}`)
                 continue

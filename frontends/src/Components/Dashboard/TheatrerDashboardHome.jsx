@@ -112,8 +112,8 @@ const TheatrerDashboardHome = () => {
           <div className="glass-card rounded-xl px-4 py-3 text-right flex-shrink-0">
             <p className="text-xs text-richblack-400">Theatre</p>
             <p className="text-sm font-semibold text-yellow-200 truncate max-w-[160px]">{theatreDetails.Theatrename || 'Your Theatre'}</p>
-            {theatreDetails.locationname && (
-              <p className="text-xs text-richblack-400 mt-0.5 truncate max-w-[160px]">{theatreDetails.locationname}</p>
+            {theatreDetails.locationName && (
+              <p className="text-xs text-richblack-400 mt-0.5 truncate max-w-[160px]">{theatreDetails.locationName}</p>
             )}
             <span className={`text-xs px-2 py-0.5 rounded-full border mt-1 inline-block ${
               theatreDetails.Verified

@@ -69,6 +69,14 @@ export function MakePayment(
         return;
       }
 
+      // The wallet covered everything: the booking is already confirmed and there is no Razorpay order
+      if (response.data.walletFullyPaid) {
+        toast.success("Payment Successful! Please check your dashboard for ticket details");
+        if (setPaymentLoading) setPaymentLoading(false);
+        if (navigate) setTimeout(() => navigate("/"), 1500);
+        return;
+      }
+
       const order = response.data.order;
       const paymentData = response.data.data;
 
@@ -94,6 +102,13 @@ export function MakePayment(
             )
           );
         },
+        modal: {
+          // Closing the checkout without paying must clear the "Processing" overlay
+          ondismiss: function () {
+            toast.dismiss(toastId);
+            if (setPaymentLoading) setPaymentLoading(false);
+          },
+        },
       };
 
       const paymentObject = new window.Razorpay(options);
@@ -109,10 +124,10 @@ export function MakePayment(
       const errorMessage = error?.response?.data?.message || "Payment Error";
       toast.error(errorMessage);
       if (setPaymentLoading) setPaymentLoading(false);
+    } finally {
+      toast.dismiss(toastId);
+      dispatch(setLoading(false));
     }
-
-    toast.dismiss(toastId);
-    dispatch(setLoading(false));
   };
 }
 
@@ -164,11 +179,11 @@ export function PaymentVerify(
       console.log(error);
       const errorMessage = error?.response?.data?.message || "Verification Error";
       toast.error(errorMessage);
+    } finally {
+      toast.dismiss(toastId);
+      dispatch(setLoading(false));
+      if (setPaymentLoading) setPaymentLoading(false);
     }
-
-    toast.dismiss(toastId);
-    dispatch(setLoading(false));
-    if (setPaymentLoading) setPaymentLoading(false);
   };
 }
 

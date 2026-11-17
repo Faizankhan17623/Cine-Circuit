@@ -10,7 +10,6 @@ const colors = require('colors')
 var morgan = require('morgan')
 const VisitorCounter = require('express-visitor-counter')
 const rateLimit  = require('express-rate-limit')
-const formData = require('express-form-data') // DISABLED: conflicts with express-fileupload (uses multiparty internally) and can consume the request stream twice, causing "BadRequestError: stream ended unexpectedly"
 const swaggerUi = require('swagger-ui-express')
 const swaggerSpec = require('./config/swagger')
 const mongoSanitize = require('mongo-sanitize')
@@ -18,8 +17,10 @@ const mongoSanitize = require('mongo-sanitize')
 require('./Background_Process/Shows/movieStatusCronjobs')
 require('./Background_Process/Tickets/Tickets')
 require('./Background_Process/ReturnnsoldTickets')
+require('./Background_Process/ExpireWalletPayments')
 
 const app = express()
+app.set('query parser', 'extended') // Express 5 defaults to 'simple'; keep Express 4 qs parsing (a[b]=1)
 app.use(helmet())
 // Taking extra precautions if the first two are blocked then in this case we will use the third one if the user has blocked first two
 const port = process.env.DEFAULT_PORT_NUMBER || process.env.SECOND_NUMBER || 4003
@@ -93,8 +94,9 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 // Strip MongoDB operators ($gt, $where, $ne, etc.) from all incoming req.body, req.query, req.params
 // This blocks NoSQL injection attacks before any route handler runs
 app.use((req, res, next) => {
-    req.body   = mongoSanitize(req.body)
-    req.query  = mongoSanitize(req.query)
+    req.body   = mongoSanitize(req.body ?? {}) // Express 5 leaves req.body undefined when no body was sent
+    // Express 5: req.query is a getter that re-parses on every read, so a plain assignment is silently dropped
+    Object.defineProperty(req, 'query', { value: mongoSanitize(req.query), writable: true, configurable: true, enumerable: true })
     req.params = mongoSanitize(req.params)
     next()
 })
@@ -113,16 +115,23 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     customCss: '.swagger-ui .topbar { background: linear-gradient(to right, #7c3aed, #db2777); }',
 }))
 
-// app.use(formData.parse()) // DISABLED: express-form-data (multiparty) conflicts with express-fileupload. Using both can end the stream unexpectedly. Use express-fileupload for handling file uploads globally or apply middleware per-route if needed.
 
 // Dynamic sitemap — includes all verified movies for Google indexing
 const { GenerateSitemap } = require('./controllers/common/Sitemap')
 app.get('/sitemap.xml', GenerateSitemap)
 
-app.use('/',(req,res)=>{
+app.get('/',(req,res)=>{
     res.status(200).json({
         message:`This is the default route for the backend`,
         success:true
+    })
+})
+
+// Unknown URLs must fail visibly instead of answering 200 success:true
+app.use((req,res)=>{
+    res.status(404).json({
+        message:'Route not found',
+        success:false
     })
 })
 

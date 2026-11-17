@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const ticketTemplate = (data) => {
     let timeChnage = data.time;
     if (timeChnage) {
@@ -572,22 +574,22 @@ const ticketTemplate = (data) => {
                                         <div class="summary-row">
                                             <span class="summary-icon">&#127916;</span>
                                             <span class="summary-label">Show Date</span>
-                                            <span class="summary-value">${data.Showdate || 'N/A'}</span>
+                                            <span class="summary-value">${escapeHtml(data.Showdate || 'N/A')}</span>
                                         </div>
                                         <div class="summary-row">
                                             <span class="summary-icon">&#128336;</span>
                                             <span class="summary-label">Show Time</span>
-                                            <span class="summary-value">${timeChnage || 'N/A'}</span>
+                                            <span class="summary-value">${escapeHtml(timeChnage || 'N/A')}</span>
                                         </div>
                                         <div class="summary-row">
                                             <span class="summary-icon">&#127903;</span>
                                             <span class="summary-label">Tickets Purchased</span>
-                                            <span class="summary-value">${data.totalTicketpurchased || 0}</span>
+                                            <span class="summary-value">${escapeHtml(data.totalTicketpurchased || 0)}</span>
                                         </div>
                                         <div class="summary-row">
                                             <span class="summary-icon">&#128176;</span>
                                             <span class="summary-label">Purchased At</span>
-                                            <span class="summary-value">${purchaseDates || 'N/A'}</span>
+                                            <span class="summary-value">${escapeHtml(purchaseDates || 'N/A')}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -598,18 +600,18 @@ const ticketTemplate = (data) => {
                                 <div class="amount-card">
                                     <div class="amount-left">
                                         <p class="amount-label">Total Amount Paid</p>
-                                        <p class="amount-value">&#8377;${data.amount || 0}</p>
+                                        <p class="amount-value">&#8377;${escapeHtml(data.amount || 0)}</p>
                                     </div>
                                     <div class="amount-right">
                                         <span class="payment-badge">Paid</span>
-                                        <p class="payment-method">via ${data.paymentMethod || 'Online'}</p>
+                                        <p class="payment-method">via ${escapeHtml(data.paymentMethod || 'Online')}</p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Download Button -->
                             <div class="download-section">
-                                <a href="https://cine-circuit-backend.onrender.com/api/v1/Payment/download/${data._id}" class="download-btn">
+                                <a href="https://cine-circuit-backend.onrender.com/api/v1/Payment/download/${encodeURIComponent(data._id ?? '')}" class="download-btn">
                                     &#11015; &nbsp; Download Tickets
                                 </a>
                                 <p class="download-hint">

@@ -1,3 +1,4 @@
+const clampLimit = require('../../utils/clampLimit')
 const AuditLog = require('../../models/AuditLog')
 const logAudit  = require('../../utils/logAudit')
 
@@ -11,6 +12,7 @@ const GetAuditLogs = async (req, res) => {
             page  = 1,
             limit = 30,
         } = req.query
+        const pageSize = clampLimit(limit, 30)
 
         const filter = {}
         if (action)   filter.action   = action
@@ -24,13 +26,13 @@ const GetAuditLogs = async (req, res) => {
             if (dateTo)   filter.createdAt.$lte = new Date(dateTo)
         }
 
-        const skip = (parseInt(page) - 1) * parseInt(limit)
+        const skip = (parseInt(page) - 1) * pageSize
 
         const [logs, total] = await Promise.all([
             AuditLog.find(filter)
                 .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(parseInt(limit))
+                .limit(pageSize)
                 .lean(),
             AuditLog.countDocuments(filter),
         ])
@@ -40,7 +42,7 @@ const GetAuditLogs = async (req, res) => {
             data: logs,
             total,
             page: parseInt(page),
-            totalPages: Math.ceil(total / parseInt(limit)),
+            totalPages: Math.ceil(total / pageSize),
         })
     } catch (error) {
         console.log('GetAuditLogs error:', error)

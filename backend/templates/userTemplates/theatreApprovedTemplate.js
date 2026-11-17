@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const theatreApprovedTemplate = (theatreName, ownerName) => {
 	return `<!DOCTYPE html>
 <html lang="en">
@@ -424,8 +426,8 @@ const theatreApprovedTemplate = (theatreName, ownerName) => {
                         <!-- Content -->
                         <div class="content">
                             <p class="greeting">
-                                Hi${ownerName ? ' <strong style="color: #ffffff;">' + ownerName + '</strong>' : ''},<br><br>
-                                Great news! Your theatre <strong style="color: #e50914;">${theatreName || 'Theatre'}</strong>
+                                Hi${ownerName ? ' <strong style="color: #ffffff;">' + escapeHtml(ownerName) + '</strong>' : ''},<br><br>
+                                Great news! Your theatre <strong style="color: #e50914;">${escapeHtml(theatreName || 'Theatre')}</strong>
                                 has been reviewed and <strong style="color: #2ecc71;">approved</strong> by our admin team.
                                 Your theatre is now verified and ready to host movie screenings on Cine Circuit.
                             </p>
@@ -435,7 +437,7 @@ const theatreApprovedTemplate = (theatreName, ownerName) => {
                         <div class="theatre-section">
                             <div class="theatre-card">
                                 <span class="theatre-badge">&#10003; &nbsp; Verified Theatre</span>
-                                <p class="theatre-name">${theatreName || 'Your Theatre'}</p>
+                                <p class="theatre-name">${escapeHtml(theatreName || 'Your Theatre')}</p>
                                 <p class="theatre-text">Your theatre is now active and can receive show allotments from organizers.</p>
                             </div>
                         </div>

@@ -40,7 +40,7 @@ export function Creation(name,password,email,number,otp,code){
         }catch(error){
             console.log("Error in Creating the orgainezer",error)
             console.log("Error in Creating the orgainezer",error.message)
-            return { success: false, error: error.message };
+            return { success: false, error: error?.response?.data?.message || error.message };
         }
         finally {
             dispatch(setLoading(false));
@@ -62,6 +62,12 @@ export function OrgainezerLogin(email,password,navigate){
                 email:email,
                 password:password
             })
+
+            // Check before storing anything: a 200 with success:false has no token or user
+            if(!response.data.success){
+                toast.error(response.data.message)
+                return
+            }
 
             // console.log("THis is the response",response)
                  console.log("User is been logged in ")
@@ -90,11 +96,6 @@ export function OrgainezerLogin(email,password,navigate){
                       localStorage.setItem('Verified', JSON.stringify(response.data.user.verified))
                       localStorage.setItem('userImage', userimage)
 
-
-            if(!response.data.success){
-                toast.error(response.data.message)
-                return
-            }
 
             navigate('/Dashboard/My-Profile')
         }catch(error){
@@ -584,7 +585,7 @@ export function MakeTicket  (ShowId, totalticket,price)  {
       // Handle success
       if (response?.data?.success) {
         toast.success(response.data.message);
-        return response.data.data; // Return ticket data if needed
+        return { success: true, data: response.data.data };
       } else {
         toast.error(response?.data?.message || "Failed to create ticket");
       }
@@ -657,7 +658,7 @@ export function AllotTickets(showid, theatreid, totaltoallot) {
       // Handle success
       if (response?.data?.success) {
         toast.success(response.data.message);
-        return response.data.data; // Return allotment data if needed
+        return { success: true, data: response.data.data };
       } else {
         toast.error(response?.data?.message || "Failed to allot tickets");
       }
@@ -705,7 +706,7 @@ export function VerifiedTheatres (token,navigate){
       // Handle success
       if (response?.data?.success) {
         toast.success(response.data.message);
-        return response.data.data; // Return allotment data if needed
+        return { success: true, data: response.data.data };
       } else {
         toast.error(response?.data?.message || "Failed to Get theatres date");
       }

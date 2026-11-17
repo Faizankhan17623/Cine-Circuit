@@ -63,7 +63,6 @@ exports.CreateTheatrere = async(req,res)=>{
             confirmpass:PasswordCreation,
             email:email,
             usertype:'Theatrer',
-            verified:true,
             number:number,
             image:`https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
             createdAt:ps,

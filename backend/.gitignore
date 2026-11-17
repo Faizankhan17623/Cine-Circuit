@@ -7,7 +7,6 @@ node_modules
 .DS_Store
 npm-debug.log*
 
-package-lock.json
 
 # Seeder / dev-only scripts
 seeder.js

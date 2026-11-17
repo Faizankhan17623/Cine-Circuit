@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const imageUpdationEmail = (username, imageUrl) => {
 	return `<!DOCTYPE html>
 	<html lang="en">
@@ -388,7 +390,7 @@ const imageUpdationEmail = (username, imageUrl) => {
 								<h1 class="title">Profile Image Updated</h1>
 								<p class="subtitle">Your profile picture has been changed successfully</p>
 								<p class="greeting">
-									Hi <strong style="color: #ffffff;">${username}</strong>,<br><br>
+									Hi <strong style="color: #ffffff;">${escapeHtml(username)}</strong>,<br><br>
 									Your profile image on <strong style="color: #e50914;">Cine Circuit</strong> has been updated successfully.
 									Here's a preview of your new profile picture.
 								</p>
@@ -399,7 +401,7 @@ const imageUpdationEmail = (username, imageUrl) => {
 								<div class="image-card">
 									<p class="image-label">New Profile Picture</p>
 									<div class="profile-image-wrapper">
-										<img src="${imageUrl}" alt="Updated Profile Image" class="profile-image" width="120" height="120">
+										<img src="${escapeHtml(imageUrl)}" alt="Updated Profile Image" class="profile-image" width="120" height="120">
 									</div>
 									<p class="image-status">
 										<span>&#10003;</span> Updated Successfully
@@ -412,7 +414,7 @@ const imageUpdationEmail = (username, imageUrl) => {
 								<div class="details-box">
 									<div class="detail-row">
 										<span class="detail-label">Account</span>
-										<span class="detail-value">${username}</span>
+										<span class="detail-value">${escapeHtml(username)}</span>
 									</div>
 									<div class="detail-divider"></div>
 									<div class="detail-row">

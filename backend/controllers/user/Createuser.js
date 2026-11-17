@@ -210,8 +210,8 @@ exports.updateUserName = async(req,res)=>{
         // console.log(userFindgin.lastUsernameUpdate)
         
         if(Finding){
-            return res.status(404).json({
-                message:"The old and the new username both are the same please take a different one",
+            return res.status(409).json({
+                message:"This username is already taken, please choose a different one",
                 success:false
             })
         }
@@ -328,7 +328,7 @@ exports.updatePassword = async(req,res)=>{
 exports.UpdateImage= async(req,res)=>{
     try {
 
-        const displayPicture = req.files.displayPicture
+        const displayPicture = req.files?.displayPicture
         // console.log(displayPicture)
         const user = req.USER
         const max_upload_size = 10

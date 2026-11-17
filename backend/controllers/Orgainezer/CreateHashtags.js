@@ -76,7 +76,7 @@ exports.updateTagsname = async(req,res)=>{
             })
         }
 
-        const Finding  = await hashtags.findOne({_id:id})
+        const Finding  = await hashtags.findOne({_id:id, userid:req.USER.id})
         if(!Finding){
             return res.status(400).json({
                 message:"There is an error in the update tag name code",
@@ -84,7 +84,7 @@ exports.updateTagsname = async(req,res)=>{
             })
         }
 
-        const updating = await hashtags.findByIdAndUpdate(id,{name:newName},{new:true})
+        const updating = await hashtags.findByIdAndUpdate(Finding._id,{name:newName},{new:true})
         return res.status(200).json({
             message:'The hashtags is been updated',
             success:true,
@@ -102,9 +102,9 @@ exports.updateTagsname = async(req,res)=>{
 // This is the function that is present in the create show route on line no 14
 exports.DeleteTagsname = async(req,res)=>{
     try{
-        const id = req.body
+        const {id} = req.body
 
-        const Finding = await hashtags.findOne({_id:id})
+        const Finding = await hashtags.findOne({_id:id, userid:req.USER.id})
         if(!Finding){
             return res.status(400).json({
                 message:"The hashtags is not been found",
@@ -113,7 +113,7 @@ exports.DeleteTagsname = async(req,res)=>{
         }
 
 
-        const deletion = await hashtags.findByIdAndDelete(id,{new:true})
+        const deletion = await hashtags.findByIdAndDelete(Finding._id)
         return res.status(200).json({
             message:"The hashtags is been deleted",
             success:true,
@@ -161,8 +161,9 @@ exports.SearchTags = async (req,res)=>{
     try {
         const userId = req.USER.id
 
-        const name = req.body
-        if(!name){
+        // GET request: the frontend sends ?name=
+        const { name } = req.query
+        if(!name || typeof name !== 'string'){
             return res.status(400).json({
                 message:"The input name is been required",
                 success:false

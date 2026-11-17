@@ -51,3 +51,7 @@ export const GetSingleShowDetailss = {
 export const CheckInStats = {
     checkinstats:BASE_URL+"/Check-In-Stats"
 }
+
+export const CheckIn = {
+    checkin:BASE_URL+"/Check-In"
+}

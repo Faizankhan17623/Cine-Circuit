@@ -6,6 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Loader from '../extra/Loading';
 import { FindUserName, NumberFinder, finduseremail,sendOtp } from '../../Services/operations/Auth';
 import { validateReferralCode } from '../../Services/operations/Referral';
+import { setSignupData } from '../../Slices/authSlice';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import Join from './Join'
@@ -154,10 +155,10 @@ const User = () => {
         const Response = await dispatch(sendOtp(email))
         if (Response?.success) {
           toast.success('OTP sent successfully');
-        return Response.data.data.data;
+        return true;
         } else {
            toast.error(Response.error || 'OTP send failed');
-        return null;
+        return false;
         }
       } catch (error) {
         console.error("Error sending OTP:", error);
@@ -191,17 +192,14 @@ const User = () => {
     };
        setData(finalData)
        setMail(data.Email)
-         const otp = await sendOTP(data.Email);
-      if (!otp) return;
+         // The OTP only goes to the user's inbox; the backend checks it when the account is created
+         const sent = await sendOTP(data.Email);
+      if (!sent) return;
 
        setShowOtp(true)
-       navigate("/OTP",{
-        state: {
-            otp,
-            mail: data.Email,
-            data: finalData,
-  },
-})
+       // In memory (redux), not router state, so the password never lands in browser history
+       dispatch(setSignupData(finalData))
+       navigate("/OTP")
 setShowOtp(false)
       }catch(error){
         console.error("User creation error:", error);

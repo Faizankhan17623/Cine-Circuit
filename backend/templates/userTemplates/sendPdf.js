@@ -21,7 +21,9 @@ const generatePDF = async (htmlTemplate) => {
     const browser = await getBrowser();
     const page = await browser.newPage();
     try {
-        await page.setContent(htmlTemplate, { waitUntil: 'networkidle0', timeout: 30000 });
+        // The ticket is static HTML with only data: URL images: no scripts to run, nothing to fetch
+        await page.setJavaScriptEnabled(false);
+        await page.setContent(htmlTemplate, { waitUntil: 'load', timeout: 30000 });
         const buffer = await page.pdf({
             format: 'A4',
             margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },

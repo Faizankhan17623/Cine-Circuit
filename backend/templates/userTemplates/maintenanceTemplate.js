@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const maintenanceTemplate = ({ message, endTime }) => {
     const formattedEnd = endTime
         ? new Date(endTime).toLocaleString('en-IN', {
@@ -307,7 +309,7 @@ const maintenanceTemplate = ({ message, endTime }) => {
                         <!-- Message Box -->
                         <div class="message-wrapper">
                             <div class="message-box">
-                                <p>${message}</p>
+                                <p>${escapeHtml(message)}</p>
                             </div>
                         </div>
 
@@ -315,7 +317,7 @@ const maintenanceTemplate = ({ message, endTime }) => {
                         <div class="time-wrapper">
                             <div class="time-box">
                                 <p class="time-label">Expected Back Online</p>
-                                <p class="time-value">${formattedEnd}</p>
+                                <p class="time-value">${escapeHtml(formattedEnd)}</p>
                             </div>
                         </div>
 

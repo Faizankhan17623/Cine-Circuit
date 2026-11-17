@@ -51,7 +51,6 @@ const UserManagement = () => {
  maxDay.setDate(maxDay.getDate() + 31)
  const Max_Date = maxDay.toISOString().split('T')[0]
 
- const ORgId = searchParams.get("id")
 
   useEffect(()=>{
     const ApiCall = async()=>{
@@ -76,6 +75,7 @@ const UserManagement = () => {
   },[token,navigate,dispatch])
 
 
+  // Rows are Orgdata docs: _id is the form record, id is the organizer's user id, which every admin endpoint expects
   const AcceptOrg = async (id)=>{
      if (!token) return;
       setloading(true)
@@ -84,7 +84,7 @@ const UserManagement = () => {
        if (response?.success) {
 // \         console.log(response)
          toast.success("Organizer approved successfully")
-         setOrgdata(prev => prev.map(o => o._id === id ? {...o, status: 'Approved'} : o))
+         setOrgdata(prev => prev.map(o => o.id === id ? {...o, status: 'Approved'} : o))
          setShowDetail(false)
        }
     }catch(error){
@@ -397,14 +397,14 @@ const UserManagement = () => {
                   <tr
                     key={org._id}
                     className={`border-b border-gray-700/20 hover:bg-white/[0.03] transition ${
-                      selectedIds.includes(org._id) ? 'bg-purple-500/[0.05]' : ''
+                      selectedIds.includes(org.id) ? 'bg-purple-500/[0.05]' : ''
                     }`}
                   >
                     <td className="p-4">
                       <input
                         type="checkbox"
-                        checked={selectedIds.includes(org._id)}
-                        onChange={() => toggleSelectId(org._id)}
+                        checked={selectedIds.includes(org.id)}
+                        onChange={() => toggleSelectId(org.id)}
                         className="accent-purple-500 cursor-pointer w-4 h-4"
                       />
                     </td>
@@ -464,7 +464,7 @@ const UserManagement = () => {
                         {(org.status === 'pending' || org.status === 'rejected') && (
                           <>
                             <button
-                              onClick={() => AcceptOrg(org._id)}
+                              onClick={() => AcceptOrg(org.id)}
                               title="Approve"
                               className="p-2 rounded-lg hover:bg-green-500/20 text-green-400 transition"
                             >
@@ -481,7 +481,7 @@ const UserManagement = () => {
                           </>
                         )}
                         <button
-                          onClick={() => openDeleteModal(org._id)}
+                          onClick={() => openDeleteModal(org.id)}
                           title="Delete"
                           className="p-2 rounded-lg hover:bg-red-500/20 text-red-400/70 hover:text-red-400 transition"
                         >
@@ -961,7 +961,7 @@ const UserManagement = () => {
                 <>
                   <button
                     onClick={() => {
-                      AcceptOrg(ORgId)
+                      AcceptOrg(selectedOrg.id)
                       setSearchParams({ id: searchParams.get("id"), status : "Approved"});
                     }}
                     className="flex-1 bg-green-600 hover:bg-green-500 text-white py-3 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"

@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const updateNumberTemplate = (username, number) => {
 	return `<!DOCTYPE html>
 	<html lang="en">
@@ -390,7 +392,7 @@ const updateNumberTemplate = (username, number) => {
 								<h1 class="title">Phone Number Updated</h1>
 								<p class="subtitle">Your mobile number has been changed successfully</p>
 								<p class="greeting">
-									Hi <strong style="color: #ffffff;">${username}</strong>,<br><br>
+									Hi <strong style="color: #ffffff;">${escapeHtml(username)}</strong>,<br><br>
 									Your phone number linked to your <strong style="color: #e50914;">Cine Circuit</strong>
 									account has been updated successfully. Here are the details of the change.
 								</p>
@@ -404,7 +406,7 @@ const updateNumberTemplate = (username, number) => {
 									</div>
 									<div class="number-body">
 										<p class="number-label">New Mobile Number</p>
-										<p class="number-value">${number}</p>
+										<p class="number-value">${escapeHtml(number)}</p>
 										<p class="number-status">&#10003; Verified & Updated</p>
 									</div>
 								</div>
@@ -415,7 +417,7 @@ const updateNumberTemplate = (username, number) => {
 								<div class="details-box">
 									<div class="detail-row">
 										<span class="detail-label">Account</span>
-										<span class="detail-value">${username}</span>
+										<span class="detail-value">${escapeHtml(username)}</span>
 									</div>
 									<div class="detail-divider"></div>
 									<div class="detail-row">

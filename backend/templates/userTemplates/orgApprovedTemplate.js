@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const orgApprovedTemplate = (username) => {
 	return `<!DOCTYPE html>
 	<html lang="en">
@@ -417,7 +419,7 @@ const orgApprovedTemplate = (username) => {
 							<!-- Content -->
 							<div class="content">
 								<p class="greeting">
-									Hi${username ? ' <strong style="color: #ffffff;">' + username + '</strong>' : ''},<br><br>
+									Hi${username ? ' <strong style="color: #ffffff;">' + escapeHtml(username) + '</strong>' : ''},<br><br>
 									Great news! Your organizer verification request on <strong style="color: #e50914;">Cine Circuit</strong>
 									has been reviewed and <strong style="color: #2ecc71;">approved</strong> by our admin team.
 									You now have full access to the organizer dashboard and all its features.

@@ -1,13 +1,22 @@
 // ProfileSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
+// A corrupt stored value (e.g. "undefined") must not crash every page load
+const readStored = (key) => {
+  try {
+    return JSON.parse(localStorage.getItem(key));
+  } catch {
+    return null;
+  }
+};
+
 const initialState = {
   loading: false,
   likes: 0,
   dislikes: 0,
   cooldownDate: localStorage.getItem("cooldownDate") || null, // ⬅️ CHANGED - Added cooldown
-  user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null,
-  verification : localStorage.getItem("Verified") ? JSON.parse(localStorage.getItem("Verified")) : null,
+  user: readStored("user"),
+  verification : readStored("Verified"),
   FormSubmitted:localStorage.getItem("Data_Submitted") || null
 };
 
@@ -25,6 +34,12 @@ const ProfileSlice = createSlice({
       state.dislikes = value.payload;
     },
     setuser: (state, value) => {
+      // setuser(null) is how logout clears the profile
+      if (!value.payload) {
+        state.user = null;
+        localStorage.removeItem("user");
+        return;
+      }
       const safeUser = {
         // userName: value.payload.userName,
         usertype: value.payload.usertype,
@@ -58,16 +73,13 @@ const ProfileSlice = createSlice({
       }
 
        if (storedCooldown) {
-    try {
-      state.cooldownDate = JSON.parse(storedCooldown); // <-- Parse properly
-    } catch (error) {
-      console.error("Error parsing cooldownDate from localStorage", error);
-      localStorage.removeItem("cooldownDate");
-    }
+      // stored as a raw ISO string by setCooldownDate, not JSON
+      state.cooldownDate = storedCooldown;
   }
     },
     setsubmit:(state,action)=>{
-      localStorage.setItem("Data Submitted",true)
+      state.FormSubmitted = "true"
+      localStorage.setItem("Data_Submitted", "true")
     }
 
   }

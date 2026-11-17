@@ -1,3 +1,5 @@
+const escapeHtml = require('../../utils/escapeHtml')
+
 const passwordChangedTemplate = (email) => {
 	return `<!DOCTYPE html>
 <html lang="en">
@@ -337,7 +339,7 @@ const passwordChangedTemplate = (email) => {
                             <h1 class="title">Password Changed!</h1>
                             <p class="subtitle">Your password has been updated successfully</p>
                             <p class="greeting">
-                                Hi <strong style="color: #ffffff;">${email}</strong>,<br><br>
+                                Hi <strong style="color: #ffffff;">${escapeHtml(email)}</strong>,<br><br>
                                 Your password for <strong style="color: #e50914;">Cine Circuit</strong>
                                 has been changed successfully. You can now log in with your new password.
                             </p>
