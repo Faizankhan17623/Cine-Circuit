@@ -35,7 +35,7 @@
     "node-cron": "^4.6.0",
     "nodemailer": "^10.6.0",
     "otp-generator": "^4.0.1",
-    "puppeteer": "^24.43.1",
+    "puppeteer": "^25.17.0",
     "qrcode": "^1.5.4",
     "razorpay": "^2.9.8",
     "socket.io": "^4.8.4",
